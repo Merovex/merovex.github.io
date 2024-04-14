@@ -1,0 +1,96 @@
+---
+layout: default
+title: 'Ben Wilson, author'
+pagination:
+enabled: true
+---
+{% include biography.html %}
+<div class="mb-12"></div>
+
+<section class="mb-20 low-res-bg"
+  style="background: url(/assets/images/merovex_simple_star_field_in_the_depths_of_space_with_a_nebula__f2d9548b-46a6-427c-8257-0e185883a3e2-a-lowres.avif) center right; background-size: cover;">
+  <div
+    class="relative flex w-full overflow-x-auto shadow-inner gap-6 snap-x snap-mandatory p-14 xbg-indigo-200/20 text-white"
+    style="text-shadow: 1px 1px 1px #000">
+    <div class="snap-center shrink-0">
+      <div class="w-4 shrink-0 sm:w-48"></div>
+    </div>
+    {%- for book in site.books %}
+    {%- if book.draft != true %}
+    <div class="snap-center shrink-0 first:pl-8 last:pr-8">
+      <a href="{{ book.url }}" class="rounded ">
+        {% if book.cover_image %}
+        {% assign file_parts = book.cover_image | split: '.' %}
+        {% assign fallback_image = file_parts[0] | append: '.' | append: 'jpg' %}
+        {% assign filename = file_parts[0] %}
+        {% assign extension = file_parts[1] %}
+        {% assign thumbnail_image = filename | append: '-thumbnail' | append: '.' | append: extension %}
+        {% assign mobile_thumbnail_image = filename | append: '-thumbnail-mobile' | append: '.' | append: extension %}
+        <picture>
+          <source media="(max-width: 799px)" type="image/avif"
+            srcset="/assets/images/covers/{{ mobile_thumbnail_image }}">
+          <source media="(min-width: 800px)" type="image/avif" srcset="/assets/images/covers/{{ thumbnail_image }}">
+          <img src="/assets/images/covers/{{fallback_image}}" alt="" class="h-[360px] w-[240px] m-4 rounded shadow-xl">
+        </picture>
+        {% else %}
+        <picture>
+          <source type="image/avif" srcset="/assets/images/no-cover.avif">
+          <img src="/assets/images/no-cover.jpg" alt="" class="h-[360px] w-[240px] m-4 rounded shadow-xl" />
+        </picture>
+
+        {% endif %}
+        <h3 class="h3 text-center">{{ book.title }}</h3>
+      </a>
+    </div>
+    {% endif %}
+    {%- endfor %}
+    <div class="snap-center shrink-0">
+      <div class="w-4 shrink-0 sm:w-48"></div>
+    </div>
+  </div>
+</section>
+
+{% for post in paginator.posts %}
+{% unless post.categories contains 'unlisted' %}
+{% include post-card.html %}
+{% endunless %}
+{% endfor %}
+
+<div class="pagination flex justify-around">
+  {% if paginator.previous_page %}
+  <a href="{{ paginator.previous_page_path }}" class="bordered hidden rounded-full px-4 py-2">
+    Previous
+  </a>
+  {% else %}
+  <span class="previous hidden">Previous</span>
+  {% endif %}
+  <span class="page_number hidden ">
+    Page: {{ paginator.page }} of {{ paginator.total_pages }}
+  </span>
+  {% if paginator.next_page %}
+  <a href="{{ paginator.next_page_path }}" class="border border-gray-500 rounded-full px-4 py-2">See more posts »</a>
+  {% else %}
+  <span class="next ">Next</span>
+  {% endif %}
+</div>
+
+<script>
+  window.addEventListener('load', (event) => {
+    const highResImage = new Image();
+    const fallback = new Image();
+    const avif = '/assets/images/merovex_simple_star_field_in_the_depths_of_space_with_a_nebula__f2d9548b-46a6-427c-8257-0e185883a3e2-a.avif'
+    const fall_img = '/assets/images/merovex_simple_star_field_in_the_depths_of_space_with_a_nebula__f2d9548b-46a6-427c-8257-0e185883a3e2-a.png'
+    highResImage.src = avif;
+    fallback.src = fall_img;
+
+    highResImage.onload = () => {
+      document.querySelector('.low-res-bg').style.backgroundImage = `url('${highResImage.src}')`;
+      // document.querySelector('.low-res-bg').style.opacity = 0; // Fade out the low-res image
+    };
+    highResImage.onerror = () => {
+      // Replace with a fallback image
+      document.querySelector('.low-res-bg').style.backgroundImage = `url('${fallback.src}')`;
+      document.getElementById('yourImage').src = 'fallback.jpg';
+    };
+  });
+</script>
