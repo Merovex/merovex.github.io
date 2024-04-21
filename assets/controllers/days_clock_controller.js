@@ -18,7 +18,7 @@ Stimulus.register("days-clock", class extends Controller {
       const now = new Date();
       const difference = endDate - now;
       this.countdownTarget.textContent = this.formatDecimalTime(difference);
-    }, 100); // Update every 10 milliseconds
+    }, 100);
   }
 
   startCountup() {
@@ -27,7 +27,7 @@ Stimulus.register("days-clock", class extends Controller {
       const now = new Date();
       const difference = now - startDate;
       this.countupTarget.textContent = this.formatDecimalTime(difference);
-    }, 100); // Update every 10 milliseconds
+    }, 100);
   }
   formatDecimalTime(difference) {
     // Total seconds in a day
