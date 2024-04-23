@@ -1,8 +1,6 @@
 import { Application, Controller } from "https://unpkg.com/@hotwired/stimulus/dist/stimulus.js"
 window.Stimulus = Application.start()
 
-
-
 // Connects to data-controller="days-clock"
 Stimulus.register("days-clock", class extends Controller {
   static targets = ["countdown", "countup"];
@@ -30,22 +28,8 @@ Stimulus.register("days-clock", class extends Controller {
     }, 100);
   }
   formatDecimalTime(difference) {
-    // Total seconds in a day
-    const secondsInDay = 86400; // 24 hours * 60 minutes * 60 seconds
-
-    // Calculate the total seconds difference
-    const totalSeconds = difference / 1000; // Convert milliseconds to seconds
-
-    // Calculate the decimal day value
-    const decimalDay = totalSeconds / secondsInDay;
-
-    // Format the decimal day to show up to 6 decimal places for precision
-    const formattedDecimalDay = decimalDay.toFixed(6); // Adjust decimal places as needed
-
-    // Compute days separately
-    let days = Math.floor(difference / (1000 * 60 * 60 * 24));
-
-    // Return formatted string combining days and the decimal of the day
+    const decimalDay = difference / (86400 * 1000);
+    const formattedDecimalDay = decimalDay.toFixed(5); // Adjust decimal places as needed
     return `${formattedDecimalDay}`;
   }
 
