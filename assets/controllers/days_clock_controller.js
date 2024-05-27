@@ -11,22 +11,28 @@ Stimulus.register("days-clock", class extends Controller {
   }
 
   startCountdown() {
-    const endDate = new Date(this.countdownTarget.dataset.clockCountdownDate);
-    this.countdownInterval = setInterval(() => {
-      const now = new Date();
-      const difference = endDate - now;
-      this.countdownTarget.textContent = this.formatDecimalTime(difference);
-    }, 100);
+    this.countdownTargets.forEach(target => {
+      console.log()
+      const endDate = new Date(target.dataset.clockCountdownDate);
+      target.countdownInterval = setInterval(() => {
+        const now = new Date();
+        const difference = endDate - now;
+        target.textContent = this.formatDecimalTime(difference);
+      }, 100);
+    });
   }
 
   startCountup() {
-    const startDate = new Date(this.countupTarget.dataset.clockCountupDate);
-    this.countupInterval = setInterval(() => {
-      const now = new Date();
-      const difference = now - startDate;
-      this.countupTarget.textContent = this.formatDecimalTime(difference);
-    }, 100);
+    this.countupTargets.forEach(target => {
+      const startDate = new Date(target.dataset.clockCountupDate);
+      target.countupInterval = setInterval(() => {
+        const now = new Date();
+        const difference = now - startDate;
+        target.textContent = this.formatDecimalTime(difference);
+      }, 100);
+    });
   }
+
   formatDecimalTime(difference) {
     const decimalDay = difference / (86400 * 1000);
     const formattedDecimalDay = decimalDay.toFixed(5); // Adjust decimal places as needed
@@ -52,7 +58,11 @@ Stimulus.register("days-clock", class extends Controller {
   }
 
   disconnect() {
-    clearInterval(this.countdownInterval);
-    clearInterval(this.countupInterval);
+    this.countdownTargets.forEach(target => {
+      clearInterval(target.countdownInterval);
+    });
+    this.countupTargets.forEach(target => {
+      clearInterval(target.countupInterval);
+    });
   }
 });
