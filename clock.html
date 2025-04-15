@@ -150,8 +150,43 @@ layout: blank
     dot.setAttribute("cx", pos.x);
     dot.setAttribute("cy", pos.y);
   }
+// Find the updateTime function and modify the timeDiff calculation
+const updateTime = function () {
+  const date = new Date();
+  // Changed from weeks to days by removing the "/ 7" division
+  const timeDiff = (new Date("2025-05-30").getTime() - date.getTime()) / (1000 * 3600 * 24);
 
-  const updateTime = function () {
+  // Set the Text Captions
+  $("#time").textContent = date.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+  $("#date").textContent = date.toLocaleDateString('default', { month: 'long', day: 'numeric' });
+  $("#day").textContent = date.toLocaleDateString('default', { weekday: 'long' });
+  // Updated the display text to show days instead of weeks
+  $("#woy").textContent = `${date.getWeek()}w ${date.getDayOfYear()} // ${Math.round(timeDiff)}d`;
+
+  // Rest of the function remains unchanged
+  const hue = date.getDayOfYear() + (parseInt((date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds()) / 60));
+  $("#time").style.fill = `hsl(${hue}, 60%, 90%)`;
+  $('.bgDot').style.fill = `hsl(${hue}, 30%, 10%, 100%)`;
+  $('.timeText').style.fill = `hsl(${hue}, 60%, 90%)`;
+  $('.caption').style.fill = `hsl(${hue}, 60%, 95%)`;
+  $('#arcHour').style.stroke = `hsl(${hue}, 50%, 50%)`;
+  $('#arcMinute').style.stroke = `hsl(${hue}, 50%, 50%)`;
+  $('#hourDot').style.fill = `hsl(${hue}, 80%, 80%)`;
+  $('#minuteDot').style.fill = `hsl(${hue}, 80%, 80%)`;
+  $('#clock-gradient').style.background = `linear-gradient(130deg, hsl(${hue + 0}, 11%, 20%), hsl(${hue + 0}, 50%, 20%)`;
+
+  // Set the Arcs
+  const offset = -120; // subtract 180 to start at 6 o'clock
+  const arcLength = 240; // 360 degrees
+  const hourArc = (date.getHours() * 60 + date.getMinutes()) / (24 * 60) * arcLength;
+  const minArc = date.getMinutes() / 60 * arcLength; // percentage times arcLength in degrees
+
+  setClockDots('#minuteDot', 120, minArc + offset);
+  $('#arcMinute').setAttribute('d', describeArc(450, 250, 120, offset, minArc + offset));
+  setClockDots('#hourDot', 150, hourArc + offset);
+  $('#arcHour').setAttribute('d', describeArc(450, 250, 150, offset, hourArc + offset));
+}
+  const XupdateTime = function () {
     const date = new Date();
     const timeDiff = (new Date("2025-05-30").getTime() - date.getTime()) / (1000 * 3600 * 24 * 7);
 
