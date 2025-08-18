@@ -21,6 +21,7 @@ String.prototype.template = function (data) {
 // Connects to data-controller="astromap"
 Stimulus.register("astromap", class extends Controller {
   static targets = ['coordinates', 'newCoordinate', 'bases', 'factions', 'location', 'name', 'orbits', 'star', 'temp', 'trade_codes', 'travel_code', 'uwp', 'description', 'routableVolumes'];
+  static values = { dataUrl: String }
   volumes = [];
   connect() {
     console.log("Loading Astromap Controller")
@@ -83,7 +84,11 @@ Stimulus.register("astromap", class extends Controller {
     this.routableVolumes(coord)
   }
   loadData() {
-    fetch('/assets/teradoma.json')
+    // Use the data-astromap-data-url-value attribute if provided, otherwise use default
+    const dataUrl = this.hasDataUrlValue ? this.dataUrlValue : '/assets/teradoma.json';
+    console.log("Loading data from:", dataUrl);
+    
+    fetch(dataUrl)
       .then(response => {
         if (response.ok) {
           return response.json();
