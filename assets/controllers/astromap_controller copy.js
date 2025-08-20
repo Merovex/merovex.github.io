@@ -20,197 +20,69 @@ String.prototype.template = function (data) {
 
 // Connects to data-controller="astromap"
 Stimulus.register("astromap", class extends Controller {
-  static targets = ['coordinates', 'newCoordinate', 'bases', 'factions', 'location', 'name', 'orbits', 'star', 'temp', 'trade_codes', 'travel_code', 'uwp', 'description', 'routableVolumes', 'mapTitle'];
+  static targets = ['coordinates', 'newCoordinate', 'bases', 'factions', 'location', 'name', 'orbits', 'star', 'temp', 'trade_codes', 'travel_code', 'uwp', 'description', 'routableVolumes'];
   static values = { dataUrl: String }
-  volumes = {};
+  volumes = [];
   connect() {
     console.log("Loading Astromap Controller")
     this.loadData();
+    // this.showVolumeDetails();
   }
   ternary(source, key, alternate) {
     return source.hasOwnProperty(key) ? source[key] : alternate
   }
-  showVolumeDetails() {
+  showVolumeDetails() { // 0801
     var coord = this.coordinatesTarget.value;
+    // coord = '0801';
     var orbits = "";
     var onum = 0;
-    
     if (coord.length != 4 || this.volumes[coord] == undefined) { return; }
 
     var data = this.volumes[coord];
-    
-    // Handle new JSON format with star and nested orbits structure
-    if (data["star"] && data["star"]["orbits"]) {
-      // New format - parse orbits from star.orbits array
-      for (let orbit of data["star"]["orbits"]) {
-        var result = '';
-        var d = {
-          orbit: onum++,
-          type: orbit.type,
-          uwp: '',
-          distance: ''
-        };
-        
-        // Parse orbit data based on type
-        if (orbit.data) {
-          var orbitData = orbit.data;
-          d.distance = orbitData.au ? orbitData.au + ' au' : '';
-          
-          // Get UWP for world types
-          if (orbit.type === 'world' && orbitData) {
-            d.uwp = this.formatUWP(orbitData);
-            d.type = 'W';
-          } else if (orbit.type === 'belt') {
-            d.uwp = 'XR00000-0';
-            d.type = 'B';
-          } else if (orbit.type === 'gas_giant') {
-            d.uwp = orbitData.giant_size === 'S' ? 'Small GG' : 'Large GG';
-            d.type = 'G';
-          } else if (orbit.type === 'rockball') {
-            d.uwp = this.formatUWP(orbitData);
-            d.type = 'R';
-          } else if (orbit.type === 'hostile') {
-            d.uwp = this.formatUWP(orbitData);
-            d.type = 'H';
-          } else if (orbit.type === 'companion') {
-            d.uwp = orbitData.star_classification || 'Companion';
-            d.type = 'S';
-          } else if (orbit.type === 'empty') {
-            d.type = '.';
-            d.uwp = '.......-.'
+    // console.log("Show Volume Details", this.coordinatesTarget.value, data);
+    for (let orbit of data["orbits"]) {
+      var result = '';
+      var d = {
+        orbit: onum++,
+        type: orbit[0][0],
+        uwp: orbit[0][1],
+        distance: orbit[0][2]
+      }
+      if (d['type'] == ".") { // Different rendering for empty orbits
+        result = this.EMPTY_TEMPLATE.template(d)
+      }
+      else {
+        d['klass'] = this.ternary(this.PLANET_CLASSES, d['type'], " striped")
+        d['type'] = this.ternary(this.PLANET_TYPES, d['type'], d['type'])
+
+        result = this.ORBIT_TEMPLATE.template(d)
+
+        if (orbit[1].length != 0) { // Add any moons to table
+          for (let moon of orbit[1]) {
+            var d = moon.split(".")
+            result += this.MOON_TEMPLATE.template({
+              distance: d[0],
+              uwp: d[1]
+            })
           }
         }
-        
-        // Render based on type
-        if (d.type === '.') {
-          result = this.EMPTY_TEMPLATE.template(d);
-        } else {
-          d['klass'] = this.ternary(this.PLANET_CLASSES, d.type, " striped");
-          d['type'] = this.ternary(this.PLANET_TYPES, d.type, d.type);
-          result = this.ORBIT_TEMPLATE.template(d);
-          
-          // Add moons if present
-          if (orbitData && orbitData.moons && orbitData.moons.length > 0) {
-            for (let moon of orbitData.moons) {
-              result += this.MOON_TEMPLATE.template({
-                distance: moon.orbital_radius + ' rad',
-                uwp: this.formatMoonUWP(moon)
-              });
-            }
-          }
-        }
-        orbits += result;
       }
-      
-      // Get world data if present
-      if (data["star"]["world"]) {
-        var world = data["star"]["world"];
-        this.basesTarget.innerHTML = world.bases || '';
-        this.factionsTarget.innerHTML = (world.factions || []).join(' ');
-        this.tempTarget.innerHTML = world.temperature || '';
-        this.trade_codesTarget.innerHTML = (world.trade_codes || []).join(' ');
-        this.travel_codeTarget.innerHTML = world.travel_code || '';
-        this.uwpTarget.innerHTML = this.formatUWP(world);
-      }
-      
-      // Set star classification
-      var starClass = '';
-      if (data["star"]["spectral"]) {
-        starClass = data["star"]["spectral"] + this.toRoman(data["star"]["star_size"]);
-      }
-      this.starTarget.innerHTML = starClass;
-      
-    } else if (data["orbits"]) {
-      // Old format fallback - parse orbits array
-      for (let orbit of data["orbits"]) {
-        var result = '';
-        var d = {
-          orbit: onum++,
-          type: orbit[0][0],
-          uwp: orbit[0][1],
-          distance: orbit[0][2]
-        }
-        if (d['type'] == ".") {
-          result = this.EMPTY_TEMPLATE.template(d)
-        } else {
-          d['klass'] = this.ternary(this.PLANET_CLASSES, d['type'], " striped")
-          d['type'] = this.ternary(this.PLANET_TYPES, d['type'], d['type'])
-          result = this.ORBIT_TEMPLATE.template(d)
-          
-          if (orbit[1].length != 0) {
-            for (let moon of orbit[1]) {
-              var moonData = moon.split(".")
-              result += this.MOON_TEMPLATE.template({
-                distance: moonData[0],
-                uwp: moonData[1]
-              })
-            }
-          }
-        }
-        orbits += result
-      }
-      
-      this.basesTarget.innerHTML = data["bases"] || '';
-      this.factionsTarget.innerHTML = data["factions"] || '';
-      this.tempTarget.innerHTML = data["temp"] || '';
-      this.trade_codesTarget.innerHTML = data["trade_codes"] || '';
-      this.travel_codeTarget.innerHTML = data["travel_code"] || '';
-      this.uwpTarget.innerHTML = data["uwp"] || '';
-      this.starTarget.innerHTML = data["star"] || '';
+      orbits += result
     }
-    
-    // Common fields
-    this.locationTarget.innerHTML = coord;
-    this.nameTarget.innerHTML = data["name"] || '';
+    this.basesTarget.innerHTML = data["bases"];
+    this.factionsTarget.innerHTML = data["factions"];
+    this.locationTarget.innerHTML = data["location"];
+    this.nameTarget.innerHTML = data["name"];
     this.orbitsTarget.innerHTML = orbits;
-    
-    // Get UWP for description
-    var uwp = this.uwpTarget.innerHTML || data["uwp"] || '';
-    if (uwp && uwp !== '') {
-      this.uwpTranslate(data["name"], uwp);
-    }
-    
-    this.routableVolumes(coord);
+    this.starTarget.innerHTML = data["star"];
+    this.tempTarget.innerHTML = data["temp"];
+    this.trade_codesTarget.innerHTML = data["trade_codes"];
+    this.travel_codeTarget.innerHTML = data["travel_code"];
+    this.uwpTarget.innerHTML = data["uwp"];
+    // console.log(orbits);
+    this.uwpTranslate(data["name"], data["uwp"])
+    this.routableVolumes(coord)
   }
-  
-  formatUWP(orbitData) {
-    if (!orbitData) return '.......-.'
-    
-    var port = orbitData.starport || orbitData.port || '.';
-    var size = this.toHex(orbitData.size || 0);
-    var atmo = this.toHex(orbitData.atmosphere || 0);
-    var hydro = this.toHex(orbitData.hydrographics || orbitData.hydro || 0);
-    var pop = this.toHex(orbitData.population || 0);
-    var gov = this.toHex(orbitData.government || 0);
-    var law = this.toHex(orbitData.law_level || orbitData.law || 0);
-    var tech = this.toHex(orbitData.tech_level || orbitData.tech || 0);
-    
-    return port + size + atmo + hydro + pop + gov + law + '-' + tech;
-  }
-  
-  formatMoonUWP(moon) {
-    if (!moon) return '.......-.'
-    
-    var size = this.toHex(moon.size || 0);
-    var atmo = this.toHex(moon.atmosphere || 0);
-    var hydro = this.toHex(moon.hydrographics || 0);
-    
-    return 'X' + size + atmo + hydro + '000-0';
-  }
-  
-  toHex(n) {
-    if (n < 0 || n == null) return '0';
-    if (n < 10) return n.toString();
-    var hexMap = {10: 'A', 11: 'B', 12: 'C', 13: 'D', 14: 'E', 15: 'F'};
-    return hexMap[n] || 'F';
-  }
-  
-  toRoman(n) {
-    if (n === 500) return 'D';
-    var romans = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'];
-    return romans[n] || n.toString();
-  }
-  
   loadData() {
     // Use the data-astromap-data-url-value attribute if provided, otherwise use default
     const dataUrl = this.hasDataUrlValue ? this.dataUrlValue : '/assets/teradoma.json';
@@ -225,31 +97,14 @@ Stimulus.register("astromap", class extends Controller {
         }
       })
       .then(data => {
-        // Store volumes - already in hash format with zero-padded keys
-        this.volumes = data["volumes"] || {};
-        console.log("Loaded data. Volume count:", Object.keys(this.volumes).length);
-        
-        // Update map title if JSON has a name field
-        if (data["name"] && this.hasMapTitleTarget) {
-          this.mapTitleTarget.innerHTML = data["name"] + " Map";
-          console.log("Set map title to:", data["name"] + " Map");
-        }
-        
-        // Set default coordinate if the input is empty or has the hardcoded default
-        if (!this.coordinatesTarget.value || this.coordinatesTarget.value === '0812') {
-          const volumeKeys = Object.keys(this.volumes).sort();
-          if (volumeKeys.length > 0) {
-            // Use 10th entry (index 9) or first if fewer than 10
-            const defaultIndex = Math.min(9, volumeKeys.length - 1);
-            const defaultCoordinate = volumeKeys[defaultIndex];
-            this.coordinatesTarget.value = defaultCoordinate;
-            console.log("Set default coordinate to:", defaultCoordinate);
-          }
-        }
-        
+        // this.handleData(data);
+
+        this.volumes = data["volumes"];
+        console.log("Loaded data.");
         if (this.coordinatesTarget.value.length == 4) {
           this.showVolumeDetails();
         }
+        // console.log(this.volumes);
       })
       .catch(error => console.error("Error fetching data: ", error));
   }
@@ -262,37 +117,30 @@ Stimulus.register("astromap", class extends Controller {
     keys.forEach((key, i) => {
       var template = this.metadata.templates[key];
       var datum = this.metadata.code[key][bits[i]];
-      if (datum) {
-        if (Array.isArray(datum)) {
-          description += template.replace('{0}', datum[0]).replace('{1}', datum[1]);
-        } else {
-          description += template.replace('{0}', datum);
-        }
-        description += ' ';
+      if (Array.isArray(datum)) {
+        description += template.replace('{0}', datum[0]).replace('{1}', datum[1]);
+      } else {
+        description += template.replace('{0}', datum);
       }
+      description += ' ';
     });
     this.descriptionTarget.innerHTML = description;
   }
-  
   EMPTY_TEMPLATE = `<tr class='text-sm text-center striped text-shade'><td class='py-2'>{orbit}</td><td class='py-2'>&mdash; Empty &mdash;</td><td class='py-2'>{distance}</td><td class='py-2'>&nbsp;</td></tr>`;
   ORBIT_TEMPLATE = `<tr class='text-center{klass}'><td class='py-2'>{orbit}</td><td class='py-2'>{type}</td><td class='py-2'>{distance}</td><td class='py-2'>{uwp}</td></tr>`;
   MOON_TEMPLATE = `<tr class='striped'><td colspan='2'></td><td class='text-right'>{distance}.</td><td class='text-center'>{uwp}</td></tr>`;
   ROUTE_TEMPLATE = `<tr class='text-center striped'><td class='py-2'><a data-astromap-target='newCoordinate' data-action='click->astromap#setCoordinate'>{coord}</a></td><td class='py-2'>{uwp}</td><td class='py-2'>{distance}</td><td class='py-2'>{name}</td></tr>`;
-  
   PLANET_CLASSES = {
     'W': " italic bg-primary-50 dark:bg-primary-50/10",
     'S': " bg-amber-300 dark:bg-amber-600 text-black"
   }
-  
   PLANET_TYPES = {
     'W': 'Mainworld',
     'S': 'Companion Star',
     'G': "Gas Giant",
     'R': "Rockball",
-    'H': "Hostile",
     'B': "Belt"
   }
-  
   center_of(column, row) {
     var side = 40
     var factor = 1.732
@@ -300,27 +148,23 @@ Stimulus.register("astromap", class extends Controller {
     var y = ((row - 1) * side * factor + (side * factor / (1 + (column % 2)))).toFixed(0)
     return [x, y]
   }
-  
   calcSlope(origin, point) {
     return Math.round((point[1] - origin[1]) / (point[0] - origin[0]) * 10)
   }
-  
   calcDistance(origin, point) {
     return Math.sqrt(Math.pow(origin[0] - point[0], 2) + Math.pow(origin[1] - point[1], 2))
   }
-  
   calcQuadrant(origin, point) {
     var x = point[0] - origin[0]
     var y = point[1] - origin[1]
     switch (true) {
-      case (x >= 0) && (y <= 0): return 1; break;
-      case (x <= 0) && (y <= 0): return 2; break;
-      case (x <= 0) && (y >= 0): return 3; break;
-      case (x >= 0) && (y >= 0): return 4; break;
+      case (x >= 0) && (y <= 0): return 1; break; // 1 = x pos, y pos
+      case (x <= 0) && (y <= 0): return 2; break; // 2 = x neg, y pos
+      case (x <= 0) && (y >= 0): return 3; break; // 3 = x neg, y neg
+      case (x >= 0) && (y >= 0): return 4; break; // 4 = x pos, y neg
       default: return 5
     }
   }
-  
   routableVolumes(key) {
     if (key.length != 4) { return; }
     var routes = {}
@@ -328,32 +172,27 @@ Stimulus.register("astromap", class extends Controller {
     var y = parseInt(key.slice(2))
     var origin = this.center_of(x, y)
 
-    var p = 0 // Failsafe
+    var p = 0 // Failsafe in case the for loops get out of control. It has happened.
 
     for (var j = (y - 3); j <= (y + 3); j++) {
       for (var i = (x - 3); i <= (x + 3); i++) {
-        var coord = i.toString().padStart(2, '0') + j.toString().padStart(2, '0')
-        
+
+        var coord = i.toString().padStart(2, '0') + j.toString().padStart(2, '0') // Printed coordinates
+
         var point = this.center_of(i, j)
-        var distance = this.calcDistance([x, y], [i, j])
+        var distance = this.calcDistance([x, y], [i, j]) // We need unadjusted coordinates.
         var quadrant = this.calcQuadrant(origin, point)
         var slope = this.calcSlope(origin, point)
 
-        // Process routes to inhabited volumes if within Jump-3
+        // Process routes to habited volumes if within Jump-3 (a bit of rounding required)
         if (0 < distance && distance < 3.605 && this.volumes[coord] != undefined) {
+          // Exclude the farther route of two candidate routes in the same direction.
           var direction = "{0}:{1}".format(quadrant, slope)
           if (direction in routes && distance > routes[direction][0]) {
             continue;
           }
 
-          // Get UWP - handle both old and new formats
-          var uwp = '';
-          if (this.volumes[coord]['uwp']) {
-            uwp = this.volumes[coord]['uwp'];
-          } else if (this.volumes[coord]['star'] && this.volumes[coord]['star']['world']) {
-            uwp = this.formatUWP(this.volumes[coord]['star']['world']);
-          }
-
+          // Capture the route information
           routes[direction] = [
             distance,
             coord,
@@ -361,29 +200,29 @@ Stimulus.register("astromap", class extends Controller {
               coord: coord,
               distance: Math.round(distance),
               name: this.volumes[coord]['name'],
-              uwp: uwp
+              uwp: this.volumes[coord]['uwp']
             })
           ]
         }
-        if (p++ > 1000) { break; }
+        if (p++ > 1000) { break; } // failsafe
       }
     }
-    
     var result = "";
-    for (var key in routes) { result += routes[key][2] }
+    for (key in routes) { result += routes[key][2] }
     this.routableVolumesTarget.innerHTML = result;
   }
-  
   setCoordinate(event) {
     event.preventDefault();
+    // console.log("Set Coordinate", event, event.target.innerHTML);
+    // var coordinate = link.getAttribute("data-coordinate");
+    // this.setVal('coordinate', coordinate)
     this.coordinatesTarget.value = event.target.innerHTML;
     this.showVolumeDetails()
   }
-  
   metadata = {
     "templates": {
       "name": "{0} {1}.",
-      "port": " {0}",
+      "port": "{0}",
       "size": "The main world is roughly {1} kilometers in diameter, and is <strong>{0}</strong>.",
       "atmos": "{0}",
       "hydro": "The surface is roughly {0} percent surface water (or similar fluid), which qualifies it as a <strong>{1}</strong> world.",
@@ -437,7 +276,7 @@ Stimulus.register("astromap", class extends Controller {
         "B": "A concentrated gas mix or unusual temperature creates a corrosive environment, which requires the use of a protective suit or vacc suit.",
         "C": "The atmosphere is similar to a corrosive atmosphere, but extreme conditions cause the corrosive effects to defeat any protective measures in a few hours.",
         "D": "Pressure at or below sea level is too great to support life but is breathable at higher altitudes.",
-        "E": "The world's surface is ellipsoidal, not spherical. Because the atmosphere remains spherical, surface atmospheric pressure ranges from very high at the middle to very low at the ends Breathable bands may exist at some point within the range of pressure.",
+        "E": "The world’s surface is ellipsoidal, not spherical. Because the atmosphere remains spherical, surface atmospheric pressure ranges from very high at the middle to very low at the ends Breathable bands may exist at some point within the range of pressure.",
         "F": "The world is large and massive, with a thin atmosphere which settles to the lowest levels of the terrain. The atmosphere is unbreathable at most altitudes except the very low ones (as in depressions or deep valleys)."
       },
       "hydro": {

@@ -7,12 +7,12 @@ keep track of the setting. It helps me measure superluminal travel distances."
 
 <script type="module" src="/assets/controllers/astromap_controller.js"></script>
 <!-- To use a custom JSON file, add data-astromap-data-url-value="/path/to/your/file.json" -->
-<article class='w-prose h-full' data-controller='astromap' data-astromap-data-url-value="/assets/teradoma.json">
+<article class='w-prose h-full' data-controller='astromap' data-astromap-data-url-value="/assets/sector_ORBITS-TEST_20250818-090851.json">
   <div class='text-center space-y-2'>
     <label for='coordinate' class=' text-xl'>Coordinate:</label>
     <div class='w-28 mx-auto'>
-      <input name='coordinate' id='coordinate' value='0812' type='number' data-astromap-target='coordinates'
-        data-action='keyup->astromap#showVolumeDetails' class='form-input'>
+      <input name='coordinate' id='coordinate' value='' type='number' data-astromap-target='coordinates'
+        data-action='keyup->astromap#showVolumeDetails' class='form-input' placeholder='Loading...'>
     </div>
   </div>
   <aside class='my-8'>
@@ -92,25 +92,45 @@ keep track of the setting. It helps me measure superluminal travel distances."
     </table>
   </section>
   <section id='map-section' class='my-8'>
-    <h3 class='h3 m'>Terradoma Map</h3>
+    <h3 class='h3 m' data-astromap-target='mapTitle'>Terradoma Map</h3>
     <a href='#coordinate'>back to top</a>
     <div class='prosed'>
       <p>This is the comprehensive map of known humanity in Terradoma. You can pan and zoom. The volume report above
         relies on the coordinates of this map.</p>
     </div>
-    <div class='w-full border-2 border-brand dark:border-brand-light' style='height: 800px'>
-      {% include imperium-map.html %}
+    <div class='w-full border-2 border-brand dark:border-brand-light' style='height: 800px; overflow: hidden;'>
+      <embed id="map" src="/assets/sector_ORBITS-TEST_20250818-090851.svg" type="image/svg+xml" width="100%" height="100%" />
     </div>
   </section>
 </article>
 <script src="/assets/svg-pan-zoom.js"></script>
 <script>
-  svgPanZoom('#map', {
-    zoomEnabled: true,
-    controlIconsEnabled: false,
-    fit: false,
-    center: false,
-    minZoom: 1,
-    maxZoom: 1.6,
+  // Wait for the SVG to load before initializing pan-zoom
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      var embed = document.getElementById('map');
+      var svgDoc = embed.getSVGDocument();
+      
+      if (svgDoc) {
+        svgPanZoom(embed, {
+          zoomEnabled: true,
+          controlIconsEnabled: false,
+          fit: false,
+          center: false,
+          minZoom: 1,
+          maxZoom: 1.6,
+        });
+      } else {
+        // Fallback: try direct selector
+        svgPanZoom('#map', {
+          zoomEnabled: true,
+          controlIconsEnabled: false,
+          fit: false,
+          center: false,
+          minZoom: 1,
+          maxZoom: 1.6,
+        });
+      }
+    }, 500); // Small delay to ensure SVG is fully loaded
   });
 </script>
