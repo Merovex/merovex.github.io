@@ -53,11 +53,19 @@ Stimulus.register("season-shaper", class extends Controller {
 
   connect() {
     this.restore();
+    // The episode count is tethered to the C-Story Engine's.
+    this._onTether = (e) => { if (e.detail.source !== "shaper") this.adoptEpisodes(e.detail.value); };
+    window.addEventListener("season-episodes", this._onTether);
     this.plan();
   }
 
+  disconnect() {
+    if (this._onTether) window.removeEventListener("season-episodes", this._onTether);
+  }
+
   // Restore the last-used sliders. localStorage persists across visits like a
-  // cookie, but stays on the device.
+  // cookie, but stays on the device. Episodes come from the shared (tethered)
+  // key so the two tools agree on load.
   restore() {
     const s = parseInt(this.load("scenes"), 10);
     if (!isNaN(s) && this.hasScenesTarget) {
@@ -65,9 +73,9 @@ Stimulus.register("season-shaper", class extends Controller {
       this.scenesTarget.value = v;
       if (this.hasScenesOutTarget) this.scenesOutTarget.textContent = v;
     }
-    const e = parseInt(this.load("episodes"), 10);
+    const e = parseInt(this.loadShared("episodes"), 10);
     if (!isNaN(e) && this.hasEpisodesTarget) {
-      const v = Math.max(4, Math.min(12, e));
+      const v = Math.max(4, Math.min(24, e));
       this.episodesTarget.value = v;
       if (this.hasEpisodesOutTarget) this.episodesOutTarget.textContent = v;
     }
@@ -75,11 +83,13 @@ Stimulus.register("season-shaper", class extends Controller {
 
   persist() {
     this.save("scenes", String(this.clampScenes()));
-    this.save("episodes", String(this.clampEpisodes()));
+    this.saveShared("episodes", String(this.clampEpisodes()));
   }
 
   save(k, v) { try { localStorage.setItem(`shaper.${k}`, v); } catch (e) { /* storage off */ } }
   load(k) { try { return localStorage.getItem(`shaper.${k}`); } catch (e) { return null; } }
+  saveShared(k, v) { try { localStorage.setItem(`season.${k}`, v); } catch (e) { /* storage off */ } }
+  loadShared(k) { try { return localStorage.getItem(`season.${k}`); } catch (e) { return null; } }
 
   scenesInput() {
     this.scenesValue = this.clampScenes();
@@ -92,7 +102,29 @@ Stimulus.register("season-shaper", class extends Controller {
     this.episodesValue = this.clampEpisodes();
     if (this.hasEpisodesOutTarget) this.episodesOutTarget.textContent = this.episodesValue;
     this.persist();
+    if (!this.adopting) this.broadcastEpisodes();
     this.plan();
+  }
+
+  // Tell the other tool our episode count changed.
+  broadcastEpisodes() {
+    window.dispatchEvent(new CustomEvent("season-episodes", { detail: { value: this.clampEpisodes(), source: "shaper" } }));
+  }
+
+  // Adopt an episode count pushed from the C-Story Engine. Replays it as a
+  // synthetic slider input (guarded by `adopting` so it doesn't re-broadcast)
+  // so the season re-plans AND the wordcount budget, which reads this slider,
+  // stays in sync.
+  adoptEpisodes(n) {
+    const v = Math.max(4, Math.min(24, n));
+    if (!this.hasEpisodesTarget) { this.episodesValue = v; this.plan(); return; }
+    if (parseInt(this.episodesTarget.value, 10) === v) return;
+    this.episodesTarget.value = v;
+    if (this.hasEpisodesOutTarget) this.episodesOutTarget.textContent = v;
+    this.saveShared("episodes", String(v));
+    this.adopting = true;
+    this.episodesTarget.dispatchEvent(new Event("input", { bubbles: true }));
+    this.adopting = false;
   }
 
   clampScenes() {
@@ -102,7 +134,7 @@ Stimulus.register("season-shaper", class extends Controller {
 
   clampEpisodes() {
     const n = this.hasEpisodesTarget ? parseInt(this.episodesTarget.value, 10) : this.episodesValue;
-    return isNaN(n) ? 6 : Math.max(4, Math.min(12, n)); // c_arc needs >= 4
+    return isNaN(n) ? 6 : Math.max(4, Math.min(24, n)); // c_arc needs >= 4
   }
 
   // ── Main entry — mirrors SeasonShaper.plan ────────────────────────────────

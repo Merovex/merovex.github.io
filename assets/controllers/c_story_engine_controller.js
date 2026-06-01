@@ -199,24 +199,30 @@ Stimulus.register("c-story-engine", class extends Controller {
     this.syncEpisodesUI();
     if (this.isCarrying) this.roll();
     else { this.current = null; this.render(); }
+    // The episode count is tethered to the Season Shaper's: either reflects the
+    // other through a shared key (on load) and a window event (live).
+    this._onTether = (e) => { if (e.detail.source !== "cstory") this.adoptEpisodes(e.detail.value); };
+    window.addEventListener("season-episodes", this._onTether);
     this.connected = true;
   }
 
+  disconnect() {
+    if (this._onTether) window.removeEventListener("season-episodes", this._onTether);
+  }
+
   // Restore the last-used dials. localStorage persists across visits like a
-  // cookie, but stays on the device. Falls back to the archetype default.
+  // cookie, but stays on the device. Episodes come from the shared (tethered)
+  // key so the two tools agree on load.
   restore() {
     const a = this.load("archetype");
     if (a && this.ARCHETYPE_LABELS[a]) this.archetypeValue = a;
-    const raw = this.load("episodes");
-    const e = parseInt(raw, 10);
-    this.episodesValue = (raw !== null && !isNaN(e))
-      ? Math.max(2, Math.min(24, e))
-      : (this.DEFAULT_EPISODES[this.archetypeValue] || this.episodesValue);
+    const e = parseInt(this.loadShared("episodes"), 10);
+    if (!isNaN(e)) this.episodesValue = this.clampEpisodes(e);
   }
 
   persist() {
     this.save("archetype", this.archetypeValue);
-    this.save("episodes", String(this.episodesValue));
+    this.saveShared("episodes", String(this.episodesValue));
   }
 
   syncEpisodesUI() {
@@ -224,8 +230,28 @@ Stimulus.register("c-story-engine", class extends Controller {
     if (this.hasEpisodesOutTarget) this.episodesOutTarget.textContent = this.episodesValue;
   }
 
+  clampEpisodes(n) { return Math.max(4, Math.min(24, n)); }
+
+  // Tell the other tool our episode count changed.
+  broadcastEpisodes() {
+    window.dispatchEvent(new CustomEvent("season-episodes", { detail: { value: this.episodesValue, source: "cstory" } }));
+  }
+
+  // Adopt an episode count pushed from the Season Shaper.
+  adoptEpisodes(n) {
+    const v = this.clampEpisodes(n);
+    if (v === this.episodesValue) return;
+    this.episodesValue = v;
+    this.syncEpisodesUI();
+    this.saveShared("episodes", String(v));
+    if (this.isCarrying) this.roll();
+    else this.render();
+  }
+
   save(k, v) { try { localStorage.setItem(`cstory.${k}`, v); } catch (e) { /* storage off */ } }
   load(k) { try { return localStorage.getItem(`cstory.${k}`); } catch (e) { return null; } }
+  saveShared(k, v) { try { localStorage.setItem(`season.${k}`, v); } catch (e) { /* storage off */ } }
+  loadShared(k) { try { return localStorage.getItem(`season.${k}`); } catch (e) { return null; } }
 
   // Seed the episode count from the selected archetype's default (falling back
   // to the generator default of 6) and sync the slider + readout to it.
@@ -282,6 +308,7 @@ Stimulus.register("c-story-engine", class extends Controller {
     this.applyArchetypeDefaultEpisodes();
     this.highlightPills();
     this.persist();
+    this.broadcastEpisodes(); // the archetype default may have moved the count
     if (this.isCarrying) {
       this.roll();
     } else {
@@ -294,13 +321,14 @@ Stimulus.register("c-story-engine", class extends Controller {
     this.episodesValue = this.clampedEpisodes();
     if (this.hasEpisodesOutTarget) this.episodesOutTarget.textContent = this.episodesValue;
     this.persist();
+    this.broadcastEpisodes();
     if (this.current && this.isCarrying) this.roll();
   }
 
   clampedEpisodes() {
     const n = this.hasEpisodesTarget ? parseInt(this.episodesTarget.value, 10) : this.episodesValue;
-    if (isNaN(n)) return 8;
-    return Math.max(2, Math.min(24, n));
+    if (isNaN(n)) return 6;
+    return this.clampEpisodes(n);
   }
 
   // The design note for the active archetype: the carrying ones explain how
