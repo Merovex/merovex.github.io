@@ -22,7 +22,7 @@ Stimulus.register("season-shaper", class extends Controller {
     "totals", "season", "copyBtn",
   ];
   static values = {
-    scenes: { type: Number, default: 10 },
+    scenes: { type: Number, default: 24 },
     episodes: { type: Number, default: 6 },
   };
 
@@ -67,7 +67,7 @@ Stimulus.register("season-shaper", class extends Controller {
 
   clampScenes() {
     const n = this.hasScenesTarget ? parseInt(this.scenesTarget.value, 10) : this.scenesValue;
-    return isNaN(n) ? 10 : Math.max(4, Math.min(20, n)); // shape_episode needs >= 4
+    return isNaN(n) ? 24 : Math.max(4, Math.min(60, n)); // shape_episode needs >= 4
   }
 
   clampEpisodes() {
