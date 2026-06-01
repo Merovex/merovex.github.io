@@ -12,7 +12,7 @@ window.Stimulus = window.Stimulus || Application.start()
 // on a plant / nudge / tag rhythm so each installment advances the arc
 // exactly one notch while the A-story resolves clean.
 //
-// Honest-broker scope: only three archetypes sustain an episodic A/B/C run,
+// Honest-broker scope: only four archetypes sustain an episodic A/B/C run,
 // so only three carry a portable spine here. The other four terminate or
 // resist episodic structure and get notes instead of generators. This is
 // deliberate, not an omission.
@@ -29,14 +29,14 @@ Stimulus.register("c-story-engine", class extends Controller {
   };
 
   ARCHETYPE_LABELS = {
-    lawman: "Lawman", drifter: "Drifter", trek: "Trek",
+    lawman: "Lawman", drifter: "Drifter", trek: "Trek", espionage: "Espionage",
     homesteader: "Homesteader", outlaw: "Outlaw", defense: "Defense", avenger: "Avenger",
   };
 
   // Per-archetype default run length. The generator default is 6; the Drifter's
   // tighter pursuit fits 4, the Lawman's institutional rot wants 8. Selecting an
   // archetype seeds its default; the slider still overrides freely after that.
-  DEFAULT_EPISODES = { lawman: 8, drifter: 4, trek: 6 };
+  DEFAULT_EPISODES = { lawman: 8, drifter: 4, trek: 6, espionage: 8 };
 
   // ── LAWMAN ────────────────────────────────────────────────────────────────
   // Belongs to the order, so the A-story carries no melancholy tax. That frees
@@ -165,8 +165,55 @@ Stimulus.register("c-story-engine", class extends Controller {
     ],
   };
 
+  // ── ESPIONAGE ─────────────────────────────────────────────────────────────
+  // The Outlaw's engine, reframed. The Outlaw runs on inverted moral polarity —
+  // the reader roots for the squeezed crew, not the Power closing in — which is
+  // exactly the sympathy a corporate cold war hands you for free when one ragtag
+  // independent cell is up against a monolithic intelligence Power. The one swap
+  // from the straight-Western Outlaw is in the termini and keys: every ending
+  // leaves the crew alive and in business rather than dead and mourned. That
+  // single change converts the form from terminal-elegiac to episodic farce.
+  ESPIONAGE = {
+    note: "An independent cell against a monolithic intelligence Power. The inverted polarity hands you the crew's sympathy for free, the way a corporate cold war does. Swapping the Outlaw's elegiac ending for 'everyone lives, still in business' converts the form from terminal to episodic farce: the net keeps closing on nothing, a crew that works only because no one trusts anyone is inherently comic, and the cold war never ends, so the Power always loses just enough to be back next episode.",
+    questions: [
+      "Which of the crew is feeding the jobs to the Power, and how close is the net?",
+      "Is the one big score that buys everyone out real, or is it bait?",
+      "Can a crew that works only because no one trusts anyone survive one more job together?",
+      "Who put the price on the crew's heads, and why is it someone they once worked for?",
+      "Is the leader holding the crew together to protect them or to spend them?",
+    ],
+    stakes: [
+      "Every job they pull together is one more thread the Power can yank to unravel all of them.",
+      "The score that frees them is the same score that exposes them.",
+      "Loyalty is the only thing keeping the crew breathing, and somebody is selling it.",
+      "If the rat isn't found, the next job is a trap and the crew ends in one night.",
+    ],
+    clicks: [
+      "A safe job goes wrong in a way only an inside leak explains.",
+      "The Power posts a bounty that names a crew member by their real name.",
+      "A fence the crew trusted turns up working for the other side.",
+      "The 'one last score' surfaces, and it is far too clean to be anything but bait.",
+      "A crew member is quietly offered the chance to walk free, alone.",
+      "The leader hides a job from the crew, and it pays better than the ones they share.",
+      "An old crew member, presumed long gone, is spotted wearing the Power's colors.",
+      "The heat that should have stayed two steps back is suddenly one step back.",
+    ],
+    termini: [
+      "The rat is found, the score is pulled, and the crew scatters laughing to regroup next season.",
+      "The last score was bait; the crew springs the trap on the trapper and walks away poorer but whole.",
+      "The leader's secret job is exposed, the crew mutinies, reorganizes on new terms, and stays in business.",
+      "The Power's net closes on empty air, because the crew was never where the rat swore they would be.",
+    ],
+    keys: [
+      "The net closed on nothing; the crew lives to steal another day.",
+      "Poorer, exposed, and still together out of pure spite.",
+      "The elegy refused; nobody trusts anybody, business as usual.",
+      "The score lost, the crew intact, the cold war exactly as cold as before.",
+    ],
+  };
+
   get ARCHETYPES() {
-    return { lawman: this.LAWMAN, drifter: this.DRIFTER, trek: this.TREK };
+    return { lawman: this.LAWMAN, drifter: this.DRIFTER, trek: this.TREK, espionage: this.ESPIONAGE };
   }
 
   // The four that do not get a generator, and why. Honest-broker flags so the
@@ -183,7 +230,7 @@ Stimulus.register("c-story-engine", class extends Controller {
   LEGEND = [
     "LEGEND — what each part of a C-story spine means",
     "C-story = the serialized continuity spine; advances one click per episode and pays off across the arc.",
-    "Generated ONCE per series, not per episode. Only three archetypes sustain an episodic A/B/C run.",
+    "Generated ONCE per series, not per episode. Only four archetypes sustain an episodic A/B/C run.",
     "Question = the dramatic question the whole arc is built to answer.",
     "Stake = why the question matters; what is on the line across the series.",
     "Terminus = how the spine resolves at the end of the run (plan this before you start).",

@@ -182,10 +182,12 @@ set the episode count, and the generator distributes the spine's clicks on a pla
     one notch while its A-story resolves clean.
   </p>
   <p>
-    <strong>Honest-broker scope:</strong> only three archetypes sustain an episodic A/B/C run, so only
-    <strong>Lawman</strong>, <strong>Drifter</strong>, and <strong>Trek</strong> carry a portable spine. The other
-    four terminate or resist episodic structure; select one and the engine returns a note explaining why, instead of a
-    spine. That's deliberate.
+    <strong>Honest-broker scope:</strong> only four archetypes sustain an episodic A/B/C run, so
+    <strong>Lawman</strong>, <strong>Drifter</strong>, <strong>Trek</strong>, and <strong>Espionage</strong> carry a
+    portable spine. <strong>Espionage</strong> is the Outlaw's inverted-polarity engine reframed as a never-ending cold
+    war farce: swap its elegiac ending for "everyone lives, still in business" and the terminal form turns episodic.
+    The other four archetypes terminate or resist episodic structure; select one and the engine returns a note
+    explaining why, instead of a spine. That's deliberate.
   </p>
 </aside>
 
@@ -196,7 +198,7 @@ set the episode count, and the generator distributes the spine's clicks on a pla
     <div class="dial">
       <span class="dial-label">Archetype</span>
       <div class="pillrow">
-        {% assign archetypes = "lawman:Lawman,drifter:Drifter,trek:Trek,homesteader:Homesteader,outlaw:Outlaw,defense:Defense,avenger:Avenger" | split: "," %}
+        {% assign archetypes = "lawman:Lawman,drifter:Drifter,trek:Trek,espionage:Espionage,homesteader:Homesteader,outlaw:Outlaw,defense:Defense,avenger:Avenger" | split: "," %}
         {% for a in archetypes %}
           {% assign pair = a | split: ":" %}
           <button type="button" class="pill" data-c-story-engine-target="archetypePill"
