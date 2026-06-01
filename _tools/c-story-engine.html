@@ -1,0 +1,275 @@
+---
+layout: tool
+title: C-Story Engine
+description: "The C-Story Engine — companion to the Western Engine plot generator. The Western Engine rolls the
+A-story, the self-contained episode that opens and closes in one installment. This rolls the C-story: the serialized
+continuity spine that advances one click per episode and pays off across the whole arc. Pick a carrying archetype,
+set the episode count, and the generator distributes the spine's clicks on a plant / nudge / tag rhythm."
+---
+<script type="module" src="/assets/controllers/c_story_engine_controller.js"></script>
+<script type="module" src="/assets/controllers/season_shaper_controller.js"></script>
+
+<style>
+  /* Self-contained styles — no Tailwind build required. Adapts to the site's
+     light/dark theme via :root[data-color-scheme="dark"] and currentColor.
+     Shares the visual language of the plot-generator (Western Engine) tool. */
+  .cstory { --accent: #b45309; --line: rgba(127, 127, 127, 0.25); }
+  :root[data-color-scheme="dark"] .cstory { --accent: #f59e0b; }
+
+  .cstory .dials { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem; font-size: 0.875rem; }
+  .cstory .dial { display: flex; align-items: center; gap: 0.5rem; }
+  .cstory .dial-label { font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.6; }
+  .cstory .pillrow { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+
+  .cstory button.pill,
+  .cstory button.roll {
+    border: 1px solid currentColor; border-radius: 9999px; background: transparent;
+    color: inherit; cursor: pointer; font: inherit; line-height: 1.2;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .cstory button.pill { padding: 0.25rem 0.75rem; }
+  .cstory button.roll { padding: 0.5rem 1.5rem; font-weight: 600; box-shadow: 0 0 0 2px var(--accent); }
+  .cstory button.pill:hover,
+  .cstory button.roll:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .cstory button.pill[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* episode-count slider */
+  .cstory input[type="range"] { accent-color: var(--accent); cursor: pointer; }
+  .cstory .episodes-out { font-weight: 600; color: var(--accent); min-width: 1.5rem; text-align: right; }
+
+  /* the archetype design note — always shown when an archetype is selected */
+  .cstory .note {
+    font-size: 0.9rem; line-height: 1.55; font-style: italic; opacity: 0.85;
+    border-left: 4px solid var(--accent); padding: 0.85rem 1.25rem; margin: 0 0 1.75rem;
+    border-radius: 0.375rem; background: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+
+  .cstory .center { text-align: center; margin-bottom: 2.5rem; }
+
+  /* spine summary block */
+  .cstory .spine { position: relative; }
+  .cstory .copy-btn {
+    position: absolute; top: 0; right: 0;
+    border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+    background: transparent; color: inherit; cursor: pointer; font: inherit;
+    border-radius: 0.375rem; padding: 0.2rem 0.5rem; font-size: 0.75rem; line-height: 1.2;
+    opacity: 0.55; transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+  }
+  .cstory .copy-btn:hover { opacity: 1; background: color-mix(in srgb, var(--accent) 12%, transparent); }
+  .cstory .copy-btn.copied { opacity: 1; color: #fff; background: var(--accent); border-color: var(--accent); }
+
+  .cstory h2.slot-head { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.6; margin-bottom: 0.75rem; }
+  .cstory dl.slots { display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--line); border-radius: 0.375rem; overflow: hidden; margin: 0 0 2.5rem; }
+  .cstory dl.slots > .row { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--page-bg, transparent); }
+  .cstory dl.slots dt { width: 7rem; flex-shrink: 0; font-weight: 600; color: var(--accent); margin: 0; }
+  .cstory dl.slots dd { flex: 1; margin: 0; }
+
+  /* per-episode timeline */
+  .cstory .timeline { display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--line); border-radius: 0.375rem; overflow: hidden; margin: 0 0 2rem; }
+  .cstory .beat { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.6rem 1rem; background: var(--page-bg, transparent); }
+  .cstory .beat .ep { width: 3.5rem; flex-shrink: 0; font-weight: 600; opacity: 0.7; }
+  .cstory .beat .role {
+    width: 4rem; flex-shrink: 0; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; align-self: center; opacity: 0.75;
+  }
+  .cstory .beat .click { flex: 1; }
+  .cstory .beat-plant .role,
+  .cstory .beat-tag .role { color: var(--accent); opacity: 1; }
+  .cstory .beat-plant, .cstory .beat-tag { background: color-mix(in srgb, var(--accent) 7%, transparent); }
+
+  .cstory .hidden { display: none; }
+
+  @media (max-width: 480px) {
+    .cstory dl.slots dt { width: 100%; }
+    .cstory dl.slots > .row, .cstory .beat { flex-wrap: wrap; }
+  }
+
+  /* ── Season Shaper ──────────────────────────────────────────────────────
+     Shares the page's theme hooks. Distinct accent (teal) so the two tools
+     read as siblings, not the same widget. A/B/C tracks are colour-coded. */
+  .shaper {
+    --accent: #0f766e; --line: rgba(127, 127, 127, 0.25);
+    --track-a: #0f766e; --track-b: #b45309; --track-c: #6d28d9;
+  }
+  :root[data-color-scheme="dark"] .shaper {
+    --accent: #2dd4bf; --track-a: #2dd4bf; --track-b: #f59e0b; --track-c: #a78bfa;
+  }
+
+  .shaper .dials { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 2rem; margin-bottom: 1.5rem; font-size: 0.875rem; }
+  .shaper .dial { display: flex; align-items: center; gap: 0.6rem; }
+  .shaper .dial-label { font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.6; }
+  .shaper input[type="range"] { accent-color: var(--accent); cursor: pointer; }
+  .shaper .out { font-weight: 600; color: var(--accent); min-width: 1.5rem; text-align: right; }
+
+  .shaper .totals {
+    position: relative; text-align: center; font-size: 0.95rem; font-weight: 600;
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    border-radius: 0.375rem; padding: 0.75rem 3rem; margin: 0 0 1.5rem;
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+  .shaper .copy-btn {
+    position: absolute; top: 0.5rem; right: 0.5rem;
+    border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+    background: transparent; color: inherit; cursor: pointer; font: inherit;
+    border-radius: 0.375rem; padding: 0.2rem 0.5rem; font-size: 0.75rem; line-height: 1.2;
+    opacity: 0.55; transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+  }
+  .shaper .copy-btn:hover { opacity: 1; background: color-mix(in srgb, var(--accent) 12%, transparent); }
+  .shaper .copy-btn.copied { opacity: 1; color: #fff; background: var(--accent); border-color: var(--accent); }
+
+  .shaper .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.25rem; font-size: 0.8rem; margin-bottom: 1.75rem; opacity: 0.85; }
+  .shaper .legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .shaper .legend i { width: 0.85rem; height: 0.85rem; border-radius: 3px; display: inline-block; font-style: normal; }
+  .shaper .legend .la { background: var(--track-a); }
+  .shaper .legend .lb { background: var(--track-b); }
+  .shaper .legend .lc { background: var(--track-c); }
+
+  .shaper .season { display: grid; gap: 1.25rem; }
+  .shaper .episode { border: 1px solid var(--line); border-radius: 0.5rem; overflow: hidden; }
+  .shaper .ep-head {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.75rem;
+    padding: 0.6rem 1rem; background: color-mix(in srgb, var(--accent) 7%, transparent);
+    border-bottom: 1px solid var(--line);
+  }
+  .shaper .ep-num { font-weight: 700; }
+  .shaper .ep-role { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+  .shaper .role-terminus, .shaper .role-false_terminus { color: #b45309; }
+  :root[data-color-scheme="dark"] .shaper .role-terminus,
+  :root[data-color-scheme="dark"] .shaper .role-false_terminus { color: #f59e0b; }
+  .shaper .ep-mix { margin-left: auto; font-size: 0.8rem; opacity: 0.7; }
+
+  .shaper .scene-strip { display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--line); }
+  .shaper .scene { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.45rem 1rem; background: var(--page-bg, transparent); }
+  .shaper .sc-pos { width: 1.75rem; flex-shrink: 0; text-align: right; opacity: 0.5; font-variant-numeric: tabular-nums; }
+  .shaper .sc-track {
+    width: 1.4rem; flex-shrink: 0; text-align: center; font-weight: 700; font-size: 0.75rem;
+    border-radius: 3px; color: #fff; line-height: 1.4; align-self: center;
+  }
+  .shaper .track-a .sc-track { background: var(--track-a); }
+  .shaper .track-b .sc-track { background: var(--track-b); }
+  .shaper .track-c .sc-track { background: var(--track-c); }
+  .shaper .track-c .sc-beat { font-weight: 600; }
+  .shaper .sc-beat { flex: 1; }
+
+  .shaper hr.divider { border: 0; border-top: 1px solid var(--line); margin: 3.5rem 0; }
+</style>
+
+<aside class="prosed text-left" style="margin-bottom: 2rem;">
+  <p>
+    The <strong>C-Story Engine</strong> is the companion to the
+    <a href="/tools/plot-generator">Western Engine</a> plot generator. The Western Engine rolls the
+    <strong>A-story</strong> — the self-contained episode that opens and closes inside one installment. This rolls the
+    <strong>C-story</strong>: the serialized continuity spine that advances one click per episode and pays off across
+    the whole arc.
+  </p>
+  <p>
+    A C-story is generated <em>once per series</em>, not per episode. You roll a spine — a <em>Question</em>, a
+    <em>Stake</em>, a <em>Terminus</em>, and a signature <em>Key</em> — then the generator distributes its clicks
+    across the episodes on a <strong>plant / nudge / tag</strong> rhythm, so each installment advances the arc exactly
+    one notch while its A-story resolves clean.
+  </p>
+  <p>
+    <strong>Honest-broker scope:</strong> only three archetypes sustain an episodic A/B/C run, so only
+    <strong>Lawman</strong>, <strong>Drifter</strong>, and <strong>Trek</strong> carry a portable spine. The other
+    four terminate or resist episodic structure; select one and the engine returns a note explaining why, instead of a
+    spine. That's deliberate.
+  </p>
+</aside>
+
+<div class="cstory" data-controller="c-story-engine">
+
+  <!-- Dials: archetype is chosen; episode count tunes the distribution -->
+  <div class="dials">
+    <div class="dial">
+      <span class="dial-label">Archetype</span>
+      <div class="pillrow">
+        {% assign archetypes = "lawman:Lawman,drifter:Drifter,trek:Trek,homesteader:Homesteader,outlaw:Outlaw,defense:Defense,avenger:Avenger" | split: "," %}
+        {% for a in archetypes %}
+          {% assign pair = a | split: ":" %}
+          <button type="button" class="pill" data-c-story-engine-target="archetypePill"
+            data-action="click->c-story-engine#setArchetype" data-c-story-engine-archetype-param="{{ pair[0] }}">{{ pair[1] }}</button>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="dial">
+      <span class="dial-label">Episodes</span>
+      <input type="range" min="2" max="24" value="6" data-c-story-engine-target="episodes"
+        data-action="input->c-story-engine#episodesInput" aria-label="Number of episodes">
+      <span class="episodes-out" data-c-story-engine-target="episodesOut">6</span>
+    </div>
+  </div>
+
+  <!-- The archetype design note, surfaced the moment an archetype is selected -->
+  <p class="note" data-c-story-engine-target="note"></p>
+
+  <div class="center">
+    <button type="button" class="roll" data-action="click->c-story-engine#roll">Roll a New Spine</button>
+  </div>
+
+  <!-- The rolled spine (carrying archetypes only) -->
+  <div class="spine" data-c-story-engine-target="spine">
+    <button type="button" class="copy-btn" data-c-story-engine-target="copyBtn"
+      data-action="click->c-story-engine#copy" aria-label="Copy spine to clipboard">Copy</button>
+
+    <h2 class="slot-head">Spine</h2>
+    <dl class="slots">
+      <div class="row"><dt>Question</dt><dd data-c-story-engine-target="question"></dd></div>
+      <div class="row"><dt>Stake</dt><dd data-c-story-engine-target="stake"></dd></div>
+      <div class="row"><dt>Terminus</dt><dd data-c-story-engine-target="terminus"></dd></div>
+      <div class="row"><dt>Key</dt><dd data-c-story-engine-target="key"></dd></div>
+    </dl>
+
+    <h2 class="slot-head">Per-Episode Allocation</h2>
+    <div class="timeline" data-c-story-engine-target="timeline"></div>
+  </div>
+
+</div>
+
+<hr class="divider" />
+
+<aside class="prosed text-left" style="margin-bottom: 2rem;">
+  <h2>Season Shaper</h2>
+  <p>
+    The C-Story Engine rolls <em>what</em> the serialized spine is. The <strong>Season Shaper</strong> lays out
+    <em>where</em> it goes. Give it a per-episode scene count and a season length, and it shapes the
+    <strong>A/B/C</strong> structure two ways at once: within each episode it splits the scenes into <strong>A</strong>
+    (the self-contained plot, which always opens and closes), <strong>B</strong> (relational / thematic counterpoint
+    woven through the gaps), and <strong>C</strong> (the serialized spine click); across the season it assigns each
+    episode a <strong>C-story role</strong> — plant, complicate, turn, deepen, pressure, terminus — so the spine
+    resolves on the finale and never sags in the middle. Eight-episode seasons get a double-pump (a false terminus,
+    then a reset) to keep the stretch from going soft.
+  </p>
+</aside>
+
+<div class="shaper" data-controller="season-shaper">
+
+  <div class="dials">
+    <div class="dial">
+      <span class="dial-label">Scenes / Episode</span>
+      <input type="range" min="4" max="20" value="10" data-season-shaper-target="scenes"
+        data-action="input->season-shaper#scenesInput" aria-label="Scenes per episode">
+      <span class="out" data-season-shaper-target="scenesOut">10</span>
+    </div>
+    <div class="dial">
+      <span class="dial-label">Episodes / Season</span>
+      <input type="range" min="4" max="12" value="6" data-season-shaper-target="episodes"
+        data-action="input->season-shaper#episodesInput" aria-label="Episodes per season">
+      <span class="out" data-season-shaper-target="episodesOut">6</span>
+    </div>
+  </div>
+
+  <p class="totals">
+    <button type="button" class="copy-btn" data-season-shaper-target="copyBtn"
+      data-action="click->season-shaper#copy" aria-label="Copy season plan to clipboard">Copy</button>
+    <span data-season-shaper-target="totals"></span>
+  </p>
+
+  <div class="legend">
+    <span><i class="la"></i> A — self-contained plot (opens &amp; closes)</span>
+    <span><i class="lb"></i> B — relational / thematic counterpoint</span>
+    <span><i class="lc"></i> C — serialized spine click</span>
+  </div>
+
+  <div class="season" data-season-shaper-target="season"></div>
+
+</div>
