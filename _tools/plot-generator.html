@@ -1,9 +1,9 @@
 ---
 layout: tool
 title: Plot Generator
-description: "The Drifter Engine — a genre-agnostic, Western-boned pulp premise generator. Roll six SEED slots for a
-premise, then expand into a full 25-scene skeleton. Works for low fantasy or sci-fi without changing a bit; you decide
-the skin."
+description: "The Western Engine — a genre-agnostic, Western-boned pulp premise generator. Pick one of seven hero
+archetypes, roll the SEED slots for a premise, then expand into a full 25-scene skeleton. Works for low fantasy or
+sci-fi without changing a bit; you decide the skin."
 ---
 <script type="module" src="/assets/controllers/plot_generator_controller.js"></script>
 
@@ -94,26 +94,39 @@ the skin."
 
 <aside class="prosed text-left" style="margin-bottom: 2rem;">
   <p>
-    <strong>The Drifter Engine</strong> is a genre-agnostic, Western-boned pulp premise generator. The Western is the
-    skeleton, never the costume — no cowboys in here. A capable outsider with a <em>Code</em> arrives at the
-    <em>Edge</em>, where a <em>System</em> — working through its <em>Enforcer</em> — puts the <em>Squeeze</em> on
-    the place and the <em>One Worth Saving</em>. They take the <em>Job</em>, get pulled in, hit a <em>Reversal</em>
-    and the <em>Turn</em>, and everything tightens toward the <em>Reckoning</em> — which tests the Code at full
-    cost — and the <em>Price</em>: a partial, costly win, then the road again.
+    <strong>The Western Engine</strong> is a genre-agnostic, Western-boned pulp premise generator. The Western is the
+    skeleton, never the costume — no cowboys in here. A capable figure with a <em>Code</em> stands in some
+    <em>Stance</em> toward the <em>Edge</em>, where a <em>System</em> — working through its <em>Enforcer</em> —
+    puts the <em>Squeeze</em> on the place and the <em>One Worth Saving</em>. A <em>Job</em> binds them to act; they
+    hit a <em>Reversal</em> and the <em>Turn</em>, and everything tightens toward the <em>Reckoning</em> — which
+    tests the Code at full cost — and the <em>Disposition</em>: a costly outcome in the archetype's signature key.
   </p>
   <p>
-    Roll the <strong>SEED</strong> slots for a premise. Set genre and tone, then flip the <em>Skeleton</em> switch to
-    fold the <strong>EXPANSION</strong> slots into the premise. Reroll any slot that fights the others. These slots
-    define external plot, arena, and one relationship only — the internal arc (Lie, Fear, Flaw, Need, Wound,
-    Epiphany) is intentionally absent. <strong>Copy</strong> carries the full premise plus a legend defining every
-    slot in craft terms, so a pasted premise needs no guesswork.
+    Pick an <strong>Archetype</strong> — the hero's relationship to place and order. It swaps only two slots: the
+    <em>Stance</em> (beat 1) and the <em>Disposition</em> (beat 7); everything between is shared. Roll the
+    <strong>SEED</strong> slots for a premise, set genre and tone, then flip the <em>Skeleton</em> switch to fold the
+    <strong>EXPANSION</strong> slots into the premise. Reroll any slot that fights the others. These slots define
+    external plot, arena, and one relationship only — the internal arc (Lie, Fear, Flaw, Need, Wound, Epiphany) is
+    intentionally absent. <strong>Copy</strong> carries the full premise plus a legend defining every slot in craft
+    terms, so a pasted premise needs no guesswork.
   </p>
 </aside>
 
 <div class="drifter" data-controller="plot-generator">
 
-  <!-- Dials: genre and tone are painted, not rolled -->
+  <!-- Dials: archetype is chosen; genre and tone are painted, not rolled -->
   <div class="dials">
+    <div class="dial">
+      <span class="dial-label">Archetype</span>
+      <div class="pillrow">
+        {% assign archetypes = "any:Any,drifter:Drifter,lawman:Lawman,homesteader:Homesteader,avenger:Avenger,outlaw:Outlaw,trek:Trek,defense:Defense" | split: "," %}
+        {% for a in archetypes %}
+          {% assign pair = a | split: ":" %}
+          <button type="button" class="pill" data-plot-generator-target="archetypePill"
+            data-action="click->plot-generator#setArchetype" data-plot-generator-archetype-param="{{ pair[0] }}">{{ pair[1] }}</button>
+        {% endfor %}
+      </div>
+    </div>
     <div class="dial">
       <span class="dial-label">Genre</span>
       <div class="pillrow">
@@ -162,7 +175,7 @@ the skin."
   <!-- SEED slots -->
   <h2 class="slot-head">Seed</h2>
   <dl class="slots seed">
-    {% assign seeds = "drifter:Drifter,code:Code,edge:Edge,system:System,enforcer:Enforcer,squeeze:Squeeze,job:Job" | split: "," %}
+    {% assign seeds = "stance:Stance,code:Code,edge:Edge,system:System,enforcer:Enforcer,squeeze:Squeeze,job:Job" | split: "," %}
     {% for s in seeds %}
       {% assign pair = s | split: ":" %}
       <div class="row">
@@ -178,7 +191,7 @@ the skin."
   <div data-plot-generator-target="expansion">
     <h2 class="slot-head">Expansion</h2>
     <dl class="slots">
-      {% assign exp = "reversal:Reversal,oneWorthSaving:One Worth Saving,turn:Turn,reckoning:Reckoning,price:Price,wildcard:Wildcard" | split: "," %}
+      {% assign exp = "reversal:Reversal,oneWorthSaving:One Worth Saving,turn:Turn,reckoning:Reckoning,disposition:Disposition,wildcard:Wildcard" | split: "," %}
       {% for s in exp %}
         {% assign pair = s | split: ":" %}
         <div class="row">
