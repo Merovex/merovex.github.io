@@ -29,14 +29,14 @@ Stimulus.register("c-story-engine", class extends Controller {
   };
 
   ARCHETYPE_LABELS = {
-    lawman: "Lawman", drifter: "Drifter", trek: "Trek", espionage: "Espionage",
-    homesteader: "Homesteader", outlaw: "Outlaw", defense: "Defense", avenger: "Avenger",
+    lawman: "Lawman", drifter: "Drifter", trek: "Trek", outlaw: "Outlaw",
+    homesteader: "Homesteader", defense: "Defense", avenger: "Avenger",
   };
 
   // Per-archetype default run length. The generator default is 6; the Drifter's
   // tighter pursuit fits 4, the Lawman's institutional rot wants 8. Selecting an
   // archetype seeds its default; the slider still overrides freely after that.
-  DEFAULT_EPISODES = { lawman: 8, drifter: 4, trek: 6, espionage: 8 };
+  DEFAULT_EPISODES = { lawman: 8, drifter: 4, trek: 6, outlaw: 8 };
 
   // ── LAWMAN ────────────────────────────────────────────────────────────────
   // Belongs to the order, so the A-story carries no melancholy tax. That frees
@@ -165,16 +165,17 @@ Stimulus.register("c-story-engine", class extends Controller {
     ],
   };
 
-  // ── ESPIONAGE ─────────────────────────────────────────────────────────────
-  // The Outlaw's engine, reframed. The Outlaw runs on inverted moral polarity —
-  // the reader roots for the squeezed crew, not the Power closing in — which is
-  // exactly the sympathy a corporate cold war hands you for free when one ragtag
-  // independent cell is up against a monolithic intelligence Power. The one swap
-  // from the straight-Western Outlaw is in the termini and keys: every ending
-  // leaves the crew alive and in business rather than dead and mourned. That
-  // single change converts the form from terminal-elegiac to episodic farce.
-  ESPIONAGE = {
-    note: "An independent cell against a monolithic intelligence Power. The inverted polarity hands you the crew's sympathy for free, the way a corporate cold war does. Swapping the Outlaw's elegiac ending for 'everyone lives, still in business' converts the form from terminal to episodic farce: the net keeps closing on nothing, a crew that works only because no one trusts anyone is inherently comic, and the cold war never ends, so the Power always loses just enough to be back next episode.",
+  // ── OUTLAW ────────────────────────────────────────────────────────────────
+  // The straight-Western Outlaw is terminal and elegiac — the frontier wins, the
+  // crew is mourned — which is why it normally can't carry an episodic spine. The
+  // one swap is in the termini and keys: every ending leaves the crew alive and in
+  // business rather than dead and mourned, which converts the form from terminal-
+  // elegiac to episodic farce. It runs on inverted moral polarity (you root for the
+  // squeezed crew, not the Power closing in), so in an espionage skin it is the
+  // independent cell against a monolithic intelligence Power — the mirror of the
+  // company man on the other side of that cold war, who is the Lawman.
+  OUTLAW = {
+    note: "The straight-Western Outlaw is terminal and elegiac — the frontier wins and the crew is mourned — so it normally can't carry an episodic spine. Swap the ending for 'everyone lives, still in business' and it turns to farce, which sustains a season: the net keeps closing on nothing, a crew that works only because no one trusts anyone is inherently comic, and the cold war never ends. It runs on inverted polarity — you root for the squeezed crew, not the Power. In an espionage skin that crew is the independent cell against a monolithic intelligence Power; the company man on the other side of the same cold war is the Lawman.",
     questions: [
       "Which of the crew is feeding the jobs to the Power, and how close is the net?",
       "Is the one big score that buys everyone out real, or is it bait?",
@@ -213,14 +214,13 @@ Stimulus.register("c-story-engine", class extends Controller {
   };
 
   get ARCHETYPES() {
-    return { lawman: this.LAWMAN, drifter: this.DRIFTER, trek: this.TREK, espionage: this.ESPIONAGE };
+    return { lawman: this.LAWMAN, drifter: this.DRIFTER, trek: this.TREK, outlaw: this.OUTLAW };
   }
 
   // The four that do not get a generator, and why. Honest-broker flags so the
   // user is never surprised that a spine didn't come back.
   ARCHETYPE_NOTES = {
     homesteader: "Rooted, not episodic. Plausible week-of-threats against one place run out fast. The form wants generational serial, not A/B/C. Build a saga, not a spine.",
-    outlaw: "Elegiac and terminal. Caper-of-the-week fights the closing frontier the form is about. Run it as an anthology of jobs heading toward one ending, not an open spine.",
     defense: "A single siege, climactic and ensemble. Recurring sieges strain belief. One-shot.",
     avenger: "Terminal by design. The spine IS the whole story, and there are no episodes to hang an A-plot on. Write the book, not the series.",
   };

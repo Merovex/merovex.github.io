@@ -183,11 +183,18 @@ set the episode count, and the generator distributes the spine's clicks on a pla
   </p>
   <p>
     <strong>Honest-broker scope:</strong> only four archetypes sustain an episodic A/B/C run, so
-    <strong>Lawman</strong>, <strong>Drifter</strong>, <strong>Trek</strong>, and <strong>Espionage</strong> carry a
-    portable spine. <strong>Espionage</strong> is the Outlaw's inverted-polarity engine reframed as a never-ending cold
-    war farce: swap its elegiac ending for "everyone lives, still in business" and the terminal form turns episodic.
-    The other four archetypes terminate or resist episodic structure; select one and the engine returns a note
+    <strong>Lawman</strong>, <strong>Drifter</strong>, <strong>Trek</strong>, and <strong>Outlaw</strong> carry a
+    portable spine. The Outlaw normally terminates — elegiac, the frontier wins, the crew is mourned — but swap its
+    ending for "everyone lives, still in business" and the farce cut turns episodic. The other three archetypes
+    (Homesteader, Defense, Avenger) terminate or resist episodic structure; select one and the engine returns a note
     explaining why, instead of a spine. That's deliberate.
+  </p>
+  <p>
+    <strong>Espionage isn't an archetype — it's a skin these wear.</strong> The company man, sworn to the institution
+    and carrying its license, is a <strong>Lawman</strong>: the agency sends him, the gadgets equip him, and the season
+    spine is institutional rot — is the agency clean, is my own handler spending me? The independent cell on the
+    <em>other</em> side of that same cold war is the <strong>Outlaw</strong>. Two POVs on one shared world: pick the
+    Lawman for the heavy serialized cut, the Outlaw for the farce.
   </p>
 </aside>
 
@@ -198,7 +205,7 @@ set the episode count, and the generator distributes the spine's clicks on a pla
     <div class="dial">
       <span class="dial-label">Archetype</span>
       <div class="pillrow">
-        {% assign archetypes = "lawman:Lawman,drifter:Drifter,trek:Trek,espionage:Espionage,homesteader:Homesteader,outlaw:Outlaw,defense:Defense,avenger:Avenger" | split: "," %}
+        {% assign archetypes = "lawman:Lawman,drifter:Drifter,trek:Trek,outlaw:Outlaw,homesteader:Homesteader,defense:Defense,avenger:Avenger" | split: "," %}
         {% for a in archetypes %}
           {% assign pair = a | split: ":" %}
           <button type="button" class="pill" data-c-story-engine-target="archetypePill"
