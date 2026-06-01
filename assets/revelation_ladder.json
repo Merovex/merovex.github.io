@@ -1,0 +1,69 @@
+{
+  "_use": "A-story module for investigation/conspiracy thrillers. A plot-mode layer, not a spine. Works with any archetype. Climb one rung per tier in order; roll scheme, clock, and red herring once per episode. Shared by two consumers: episode-scale into the plot generator's Investigation toggle, season-scale into the C-Story Engine as a conspiracy spine type whose five rungs become the C-clicks the Season Shaper distributes.",
+
+  "scheme": [
+    "The visible crime is cover for a theft no one has noticed yet.",
+    "The target is being framed so the real culprit can act unwatched.",
+    "An inside faction is selling out the institution from within.",
+    "A loss is being manufactured to justify a seizure of power.",
+    "A far larger crime is being laundered through this small one.",
+    "The threat is real but aimed at a different victim than everyone assumes."
+  ],
+
+  "rungs": {
+    "tier_1_surface": [
+      "The presented threat does not add up; the timeline is wrong.",
+      "A detail at the scene was planted, not left behind.",
+      "The first victim was a message, not the point."
+    ],
+    "tier_2_scope": [
+      "This is one of several identical cases no one had connected.",
+      "The operation reaches into an institution the hero trusted.",
+      "The money or cargo trail runs far past the local players."
+    ],
+    "tier_3_betrayal": [
+      "Someone feeding the hero information is feeding the other side too.",
+      "An ally's alibi is the one piece of the story that was fabricated.",
+      "The hero's own side authorized the thing the hero is trying to stop."
+    ],
+    "tier_4_personal": [
+      "The hero was handed this case because they were expected to fail.",
+      "The scheme needs the hero's own action to complete; they are the tool.",
+      "The wound in the hero's past was the opening move of this same plan."
+    ],
+    "tier_5_true_stakes": [
+      "When the clock runs out, the real target, not the decoy, is taken.",
+      "The deadline is the moment the cover becomes permanent, not a moment to act.",
+      "Stopping it now exposes the hero as the one who let it get this far."
+    ]
+  },
+
+  "rung_tiers": [
+    { "key": "tier_1_surface", "label": "Surface" },
+    { "key": "tier_2_scope", "label": "Scope" },
+    { "key": "tier_3_betrayal", "label": "Betrayal" },
+    { "key": "tier_4_personal", "label": "Personal" },
+    { "key": "tier_5_true_stakes", "label": "True Stakes" }
+  ],
+
+  "clock": [
+    "A handoff at a fixed hour that cannot be moved.",
+    "A vote, ruling, or signature that locks the scheme in once it passes.",
+    "A witness who will be gone, bought, or silenced by a set time.",
+    "A shipment in transit that becomes untouchable on arrival.",
+    "A cover story that becomes unbreakable once it is filed."
+  ],
+
+  "red_herring": [
+    "The obvious suspect is guilty of something, just not this.",
+    "A planted document points the hero confidently the wrong way.",
+    "A second, louder crime pulls attention while the real one proceeds.",
+    "A defector offers help that burns the hero's most expensive hours."
+  ],
+
+  "step_behind": [
+    "The antagonist acts on the exact lead the hero just uncovered.",
+    "Every door the hero opens was left open on purpose.",
+    "The hero's progress is the antagonist's timeline; catching up is the plan."
+  ]
+}

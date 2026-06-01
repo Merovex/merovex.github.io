@@ -15,11 +15,16 @@ Stimulus.register("plot-generator", class extends Controller {
     "skin", "expandToggle", "clip", "copyBtn", "lockBtn",
     "archetypePill",
     "genreNeutral", "genreFantasy", "genreScifi", "toneAny", "toneDark", "toneHeroic",
+    "modeConfrontation", "modeInvestigation",
+    "investigationGroup", "systemRow", "reversalRow", "turnRow",
+    "scheme", "surface", "scope", "betrayal", "personal", "trueStakes",
+    "clock", "redHerring", "stepBehind",
   ];
   static values = {
     archetype: { type: String, default: "drifter" },
     genre: { type: String, default: "neutral" },
     tone: { type: String, default: "any" },
+    mode: { type: String, default: "confrontation" },
   };
 
   // Slot names frozen against the global Roll. Re-roll keeps locked slots and
@@ -73,6 +78,17 @@ Stimulus.register("plot-generator", class extends Controller {
     "Wildcard = a complication object or MacGuffin.",
     "",
     "These slots define external plot, arena, and one relationship only. The internal arc — Lie, Fear, Flaw, Need, Wound, Epiphany — is intentionally absent and must be built separately.",
+  ].join("\n");
+
+  // Appended to the legend when Investigation mode is on.
+  INVESTIGATION_LEGEND = [
+    "INVESTIGATION (Revelation Ladder) — A-story plot-mode layer for conspiracy thrillers",
+    "Scheme = what the System is secretly doing; in investigation mode it replaces the visible System in the logline.",
+    "Revelation Ladder = a graduated reveal; climb one rung per tier, in order:",
+    "  Surface (1), Scope (2), Betrayal (3 = the Reversal), Personal (4 = the Turn), True Stakes (5).",
+    "Clock = the explicit deadline the case races.",
+    "Red Herring = the lead that burns the hero's most expensive hours.",
+    "One Step Behind = how the antagonist stays ahead of the hero.",
   ].join("\n");
 
   ARCHETYPE_LABELS = {
@@ -154,6 +170,21 @@ Stimulus.register("plot-generator", class extends Controller {
     this.renderSkin();
     this.roll();
     this.updateLockVisibility();
+    this.applyMode();
+    this.loadLadder();
+  }
+
+  // Fetch the shared investigation data once (assets/revelation_ladder.json),
+  // shared with the C-Story Engine. If we're already in investigation mode when
+  // it lands, populate the ladder and repaint.
+  loadLadder() {
+    fetch("/assets/revelation_ladder.json")
+      .then((r) => r.json())
+      .then((data) => {
+        this.ladder = data;
+        if (this.modeValue === "investigation") { this.fillInvestigation(); this.renderPremise(); }
+      })
+      .catch(() => { this.ladder = null; });
   }
 
   // Sample a fresh premise: all SEED slots plus the EXPANSION skeleton.
@@ -177,7 +208,34 @@ Stimulus.register("plot-generator", class extends Controller {
       job: this.keepOrPick(prev, "job", this.JOB),
     };
     this.fillExpansion(prev);
+    this.fillInvestigation();
     this.renderSeed();
+  }
+
+  // Roll the investigation layer (scheme, the five rungs, clock, red herring,
+  // step-behind). No-op until the shared ladder data has loaded.
+  fillInvestigation() {
+    if (!this.ladder) return;
+    const L = this.ladder;
+    this.current.scheme = this.pick(L.scheme);
+    this.current.surface = this.pick(L.rungs.tier_1_surface);
+    this.current.scope = this.pick(L.rungs.tier_2_scope);
+    this.current.betrayal = this.pick(L.rungs.tier_3_betrayal);
+    this.current.personal = this.pick(L.rungs.tier_4_personal);
+    this.current.trueStakes = this.pick(L.rungs.tier_5_true_stakes);
+    this.current.clock = this.pick(L.clock);
+    this.current.redHerring = this.pick(L.red_herring);
+    this.current.stepBehind = this.pick(L.step_behind);
+    this.renderInvestigation();
+  }
+
+  renderInvestigation() {
+    if (!this.current || !this.current.scheme) return;
+    ["scheme", "surface", "scope", "betrayal", "personal", "trueStakes", "clock", "redHerring", "stepBehind"]
+      .forEach((slot) => {
+        const has = `has${slot[0].toUpperCase()}${slot.slice(1)}Target`;
+        if (this[has]) this[`${slot}Target`].textContent = this.current[slot];
+      });
   }
 
   // Keep a locked slot's prior value; otherwise pick fresh from its bank.
@@ -235,6 +293,16 @@ Stimulus.register("plot-generator", class extends Controller {
       reversal: this.REVERSAL, oneWorthSaving: this.ONE_WORTH_SAVING, turn: this.TURN,
       reckoning: this.RECKONING, disposition: arch.DISPOSITION, wildcard: this.WILDCARD,
     };
+    if (this.ladder) {
+      const L = this.ladder;
+      Object.assign(banks, {
+        scheme: L.scheme, surface: L.rungs.tier_1_surface, scope: L.rungs.tier_2_scope,
+        betrayal: L.rungs.tier_3_betrayal, personal: L.rungs.tier_4_personal,
+        trueStakes: L.rungs.tier_5_true_stakes,
+        clock: L.clock, redHerring: L.red_herring, stepBehind: L.step_behind,
+      });
+    }
+    if (!banks[slot]) return;
     this.current[slot] = this.pick(banks[slot]);
     this[`${slot}Target`].textContent = this.current[slot];
     // Any reroll may change the premise text (seed always; skeleton when toggled).
@@ -251,33 +319,56 @@ Stimulus.register("plot-generator", class extends Controller {
   // is pasted elsewhere needs no inference about what each slot means.
   buildCopyText() {
     const c = this.current;
+    const inv = this.modeValue === "investigation" && c.scheme;
     const expanded = this.hasExpandToggleTarget && this.expandToggleTarget.checked;
     const archLabel = this.archetypeValue === "any"
       ? `Any (rolled ${this.ARCHETYPE_LABELS[this.archetypeKey]})`
       : this.ARCHETYPE_LABELS[this.archetypeValue];
+    const common = [`Stance: ${c.stance}`, `Code: ${c.code}`, `Edge: ${c.edge}`];
+    const slotLines = inv
+      ? [
+          ...common,
+          `Enforcer: ${c.enforcer}`,
+          `Squeeze: ${c.squeeze}`,
+          `Job: ${c.job}`,
+          `Scheme: ${c.scheme}`,
+          `Surface (rung 1): ${c.surface}`,
+          `Scope (rung 2): ${c.scope}`,
+          `Betrayal (rung 3 = Reversal): ${c.betrayal}`,
+          `Personal (rung 4 = Turn): ${c.personal}`,
+          `True Stakes (rung 5): ${c.trueStakes}`,
+          `Clock: ${c.clock}`,
+          `Red Herring: ${c.redHerring}`,
+          `One Step Behind: ${c.stepBehind}`,
+          `One Worth Saving: ${c.oneWorthSaving}`,
+          `Reckoning: ${c.reckoning}`,
+          `Disposition: ${c.disposition}`,
+          `Wildcard: ${c.wildcard}`,
+        ]
+      : [
+          ...common,
+          `System: ${c.system}`,
+          `Enforcer: ${c.enforcer}`,
+          `Squeeze: ${c.squeeze}`,
+          `Job: ${c.job}`,
+          `Reversal: ${c.reversal}`,
+          `One Worth Saving: ${c.oneWorthSaving}`,
+          `Turn: ${c.turn}`,
+          `Reckoning: ${c.reckoning}`,
+          `Disposition: ${c.disposition}`,
+          `Wildcard: ${c.wildcard}`,
+        ];
     const lines = [
       "PREMISE",
       this.premiseTarget.textContent,
       "",
       "SLOTS",
       `Archetype: ${archLabel}`,
-      `Stance: ${c.stance}`,
-      `Code: ${c.code}`,
-      `Edge: ${c.edge}`,
-      `System: ${c.system}`,
-      `Enforcer: ${c.enforcer}`,
-      `Squeeze: ${c.squeeze}`,
-      `Job: ${c.job}`,
-      `Reversal: ${c.reversal}`,
-      `One Worth Saving: ${c.oneWorthSaving}`,
-      `Turn: ${c.turn}`,
-      `Reckoning: ${c.reckoning}`,
-      `Disposition: ${c.disposition}`,
-      `Wildcard: ${c.wildcard}`,
+      ...slotLines,
       "",
-      `Archetype: ${archLabel} · Genre: ${this.GENRE_LABELS[this.genreValue]} · Tone: ${this.TONE_LABELS[this.toneValue]} · Skeleton woven into premise: ${expanded ? "yes" : "no"}`,
+      `Archetype: ${archLabel} · Mode: ${inv ? "Investigation" : "Confrontation"} · Genre: ${this.GENRE_LABELS[this.genreValue]} · Tone: ${this.TONE_LABELS[this.toneValue]} · Skeleton woven into premise: ${expanded ? "yes" : "no"}`,
       "",
-      this.LEGEND,
+      inv ? `${this.LEGEND}\n\n${this.INVESTIGATION_LEGEND}` : this.LEGEND,
     ];
     return lines.join("\n");
   }
@@ -331,6 +422,25 @@ Stimulus.register("plot-generator", class extends Controller {
   setArchetype(event) { this.archetypeValue = event.params.archetype; }
   setGenre(event) { this.genreValue = event.params.genre; }
   setTone(event) { this.toneValue = event.params.tone; }
+  setMode(event) { this.modeValue = event.params.mode; }
+
+  // Investigation swaps the visible System for the Scheme, hides the generic
+  // Reversal and Turn (the ladder supersedes them), and surfaces the ladder.
+  modeValueChanged() {
+    if (!this.current) return;
+    if (this.modeValue === "investigation" && this.ladder && !this.current.scheme) this.fillInvestigation();
+    this.applyMode();
+    this.renderPremise();
+    this.highlightDials();
+  }
+
+  applyMode() {
+    const inv = this.modeValue === "investigation";
+    if (this.hasInvestigationGroupTarget) this.investigationGroupTarget.classList.toggle("hidden", !inv);
+    if (this.hasSystemRowTarget) this.systemRowTarget.classList.toggle("hidden", inv);
+    if (this.hasReversalRowTarget) this.reversalRowTarget.classList.toggle("hidden", inv);
+    if (this.hasTurnRowTarget) this.turnRowTarget.classList.toggle("hidden", inv);
+  }
 
   // Switching archetype resamples the two swappable slots from the new banks
   // and re-renders the note and premise; the shared middle is left intact.
@@ -374,6 +484,10 @@ Stimulus.register("plot-generator", class extends Controller {
     };
     Object.entries(genrePills).forEach(([k, el]) => el.setAttribute("aria-pressed", k === this.genreValue));
     Object.entries(tonePills).forEach(([k, el]) => el.setAttribute("aria-pressed", k === this.toneValue));
+    if (this.hasModeConfrontationTarget) {
+      this.modeConfrontationTarget.setAttribute("aria-pressed", this.modeValue === "confrontation");
+      this.modeInvestigationTarget.setAttribute("aria-pressed", this.modeValue === "investigation");
+    }
   }
 
   renderSeed() {
@@ -393,14 +507,34 @@ Stimulus.register("plot-generator", class extends Controller {
   renderPremise() {
     if (!this.current) return;
     const c = this.current;
-    let text = this.archetype.lead(c);
-    if (this.hasExpandToggleTarget && this.expandToggleTarget.checked && c.reversal) {
-      text +=
-        ` The reversal: ${c.reversal}. The one worth saving is ${c.oneWorthSaving}. ` +
-        `The turn comes when ${c.turn}. Everything tightens toward the reckoning — ${c.reckoning} — ` +
-        `and the disposition: ${c.disposition}. Wildcard: ${c.wildcard}.`;
+    const expanded = this.hasExpandToggleTarget && this.expandToggleTarget.checked;
+    let text;
+    if (this.modeValue === "investigation" && c.scheme) {
+      text = this.investigationLead(c);
+      if (expanded) {
+        text +=
+          ` The reveal climbs — Surface: ${c.surface} Scope: ${c.scope} Betrayal: ${c.betrayal} ` +
+          `Personal: ${c.personal} True stakes: ${c.trueStakes} Red herring: ${c.redHerring} ` +
+          `Always a step behind: ${c.stepBehind}`;
+      }
+    } else {
+      text = this.archetype.lead(c);
+      if (expanded && c.reversal) {
+        text +=
+          ` The reversal: ${c.reversal}. The one worth saving is ${c.oneWorthSaving}. ` +
+          `The turn comes when ${c.turn}. Everything tightens toward the reckoning — ${c.reckoning} — ` +
+          `and the disposition: ${c.disposition}. Wildcard: ${c.wildcard}.`;
+      }
     }
     this.premiseTarget.textContent = text;
+  }
+
+  // Mode-level investigation logline: the visible squeeze is cover, the Scheme is
+  // the truth, the Clock is load-bearing. Replaces the System with the Scheme.
+  investigationLead(c) {
+    const cap = (s) => this.capitalize(s);
+    return `${cap(c.stance)} comes to ${c.edge}. On the surface, ${c.enforcer} is ${c.squeeze} — but that is ` +
+      `cover. ${c.scheme} Holding that ${c.code}, they work the case to ${c.job}. Clock: ${c.clock}`;
   }
 
   pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }

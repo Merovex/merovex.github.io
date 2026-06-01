@@ -156,6 +156,15 @@ sci-fi without changing a bit; you decide the skin."
       </div>
     </div>
     <div class="dial">
+      <span class="dial-label">Mode</span>
+      <div class="pillrow">
+        <button type="button" class="pill" data-plot-generator-target="modeConfrontation"
+          data-action="click->plot-generator#setMode" data-plot-generator-mode-param="confrontation">Confrontation</button>
+        <button type="button" class="pill" data-plot-generator-target="modeInvestigation"
+          data-action="click->plot-generator#setMode" data-plot-generator-mode-param="investigation">Investigation</button>
+      </div>
+    </div>
+    <div class="dial">
       <span class="dial-label">Skeleton</span>
       <label class="switch" title="Add the expanded skeleton to the premise">
         <input type="checkbox" data-plot-generator-target="expandToggle"
@@ -184,7 +193,7 @@ sci-fi without changing a bit; you decide the skin."
     {% assign seeds = "stance:Stance,code:Code,edge:Edge,system:System,enforcer:Enforcer,squeeze:Squeeze,job:Job" | split: "," %}
     {% for s in seeds %}
       {% assign pair = s | split: ":" %}
-      <div class="row">
+      <div class="row"{% if pair[0] == "system" %} data-plot-generator-target="systemRow"{% endif %}>
         <dt>{{ pair[1] }}</dt>
         <dd data-plot-generator-target="{{ pair[0] }}"></dd>
         <button type="button" class="reroll" title="Reroll {{ pair[1] }}"
@@ -206,7 +215,7 @@ sci-fi without changing a bit; you decide the skin."
       {% assign exp = "reversal:Reversal,oneWorthSaving:One Worth Saving,turn:Turn,reckoning:Reckoning,disposition:Disposition,wildcard:Wildcard" | split: "," %}
       {% for s in exp %}
         {% assign pair = s | split: ":" %}
-        <div class="row">
+        <div class="row"{% if pair[0] == "reversal" %} data-plot-generator-target="reversalRow"{% elsif pair[0] == "turn" %} data-plot-generator-target="turnRow"{% endif %}>
           <dt>{{ pair[1] }}</dt>
           <dd data-plot-generator-target="{{ pair[0] }}"></dd>
           <button type="button" class="reroll" title="Reroll {{ pair[1] }}"
@@ -216,6 +225,23 @@ sci-fi without changing a bit; you decide the skin."
               data-plot-generator-target="lockBtn"
               data-action="click->plot-generator#toggleLock" data-plot-generator-slot-param="{{ pair[0] }}">🔓</button>
           {% endif %}
+        </div>
+      {% endfor %}
+    </dl>
+  </div>
+
+  <!-- INVESTIGATION slots (shown only in Investigation mode; the ladder supersedes Reversal + Turn) -->
+  <div class="hidden" data-plot-generator-target="investigationGroup">
+    <h2 class="slot-head">Investigation — Revelation Ladder</h2>
+    <dl class="slots">
+      {% assign inv = "scheme:Scheme,surface:Surface,scope:Scope,betrayal:Betrayal,personal:Personal,trueStakes:True Stakes,clock:Clock,redHerring:Red Herring,stepBehind:One Step Behind" | split: "," %}
+      {% for s in inv %}
+        {% assign pair = s | split: ":" %}
+        <div class="row">
+          <dt>{{ pair[1] }}</dt>
+          <dd data-plot-generator-target="{{ pair[0] }}"></dd>
+          <button type="button" class="reroll" title="Reroll {{ pair[1] }}"
+            data-action="click->plot-generator#reroll" data-plot-generator-slot-param="{{ pair[0] }}">⟳</button>
         </div>
       {% endfor %}
     </dl>
