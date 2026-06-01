@@ -1,10 +1,11 @@
 ---
 layout: tool
-title: C-Story Engine
-description: "The C-Story Engine — companion to the Western Engine plot generator. The Western Engine rolls the
-A-story, the self-contained episode that opens and closes in one installment. This rolls the C-story: the serialized
-continuity spine that advances one click per episode and pays off across the whole arc. Pick a carrying archetype,
-set the episode count, and the generator distributes the spine's clicks on a plant / nudge / tag rhythm."
+title: Season Arc Generator
+description: "The Season Arc Generator — companion to the Episode Plot Generator. Episodic fiction braids three tracks:
+the A-story (the self-contained episode plot), the B-story (relational/thematic counterpoint), and the C-story (the
+season arc). The Episode Plot Generator rolls the A-story; this rolls the C-story: the serialized spine that advances
+one click per episode and pays off across the whole run. Pick a carrying archetype, set the episode count, and it
+distributes the spine's clicks on a plant / nudge / tag rhythm."
 ---
 <script type="module" src="/assets/controllers/c_story_engine_controller.js"></script>
 <script type="module" src="/assets/controllers/season_shaper_controller.js"></script>
@@ -14,7 +15,7 @@ set the episode count, and the generator distributes the spine's clicks on a pla
 <style>
   /* Self-contained styles — no Tailwind build required. Adapts to the site's
      light/dark theme via :root[data-color-scheme="dark"] and currentColor.
-     Shares the visual language of the plot-generator (Western Engine) tool. */
+     Shares the visual language of the Episode Plot Generator tool. */
   .cstory { --accent: #b45309; --line: rgba(127, 127, 127, 0.25); }
   :root[data-color-scheme="dark"] .cstory { --accent: #f59e0b; }
 
@@ -183,11 +184,12 @@ set the episode count, and the generator distributes the spine's clicks on a pla
 
 <aside class="prosed text-left" style="margin-bottom: 2rem;">
   <p>
-    The <strong>C-Story Engine</strong> is the companion to the
-    <a href="/tools/plot-generator">Western Engine</a> plot generator. The Western Engine rolls the
-    <strong>A-story</strong> — the self-contained episode that opens and closes inside one installment. This rolls the
-    <strong>C-story</strong>: the serialized continuity spine that advances one click per episode and pays off across
-    the whole arc.
+    The <strong>Season Arc Generator</strong> is the companion to the
+    <a href="/tools/plot-generator">Episode Plot Generator</a>. Episodic fiction braids three tracks: the
+    <strong>A-story</strong> is the self-contained plot that opens and closes inside one episode; the
+    <strong>B-story</strong> is the relational or thematic counterpoint woven through its gaps; and the
+    <strong>C-story</strong> is the <em>season arc</em> — the serialized spine that advances one click per episode and
+    pays off across the whole run. The Episode Plot Generator rolls the A-story; this tool rolls the C-story, the arc.
   </p>
   <p>
     A C-story is generated <em>once per series</em>, not per episode. You roll a spine — a <em>Question</em>, a
@@ -272,7 +274,7 @@ set the episode count, and the generator distributes the spine's clicks on a pla
 <aside class="prosed text-left" style="margin-bottom: 2rem;">
   <h2>Season Shaper</h2>
   <p>
-    The C-Story Engine rolls <em>what</em> the serialized spine is. The <strong>Season Shaper</strong> lays out
+    The Season Arc Generator rolls <em>what</em> the serialized spine is. The <strong>Season Shaper</strong> lays out
     <em>where</em> it goes. Give it a per-episode scene count and a season length, and it shapes the
     <strong>A/B/C</strong> structure two ways at once. Within each episode it splits the scenes into:
   </p>
