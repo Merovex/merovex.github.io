@@ -9,6 +9,7 @@ set the episode count, and the generator distributes the spine's clicks on a pla
 <script type="module" src="/assets/controllers/c_story_engine_controller.js"></script>
 <script type="module" src="/assets/controllers/season_shaper_controller.js"></script>
 <script type="module" src="/assets/controllers/wordcount_budget_controller.js"></script>
+<script type="module" src="/assets/controllers/shape_export_controller.js"></script>
 
 <style>
   /* Self-contained styles — no Tailwind build required. Adapts to the site's
@@ -165,6 +166,17 @@ set the episode count, and the generator distributes the spine's clicks on a pla
   .shaper .sc-beat { flex: 1; }
 
   .shaper hr.divider { border: 0; border-top: 1px solid var(--line); margin: 3.5rem 0; }
+
+  /* Shape export: one button that copies the whole page as a prompt */
+  .shape-export { --accent: #0f766e; text-align: center; margin: 2.5rem 0 0; }
+  :root[data-color-scheme="dark"] .shape-export { --accent: #2dd4bf; }
+  .shape-export button {
+    border: 1px solid currentColor; border-radius: 9999px; background: transparent; color: inherit;
+    cursor: pointer; font: inherit; font-weight: 600; line-height: 1.2; padding: 0.6rem 1.75rem;
+    box-shadow: 0 0 0 2px var(--accent); transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .shape-export button:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .shape-export button.copied { background: var(--accent); color: #fff; border-color: var(--accent); }
 </style>
 
 <aside class="prosed text-left" style="margin-bottom: 2rem;">
@@ -320,6 +332,13 @@ set the episode count, and the generator distributes the spine's clicks on a pla
 
   <div class="season" data-season-shaper-target="season"></div>
 
+</div>
+
+<!-- Fuses both tools into one portable prompt; the hidden textarea holds it -->
+<div class="shape-export" data-controller="shape-export">
+  <button type="button" data-shape-export-target="button"
+    data-action="click->shape-export#copy">Copy shape to clipboard</button>
+  <textarea hidden aria-hidden="true" tabindex="-1" data-shape-export-target="output"></textarea>
 </div>
 
 <aside class="prosed text-left" style="margin-top: 3rem;">
