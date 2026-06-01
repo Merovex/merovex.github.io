@@ -189,8 +189,11 @@ sci-fi without changing a bit; you decide the skin."
         <dd data-plot-generator-target="{{ pair[0] }}"></dd>
         <button type="button" class="reroll" title="Reroll {{ pair[1] }}"
           data-action="click->plot-generator#reroll" data-plot-generator-slot-param="{{ pair[0] }}">⟳</button>
-        <button type="button" class="lock" title="Lock {{ pair[1] }}" aria-pressed="false"
-          data-action="click->plot-generator#toggleLock" data-plot-generator-slot-param="{{ pair[0] }}">🔓</button>
+        {% comment %} Only the Code (carries the C-story) and the Stance (the hero) lock. {% endcomment %}
+        {% if pair[0] == "code" or pair[0] == "stance" %}
+          <button type="button" class="lock" title="Lock {{ pair[1] }} to a C-story" aria-pressed="false"
+            data-action="click->plot-generator#toggleLock" data-plot-generator-slot-param="{{ pair[0] }}">🔓</button>
+        {% endif %}
       </div>
     {% endfor %}
   </dl>
@@ -207,8 +210,6 @@ sci-fi without changing a bit; you decide the skin."
           <dd data-plot-generator-target="{{ pair[0] }}"></dd>
           <button type="button" class="reroll" title="Reroll {{ pair[1] }}"
             data-action="click->plot-generator#reroll" data-plot-generator-slot-param="{{ pair[0] }}">⟳</button>
-          <button type="button" class="lock" title="Lock {{ pair[1] }}" aria-pressed="false"
-            data-action="click->plot-generator#toggleLock" data-plot-generator-slot-param="{{ pair[0] }}">🔓</button>
         </div>
       {% endfor %}
     </dl>
