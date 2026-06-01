@@ -65,6 +65,8 @@ set the episode count, and the generator distributes the spine's clicks on a pla
   .cstory dl.slots > .row { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--page-bg, transparent); }
   .cstory dl.slots dt { width: 7rem; flex-shrink: 0; font-weight: 600; color: var(--accent); margin: 0; }
   .cstory dl.slots dd { flex: 1; margin: 0; }
+  .cstory button.reroll { flex-shrink: 0; background: transparent; border: 0; color: inherit; opacity: 0.5; cursor: pointer; font-size: 1.125rem; line-height: 1; padding: 0; align-self: center; }
+  .cstory button.reroll:hover { opacity: 1; }
 
   /* per-episode timeline */
   .cstory .timeline { display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--line); border-radius: 0.375rem; overflow: hidden; margin: 0 0 2rem; }
@@ -247,10 +249,16 @@ set the episode count, and the generator distributes the spine's clicks on a pla
 
     <h2 class="slot-head">Spine</h2>
     <dl class="slots">
-      <div class="row"><dt>Question</dt><dd data-c-story-engine-target="question"></dd></div>
-      <div class="row"><dt>Stake</dt><dd data-c-story-engine-target="stake"></dd></div>
-      <div class="row"><dt>Terminus</dt><dd data-c-story-engine-target="terminus"></dd></div>
-      <div class="row"><dt>Key</dt><dd data-c-story-engine-target="key"></dd></div>
+      {% assign spine = "question:Question,stake:Stake,terminus:Terminus,key:Key" | split: "," %}
+      {% for s in spine %}
+        {% assign pair = s | split: ":" %}
+        <div class="row">
+          <dt>{{ pair[1] }}</dt>
+          <dd data-c-story-engine-target="{{ pair[0] }}"></dd>
+          <button type="button" class="reroll" title="Reroll {{ pair[1] }}" aria-label="Reroll {{ pair[1] }}"
+            data-action="click->c-story-engine#reroll" data-c-story-engine-slot-param="{{ pair[0] }}">⟳</button>
+        </div>
+      {% endfor %}
     </dl>
 
     <h2 class="slot-head">Per-Episode Allocation</h2>
@@ -388,5 +396,54 @@ set the episode count, and the generator distributes the spine's clicks on a pla
     valleys. So a B-scene never owns a surprise; at most it sits beside one. The honest caveat remains: a B-scene in
     the rising stretch between the last surprise and the RECKONING is either the strongest beat in the episode (the
     thematic key that powers the climax) or a momentum-killer — and only how you write it decides which.
+  </p>
+</aside>
+
+<hr class="divider" style="border: 0; border-top: 1px solid rgba(127,127,127,0.25); margin: 3.5rem 0;" />
+
+<aside class="prosed text-left">
+  <h2>How to Generate a Serial: C-Story to Episodes</h2>
+  <p>
+    The C-Story is rolled <em>once</em> and locked. Episodes are rolled in a curated batch and assembled against it.
+    Work in this order.
+  </p>
+
+  <h3>1. Roll the C-Story once, then lock it</h3>
+  <p>
+    Pick the archetype and roll the spine. Re-roll only until the <strong>Question</strong>, <strong>Stake</strong>,
+    <strong>Terminus</strong>, and <strong>Key</strong> read as one coherent thread, not four unrelated ones — reroll
+    individual slots with the ⟳ to nudge a single one into line. Freeze it. This is the season's single constant, and
+    you do it exactly once.
+  </p>
+
+  <h3>2. Run the Season Shaper once, then lock it</h3>
+  <p>
+    Set the episode count (4, 6, or 8) and the scenes per episode. The Shaper returns each episode's C-role and its
+    A/B/C scene split. You now have an empty season skeleton with labeled slots.
+  </p>
+
+  <h3>3. Roll the A-Stories in a batch, then curate</h3>
+  <p>
+    This is the only step where you re-roll freely, over on the
+    <a href="/tools/plot-generator">Western Engine</a>. Over-roll: ten or twelve A-stories for a six-episode season.
+    Lay them side by side, bin the collisions and the duds, and keep the six that vary by job-type and escalate.
+    Curating a batch is what controls variety. Rolling one slot at a time until it feels right does not, because you
+    cannot see the collisions until the rolls sit together.
+  </p>
+
+  <h3>4. Assign and reconcile</h3>
+  <p>
+    Drop the kept A-stories onto episode positions: establishing plots early, the biggest at the finale. Then
+    reconcile each A-story to its C-role from step 2. The episode carrying the spine's <strong>Turn</strong> should
+    have an A-story whose own midpoint can echo it.
+  </p>
+
+  <h3>Hold these constant across the run</h3>
+  <ul>
+    <li><strong>Archetype.</strong> A Drifter season is Drifter every episode. Never re-roll the hero's relationship to place.</li>
+    <li><strong>C-spine.</strong> Rolled once in step 1, never touched again.</li>
+  </ul>
+  <p>
+    The button-mashing belongs only in step 3, and even there it is batch-and-curate, not roll-until-happy.
   </p>
 </aside>

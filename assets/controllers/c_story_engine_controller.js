@@ -412,7 +412,7 @@ Stimulus.register("c-story-engine", class extends Controller {
   renderTimeline(timeline) {
     if (!this.hasTimelineTarget) return;
     this.timelineTarget.innerHTML = "";
-    timeline.forEach((beat) => {
+    timeline.forEach((beat, idx) => {
       const row = document.createElement("div");
       row.className = `beat beat-${beat.role.toLowerCase()}`;
       const ep = document.createElement("span");
@@ -425,8 +425,57 @@ Stimulus.register("c-story-engine", class extends Controller {
       click.className = "click";
       click.textContent = beat.click;
       row.append(ep, role, click);
+      // Only the middle (NUDGE) beats reroll on their own; PLANT and TAG are
+      // derived from the Question and Terminus, so reroll those slots instead.
+      if (beat.role === "NUDGE") {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "reroll";
+        btn.title = "Reroll this beat";
+        btn.setAttribute("aria-label", "Reroll this beat");
+        btn.textContent = "⟳";
+        btn.addEventListener("click", () => this.rerollClick(idx));
+        row.append(btn);
+      }
       this.timelineTarget.appendChild(row);
     });
+  }
+
+  // Reroll a single spine slot (Question / Stake / Terminus / Key) from its
+  // bank, like the plot generator's per-slot reroll. The button names the slot
+  // via data-slot.
+  reroll(event) {
+    if (!this.current || !this.isCarrying) return;
+    const slot = event.params.slot;
+    const pool = this.ARCHETYPES[this.archetypeValue];
+    const banks = { question: pool.questions, stake: pool.stakes, terminus: pool.termini, key: pool.keys };
+    if (!banks[slot]) return;
+    this.current[slot] = this.pick(banks[slot]);
+    this[`${slot}Target`].textContent = this.current[slot];
+    // The PLANT and TAG beats quote the Question and Terminus — keep them in sync.
+    if (slot === "question" || slot === "terminus") this.syncTimelineEnds();
+  }
+
+  // Reroll one NUDGE beat to a fresh click, avoiding ones already on the board.
+  rerollClick(idx) {
+    if (!this.current || !this.isCarrying) return;
+    const pool = this.ARCHETYPES[this.archetypeValue];
+    const used = new Set(this.current.timeline.map((b) => b.click));
+    let click = this.pick(pool.clicks);
+    let tries = 0;
+    while (used.has(click) && tries < 20) { click = this.pick(pool.clicks); tries++; }
+    this.current.timeline[idx].click = click;
+    this.renderTimeline(this.current.timeline);
+  }
+
+  // Re-derive the PLANT (beat 1) and TAG (last beat) text from the current
+  // Question and Terminus, then repaint the timeline.
+  syncTimelineEnds() {
+    const tl = this.current.timeline;
+    if (!tl.length) return;
+    tl[0].click = `The question surfaces: ${this.current.question}`;
+    tl[tl.length - 1].click = `Spine resolves: ${this.current.terminus}`;
+    this.renderTimeline(tl);
   }
 
   highlightPills() {

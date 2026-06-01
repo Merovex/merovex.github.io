@@ -22,6 +22,10 @@ Stimulus.register("plot-generator", class extends Controller {
     tone: { type: String, default: "any" },
   };
 
+  // Slot names frozen against the global Roll. Lock the Code (and usually the
+  // Stance) to pin the hero to a C-story spine, then re-roll the rest.
+  locked = new Set();
+
   SKINS = {
     neutral: "Neutral: the slots are abstract. Pick a genre to paint them.",
     fantasy: "Fantasy: the System is a guild / order / road-baron; the route is a post-road or river; the thing that must arrive is a sealed writ or relic.",
@@ -139,25 +143,49 @@ Stimulus.register("plot-generator", class extends Controller {
   // The skeleton slots are always rolled and shown; the toggle only decides
   // whether they're woven into the premise text above.
   roll() {
-    const key = this.rollArchetypeKey();
+    const prev = this.current;
+    // Locking Stance or Disposition pins the hero's archetype too, so when "any"
+    // is selected and one of those is held, keep the prior archetype.
+    const keepArch = prev && (this.isLocked("stance") || this.isLocked("disposition"));
+    const key = keepArch ? prev.archetypeKey : this.rollArchetypeKey();
     const arch = this.ARCHETYPES[key];
     this.current = {
       archetypeKey: key,
-      stance: this.pick(arch.STANCE),
-      code: this.pick(this.CODE),
-      edge: this.pick(this.EDGE),
-      system: this.pick(this.SYSTEM),
-      enforcer: this.pick(this.ENFORCER),
-      squeeze: this.pick(this.SQUEEZE),
-      job: this.pick(this.JOB),
+      stance: this.keepOrPick(prev, "stance", arch.STANCE),
+      code: this.keepOrPick(prev, "code", this.CODE),
+      edge: this.keepOrPick(prev, "edge", this.EDGE),
+      system: this.keepOrPick(prev, "system", this.SYSTEM),
+      enforcer: this.keepOrPick(prev, "enforcer", this.ENFORCER),
+      squeeze: this.keepOrPick(prev, "squeeze", this.SQUEEZE),
+      job: this.keepOrPick(prev, "job", this.JOB),
     };
-    this.fillExpansion();
+    this.fillExpansion(prev);
     this.renderSeed();
   }
+
+  // Keep a locked slot's prior value; otherwise pick fresh from its bank.
+  keepOrPick(prev, slot, bank) {
+    return (prev && this.isLocked(slot) && prev[slot] != null) ? prev[slot] : this.pick(bank);
+  }
+
+  // Toggle a slot's lock. The button names the slot via data-slot.
+  toggleLock(event) {
+    const slot = event.params.slot;
+    const btn = event.currentTarget;
+    const row = btn.closest(".row");
+    const on = !this.locked.has(slot);
+    if (on) this.locked.add(slot); else this.locked.delete(slot);
+    btn.textContent = on ? "🔒" : "🔓";
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+    if (row) row.classList.toggle("locked", on);
+  }
+
+  isLocked(slot) { return this.locked.has(slot); }
 
   // Re-roll a single slot. The triggering button names the slot via data-slot.
   reroll(event) {
     const slot = event.params.slot;
+    if (this.isLocked(slot)) return; // frozen — unlock to change it
     const arch = this.archetype;
     const banks = {
       stance: arch.STANCE, code: this.CODE, edge: this.EDGE,
@@ -241,13 +269,14 @@ Stimulus.register("plot-generator", class extends Controller {
   }
 
   // Pull from the five EXPANSION slots (plus optional wildcard) to flesh out the skeleton.
-  fillExpansion() {
-    this.current.reversal = this.pick(this.REVERSAL);
-    this.current.oneWorthSaving = this.pick(this.ONE_WORTH_SAVING);
-    this.current.turn = this.pick(this.TURN);
-    this.current.reckoning = this.pick(this.RECKONING);
-    this.current.disposition = this.pick(this.archetype.DISPOSITION);
-    this.current.wildcard = this.pick(this.WILDCARD);
+  fillExpansion(prev) {
+    prev = prev || this.current;
+    this.current.reversal = this.keepOrPick(prev, "reversal", this.REVERSAL);
+    this.current.oneWorthSaving = this.keepOrPick(prev, "oneWorthSaving", this.ONE_WORTH_SAVING);
+    this.current.turn = this.keepOrPick(prev, "turn", this.TURN);
+    this.current.reckoning = this.keepOrPick(prev, "reckoning", this.RECKONING);
+    this.current.disposition = this.keepOrPick(prev, "disposition", this.archetype.DISPOSITION);
+    this.current.wildcard = this.keepOrPick(prev, "wildcard", this.WILDCARD);
 
     this.reversalTarget.textContent = this.current.reversal;
     this.oneWorthSavingTarget.textContent = this.current.oneWorthSaving;

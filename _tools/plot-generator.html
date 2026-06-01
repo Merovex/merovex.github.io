@@ -82,6 +82,12 @@ sci-fi without changing a bit; you decide the skin."
   .drifter dl.slots .seed dt { width: 6rem; }
   .drifter button.reroll { flex-shrink: 0; background: transparent; border: 0; color: inherit; opacity: 0.5; cursor: pointer; font-size: 1.125rem; line-height: 1; padding: 0; }
   .drifter button.reroll:hover { opacity: 1; }
+  /* per-slot lock: grayed when open, full colour when held */
+  .drifter button.lock { flex-shrink: 0; background: transparent; border: 0; cursor: pointer; font-size: 0.95rem; line-height: 1; padding: 0; opacity: 0.5; filter: grayscale(1); align-self: center; }
+  .drifter button.lock:hover { opacity: 0.85; }
+  .drifter button.lock[aria-pressed="true"] { opacity: 1; filter: none; }
+  .drifter dl.slots > .row.locked { background: color-mix(in srgb, var(--accent) 9%, transparent); }
+  .drifter dl.slots > .row.locked .reroll { opacity: 0.2; pointer-events: none; }
 
   .drifter .hidden { display: none; }
 
@@ -183,6 +189,8 @@ sci-fi without changing a bit; you decide the skin."
         <dd data-plot-generator-target="{{ pair[0] }}"></dd>
         <button type="button" class="reroll" title="Reroll {{ pair[1] }}"
           data-action="click->plot-generator#reroll" data-plot-generator-slot-param="{{ pair[0] }}">⟳</button>
+        <button type="button" class="lock" title="Lock {{ pair[1] }}" aria-pressed="false"
+          data-action="click->plot-generator#toggleLock" data-plot-generator-slot-param="{{ pair[0] }}">🔓</button>
       </div>
     {% endfor %}
   </dl>
@@ -199,6 +207,8 @@ sci-fi without changing a bit; you decide the skin."
           <dd data-plot-generator-target="{{ pair[0] }}"></dd>
           <button type="button" class="reroll" title="Reroll {{ pair[1] }}"
             data-action="click->plot-generator#reroll" data-plot-generator-slot-param="{{ pair[0] }}">⟳</button>
+          <button type="button" class="lock" title="Lock {{ pair[1] }}" aria-pressed="false"
+            data-action="click->plot-generator#toggleLock" data-plot-generator-slot-param="{{ pair[0] }}">🔓</button>
         </div>
       {% endfor %}
     </dl>
