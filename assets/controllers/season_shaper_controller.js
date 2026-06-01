@@ -51,17 +51,47 @@ Stimulus.register("season-shaper", class extends Controller {
     TERMINUS: "the season spine resolves",
   };
 
-  connect() { this.plan(); }
+  connect() {
+    this.restore();
+    this.plan();
+  }
+
+  // Restore the last-used sliders. localStorage persists across visits like a
+  // cookie, but stays on the device.
+  restore() {
+    const s = parseInt(this.load("scenes"), 10);
+    if (!isNaN(s) && this.hasScenesTarget) {
+      const v = Math.max(4, Math.min(60, s));
+      this.scenesTarget.value = v;
+      if (this.hasScenesOutTarget) this.scenesOutTarget.textContent = v;
+    }
+    const e = parseInt(this.load("episodes"), 10);
+    if (!isNaN(e) && this.hasEpisodesTarget) {
+      const v = Math.max(4, Math.min(12, e));
+      this.episodesTarget.value = v;
+      if (this.hasEpisodesOutTarget) this.episodesOutTarget.textContent = v;
+    }
+  }
+
+  persist() {
+    this.save("scenes", String(this.clampScenes()));
+    this.save("episodes", String(this.clampEpisodes()));
+  }
+
+  save(k, v) { try { localStorage.setItem(`shaper.${k}`, v); } catch (e) { /* storage off */ } }
+  load(k) { try { return localStorage.getItem(`shaper.${k}`); } catch (e) { return null; } }
 
   scenesInput() {
     this.scenesValue = this.clampScenes();
     if (this.hasScenesOutTarget) this.scenesOutTarget.textContent = this.scenesValue;
+    this.persist();
     this.plan();
   }
 
   episodesInput() {
     this.episodesValue = this.clampEpisodes();
     if (this.hasEpisodesOutTarget) this.episodesOutTarget.textContent = this.episodesValue;
+    this.persist();
     this.plan();
   }
 
@@ -119,47 +149,79 @@ Stimulus.register("season-shaper", class extends Controller {
     return new Array(episodes).fill(scenes);
   }
 
-  // ── Episode-level allocation — mirrors shape_episode ──────────────────────
+  // ── Episode-level allocation ──────────────────────────────────────────────
+  // Ingermanson's four acts are divided by THREE surprises at the quarter marks
+  // (25% / 50% / 75%). Those three beats — plus the opener and the exit — are
+  // reserved for the A-story regardless of scene count or season length. The
+  // C-click lands adjacent to its role's anchor (never on a surprise), and the
+  // B-story fills the valleys, kept off the surprise slots entirely.
   shapeEpisode(number, role, total) {
-    const c = Math.min(this.cWeight(role), total - 3); // never starve A below 3
-    const remaining = total - c;
-    let b = Math.max(Math.round(remaining * this.B_SHARE), 1);
-    b = Math.min(b, remaining - 2); // leave A at least 2
-    const a = remaining - b;
-
-    const scenes = this.sequence(total, role, a, b, c);
-    return { number, c_role: role, total, a, b, c, scenes };
+    const surprises = this.surpriseIdx(total);
+    const scenes = this.sequence(total, role, surprises);
+    const count = (t) => scenes.filter((s) => s.track === t).length;
+    return { number, c_role: role, total, a: count("A"), b: count("B"), c: count("C"), scenes };
   }
 
   cWeight(role) { return this.C_WEIGHT[role] || 1; }
 
-  // A opens and closes; C placed by season-role; B spread through the gaps.
-  sequence(total, role, a, b, c) {
+  // 0-indexed positions of the three surprises, at the quarter marks. Clamped to
+  // the interior and de-duplicated so very short episodes degrade gracefully.
+  surpriseIdx(total) {
+    const used = new Set([0, total - 1]); // opener + exit are reserved
+    const out = [];
+    [0.25, 0.5, 0.75].forEach((frac) => {
+      let i = this.clamp(Math.round(total * frac) - 1, 1, total - 2);
+      while (used.has(i) && i < total - 2) i++;
+      if (!used.has(i)) { used.add(i); out.push(i); }
+    });
+    return out.sort((x, y) => x - y);
+  }
+
+  // A opens and closes AND holds the three surprise beats; C lands by role,
+  // never on a reserved slot; B fills the remaining valleys.
+  sequence(total, role, surprises) {
     const slots = new Array(total).fill(null);
     slots[0] = "A";
     slots[total - 1] = "A";
+    surprises.forEach((i) => { slots[i] = "A"; });
 
-    this.cSlots(total, role, c).forEach((p) => { slots[p] = "C"; });
+    this.placeC(slots, total, role, this.cWeight(role), surprises);
 
-    const openInterior = this.range(1, total - 1).filter((i) => !slots[i]);
-    this.spread(openInterior, b).forEach((p) => { slots[p] = "B"; });
+    const open = this.range(1, total - 1).filter((i) => slots[i] === null);
+    let bTarget = 0;
+    if (open.length > 2) {
+      bTarget = Math.min(Math.max(Math.round(open.length * this.B_SHARE), 1), open.length - 2);
+    }
+    this.spread(open, bTarget).forEach((p) => { slots[p] = "B"; });
 
     for (let i = 0; i < total; i++) if (!slots[i]) slots[i] = "A";
-    return this.label(slots, role);
+    return this.label(slots, role, surprises);
   }
 
-  cSlots(total, role, count) {
-    let anchor;
+  // Place the C-click(s) near the role's anchor, snapping to the nearest free
+  // interior slot so they never collide with a surprise or an endpoint.
+  placeC(slots, total, role, count, surprises) {
+    let target;
     if (role === "PLANT") {
-      anchor = Math.max(Math.round(total * 0.25), 1);
+      target = (surprises[0] != null ? surprises[0] : Math.round(total * 0.25)) + 1;
     } else if (role === "TERMINUS" || role === "FALSE_TERMINUS") {
-      anchor = total - 2;
+      target = total - 2;
     } else {
-      anchor = Math.floor(total / 2);
+      target = (surprises[1] != null ? surprises[1] : Math.floor(total / 2)) + 1;
     }
-    return this.uniq(
-      [anchor, anchor - 1].slice(0, count).map((p) => this.clamp(p, 1, total - 2))
-    );
+    for (let k = 0; k < count; k++) {
+      const idx = this.nearestFree(slots, target + k, total);
+      if (idx != null) slots[idx] = "C";
+    }
+  }
+
+  nearestFree(slots, target, total) {
+    for (let d = 0; d < total; d++) {
+      for (const i of [target + d, target - d]) {
+        if (i >= 1 && i <= total - 2 && slots[i] === null) return i;
+      }
+    }
+    return null;
   }
 
   spread(openSlots, n) {
@@ -172,31 +234,36 @@ Stimulus.register("season-shaper", class extends Controller {
   }
 
   // ── Labeling ──────────────────────────────────────────────────────────────
-  label(slots, role) {
-    const aIndices = [];
-    slots.forEach((s, i) => { if (s === "A") aIndices.push(i); });
-    const aArc = this.aArc(aIndices.length);
-    const aMap = {};
-    aIndices.forEach((idx, i) => { aMap[idx] = aArc[i]; });
+  // Opener and exit bracket the A-story; the three quarter-mark surprises get
+  // the act-turn labels; A scenes after the last surprise are the climax run
+  // (RECKONING); the rest are connective tissue (SQUEEZE in act one, else
+  // COMPLICATION). B and C keep their track labels.
+  SURPRISE_LABELS = [
+    "SURPRISE 1 — act-one turn (lock-in)",
+    "SURPRISE 2 — midpoint reversal",
+    "SURPRISE 3 — act-three turn (all is lost)",
+  ];
+
+  label(slots, role, surprises) {
+    const aIdx = [];
+    slots.forEach((s, i) => { if (s === "A") aIdx.push(i); });
+    const first = aIdx[0];
+    const last = aIdx[aIdx.length - 1];
+    const lastSurprise = surprises.length ? surprises[surprises.length - 1] : -1;
+    const firstSurprise = surprises.length ? surprises[0] : Infinity;
 
     return slots.map((track, i) => {
       let beat;
-      if (track === "A") beat = aMap[i];
-      else if (track === "B") beat = "relational / thematic counterpoint";
-      else beat = this.cBeat(role);
+      if (track === "B") beat = "relational / thematic counterpoint";
+      else if (track === "C") beat = this.cBeat(role);
+      else if (i === first) beat = "OPENER";
+      else if (i === last) beat = "EXIT";
+      else if (surprises.includes(i)) beat = this.SURPRISE_LABELS[surprises.indexOf(i)];
+      else if (i > lastSurprise) beat = "RECKONING";
+      else if (i < firstSurprise) beat = "SQUEEZE";
+      else beat = "COMPLICATION";
       return { position: i + 1, track, beat };
     });
-  }
-
-  // Compressed A-story arc across however many A scenes the episode has.
-  aArc(n) {
-    if (n <= 0) return [];
-    const spine = ["OPENER", "SQUEEZE", "COMPLICATION", "TURN", "RECKONING", "EXIT"];
-    if (n <= spine.length) return spine.slice(0, n);
-    const extra = n - spine.length;
-    return ["OPENER", "SQUEEZE"]
-      .concat(new Array(1 + extra).fill("COMPLICATION"))
-      .concat(["TURN", "RECKONING", "EXIT"]);
   }
 
   cBeat(role) { return this.C_BEATS[role] || "advance one click"; }

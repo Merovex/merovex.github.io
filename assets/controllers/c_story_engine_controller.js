@@ -194,9 +194,38 @@ Stimulus.register("c-story-engine", class extends Controller {
   ].join("\n");
 
   connect() {
-    this.applyArchetypeDefaultEpisodes();
-    this.render();
+    this.restore();
+    this.highlightPills();
+    this.syncEpisodesUI();
+    if (this.isCarrying) this.roll();
+    else { this.current = null; this.render(); }
+    this.connected = true;
   }
+
+  // Restore the last-used dials. localStorage persists across visits like a
+  // cookie, but stays on the device. Falls back to the archetype default.
+  restore() {
+    const a = this.load("archetype");
+    if (a && this.ARCHETYPE_LABELS[a]) this.archetypeValue = a;
+    const raw = this.load("episodes");
+    const e = parseInt(raw, 10);
+    this.episodesValue = (raw !== null && !isNaN(e))
+      ? Math.max(2, Math.min(24, e))
+      : (this.DEFAULT_EPISODES[this.archetypeValue] || this.episodesValue);
+  }
+
+  persist() {
+    this.save("archetype", this.archetypeValue);
+    this.save("episodes", String(this.episodesValue));
+  }
+
+  syncEpisodesUI() {
+    if (this.hasEpisodesTarget) this.episodesTarget.value = this.episodesValue;
+    if (this.hasEpisodesOutTarget) this.episodesOutTarget.textContent = this.episodesValue;
+  }
+
+  save(k, v) { try { localStorage.setItem(`cstory.${k}`, v); } catch (e) { /* storage off */ } }
+  load(k) { try { return localStorage.getItem(`cstory.${k}`); } catch (e) { return null; } }
 
   // Seed the episode count from the selected archetype's default (falling back
   // to the generator default of 6) and sync the slider + readout to it.
@@ -249,9 +278,10 @@ Stimulus.register("c-story-engine", class extends Controller {
   // Switching archetype rolls a fresh spine for a carrying one, or shows the
   // honest-broker note for a non-episodic one.
   archetypeValueChanged() {
-    if (!this.hasArchetypePillTarget) return; // not connected yet
-    this.highlightPills();
+    if (!this.connected) return; // connect() handles the initial restore/render
     this.applyArchetypeDefaultEpisodes();
+    this.highlightPills();
+    this.persist();
     if (this.isCarrying) {
       this.roll();
     } else {
@@ -263,6 +293,7 @@ Stimulus.register("c-story-engine", class extends Controller {
   episodesInput() {
     this.episodesValue = this.clampedEpisodes();
     if (this.hasEpisodesOutTarget) this.episodesOutTarget.textContent = this.episodesValue;
+    this.persist();
     if (this.current && this.isCarrying) this.roll();
   }
 

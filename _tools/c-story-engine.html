@@ -232,12 +232,17 @@ set the episode count, and the generator distributes the spine's clicks on a pla
   <p>
     The C-Story Engine rolls <em>what</em> the serialized spine is. The <strong>Season Shaper</strong> lays out
     <em>where</em> it goes. Give it a per-episode scene count and a season length, and it shapes the
-    <strong>A/B/C</strong> structure two ways at once: within each episode it splits the scenes into <strong>A</strong>
-    (the self-contained plot, which always opens and closes), <strong>B</strong> (relational / thematic counterpoint
-    woven through the gaps), and <strong>C</strong> (the serialized spine click); across the season it assigns each
-    episode a <strong>C-story role</strong> — plant, complicate, turn, deepen, pressure, terminus — so the spine
-    resolves on the finale and never sags in the middle. Eight-episode seasons get a double-pump (a false terminus,
-    then a reset) to keep the stretch from going soft.
+    <strong>A/B/C</strong> structure two ways at once. Within each episode it splits the scenes into:
+  </p>
+  <ul>
+    <li><strong>A</strong> — the self-contained plot, which always opens and closes.</li>
+    <li><strong>B</strong> — relational / thematic counterpoint woven through the gaps.</li>
+    <li><strong>C</strong> — the serialized spine click.</li>
+  </ul>
+  <p>
+    Across the season it assigns each episode a <strong>C-story role</strong> — plant, complicate, turn, deepen,
+    pressure, terminus — so the spine resolves on the finale and never sags in the middle. Eight-episode seasons get a
+    double-pump (a false terminus, then a reset) to keep the stretch from going soft.
   </p>
 </aside>
 
@@ -273,3 +278,53 @@ set the episode count, and the generator distributes the spine's clicks on a pla
   <div class="season" data-season-shaper-target="season"></div>
 
 </div>
+
+<aside class="prosed text-left" style="margin-top: 3rem;">
+  <h2>Where the surprises go (Ingermanson's four acts)</h2>
+  <p>
+    If you build on Randy Ingermanson's four-act structure — four acts divided by <strong>three surprises</strong>
+    (the disasters at roughly the 25%, 50%, and 75% marks) — a fair question is whether those surprises belong on the
+    <strong>A-story</strong> or the <strong>B-story</strong>. Short answer: <strong>the surprises belong to the
+    A-story</strong>, and at the season scale to the <strong>C-story spine</strong>. The B-story should
+    <em>collide</em> with them, never <em>own</em> them.
+  </p>
+  <p>
+    The surprises are the turns of the <em>primary throughline</em>. They are, by definition, the load-bearing
+    reversals of the central dramatic question. Hang one on the B-story and you've buried an act break inside a
+    subplot — the spine goes slack at exactly the moment it should snap. Which track is "primary" depends on scale,
+    and the two tools above already encode it:
+  </p>
+  <ul>
+    <li>
+      <strong>Within an episode</strong>, the primary throughline is the <strong>A-story</strong>. The Season Shaper
+      puts the episode's three surprises on A at the quarter marks —
+      <code>OPENER … SURPRISE 1 … SURPRISE 2 (midpoint) … SURPRISE 3 … RECKONING … EXIT</code> — so the disasters
+      always ride the self-contained plot.
+    </li>
+    <li>
+      <strong>Across the season</strong>, the primary throughline is the <strong>C-story</strong>, and the C-role arc
+      <em>is</em> the three surprises: <code>TURN</code> ≈ surprise one (lock-in), <code>FALSE_TERMINUS → RESET</code>
+      ≈ surprise two (the midpoint false-victory-then-reversal), and <code>TERMINUS</code> ≈ surprise three into the
+      climax. The eight-episode double-pump is a textbook second disaster.
+    </li>
+  </ul>
+  <p>
+    So what is <strong>B</strong> for? Counterpoint and theme. Its highest-value job is the convergence move: the
+    B-story carries the thematic answer and lands <em>adjacent</em> to a surprise so the plot turn also delivers an
+    emotional blow — classically, B hands the protagonist the key right before the final act break. Its other job is
+    rhythm: a B beat in the <em>valleys between</em> surprises, so no two tracks peak at once and the reader never gets
+    to rest.
+  </p>
+  <p>
+    The Season Shaper enforces this directly. In every episode — <strong>regardless of scene count or season
+    length</strong> — it reserves the three quarter-mark scenes (<code>round(N&#247;4)</code>, <code>round(N&#247;2)</code>,
+    <code>round(3N&#247;4)</code>) for the <strong>A-story</strong> and labels them <strong>SURPRISE 1</strong>
+    (act-one lock-in), <strong>SURPRISE 2</strong> (midpoint reversal), and <strong>SURPRISE 3</strong> (act-three "all
+    is lost"). The opener and exit bracket the A-story; the climax run after surprise three is the
+    <strong>RECKONING</strong>. The serialized <strong>C</strong>-click snaps to the nearest free slot beside its
+    season-role anchor, and the <strong>B</strong>-story is kept off the three surprise marks entirely — it fills the
+    valleys. So a B-scene never owns a surprise; at most it sits beside one. The honest caveat remains: a B-scene in
+    the rising stretch between the last surprise and the RECKONING is either the strongest beat in the episode (the
+    thematic key that powers the climax) or a momentum-killer — and only how you write it decides which.
+  </p>
+</aside>
