@@ -189,9 +189,10 @@ sci-fi without changing a bit; you decide the skin."
         <dd data-plot-generator-target="{{ pair[0] }}"></dd>
         <button type="button" class="reroll" title="Reroll {{ pair[1] }}"
           data-action="click->plot-generator#reroll" data-plot-generator-slot-param="{{ pair[0] }}">⟳</button>
-        {% comment %} Only the Code (carries the C-story) and the Stance (the hero) lock. {% endcomment %}
-        {% if pair[0] == "code" or pair[0] == "stance" %}
-          <button type="button" class="lock" title="Lock {{ pair[1] }} to a C-story" aria-pressed="false"
+        {% comment %} A lock exists for every slot an archetype's spine can ride on; the controller shows only the ones the selected archetype uses. {% endcomment %}
+        {% if pair[0] == "stance" or pair[0] == "code" or pair[0] == "edge" or pair[0] == "system" or pair[0] == "enforcer" %}
+          <button type="button" class="lock" title="Lock {{ pair[1] }} to a C-story" aria-pressed="false" style="display:none"
+            data-plot-generator-target="lockBtn"
             data-action="click->plot-generator#toggleLock" data-plot-generator-slot-param="{{ pair[0] }}">🔓</button>
         {% endif %}
       </div>
@@ -210,6 +211,11 @@ sci-fi without changing a bit; you decide the skin."
           <dd data-plot-generator-target="{{ pair[0] }}"></dd>
           <button type="button" class="reroll" title="Reroll {{ pair[1] }}"
             data-action="click->plot-generator#reroll" data-plot-generator-slot-param="{{ pair[0] }}">⟳</button>
+          {% if pair[0] == "oneWorthSaving" or pair[0] == "wildcard" %}
+            <button type="button" class="lock" title="Lock {{ pair[1] }} to a C-story" aria-pressed="false" style="display:none"
+              data-plot-generator-target="lockBtn"
+              data-action="click->plot-generator#toggleLock" data-plot-generator-slot-param="{{ pair[0] }}">🔓</button>
+          {% endif %}
         </div>
       {% endfor %}
     </dl>

@@ -12,7 +12,7 @@ Stimulus.register("plot-generator", class extends Controller {
     "stance", "code", "edge", "system", "enforcer", "squeeze", "job",
     "premise",
     "expansion", "reversal", "oneWorthSaving", "turn", "reckoning", "disposition", "wildcard",
-    "skin", "expandToggle", "clip", "copyBtn",
+    "skin", "expandToggle", "clip", "copyBtn", "lockBtn",
     "archetypePill",
     "genreNeutral", "genreFantasy", "genreScifi", "toneAny", "toneDark", "toneHeroic",
   ];
@@ -22,9 +22,25 @@ Stimulus.register("plot-generator", class extends Controller {
     tone: { type: String, default: "any" },
   };
 
-  // Slot names frozen against the global Roll. Lock the Code (and usually the
-  // Stance) to pin the hero to a C-story spine, then re-roll the rest.
+  // Slot names frozen against the global Roll. Re-roll keeps locked slots and
+  // regenerates the rest. Which slots are even lockable depends on the archetype
+  // (see LOCKABLE), because each archetype's C-spine rides on different slots.
   locked = new Set();
+
+  // Per-archetype lockable slots. The Code always carries the spine; the rest
+  // ride on whatever that archetype's spine lives in. Locking a slot the form
+  // doesn't ride on would quietly reassign the archetype, so those locks aren't
+  // even shown. Archetypes not listed (and "any") fall back to LOCKABLE_DEFAULT.
+  LOCKABLE = {
+    drifter: ["code", "stance"],
+    lawman: ["code", "system", "enforcer"],
+    trek: ["code", "wildcard", "edge"],
+    outlaw: ["code", "oneWorthSaving", "system"],
+    homesteader: ["code", "edge", "system"],
+    avenger: ["code"],
+    defense: ["code"],
+  };
+  LOCKABLE_DEFAULT = ["code"];
 
   SKINS = {
     neutral: "Neutral: the slots are abstract. Pick a genre to paint them.",
@@ -137,6 +153,7 @@ Stimulus.register("plot-generator", class extends Controller {
   connect() {
     this.renderSkin();
     this.roll();
+    this.updateLockVisibility();
   }
 
   // Sample a fresh premise: all SEED slots plus the EXPANSION skeleton.
@@ -181,6 +198,31 @@ Stimulus.register("plot-generator", class extends Controller {
   }
 
   isLocked(slot) { return this.locked.has(slot); }
+
+  // The slots whose lock is relevant to the current archetype.
+  lockableSlots() {
+    if (this.archetypeValue === "any") return this.LOCKABLE_DEFAULT;
+    return this.LOCKABLE[this.archetypeValue] || this.LOCKABLE_DEFAULT;
+  }
+
+  // Show only the lock buttons the selected archetype's spine rides on; hide the
+  // rest. A lock that no longer applies is released so it can't silently persist.
+  updateLockVisibility() {
+    if (!this.hasLockBtnTarget) return;
+    const allowed = this.lockableSlots();
+    this.lockBtnTargets.forEach((btn) => {
+      const slot = btn.dataset.plotGeneratorSlotParam;
+      const show = allowed.includes(slot);
+      btn.style.display = show ? "" : "none";
+      if (!show && this.locked.has(slot)) {
+        this.locked.delete(slot);
+        btn.textContent = "🔓";
+        btn.setAttribute("aria-pressed", "false");
+        const row = btn.closest(".row");
+        if (row) row.classList.remove("locked");
+      }
+    });
+  }
 
   // Re-roll a single slot. The triggering button names the slot via data-slot.
   reroll(event) {
@@ -303,6 +345,7 @@ Stimulus.register("plot-generator", class extends Controller {
     this.dispositionTarget.textContent = this.current.disposition;
     this.renderSkin();
     this.renderPremise();
+    this.updateLockVisibility();
   }
 
   genreValueChanged() { this.renderSkin(); }
