@@ -6,7 +6,8 @@ title: Tools
 {% include biography.html %}
 <div class="mb-12"></div>
 <section class="max-w-prose mx-auto">
-  {% for tool in site.tools %}
+  {% assign listed = site.tools | where_exp: "t", "t.unlisted != true" %}
+  {% for tool in listed %}
   <article class='post-card'>
     <header>
       <h2>{{ tool.title }}</h2>
