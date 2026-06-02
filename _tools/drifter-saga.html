@@ -1,0 +1,182 @@
+---
+layout: tool
+title: "Drifter Saga: Book Generator"
+description: "Season 1 of the saga is a Drifter season — the spine lives inside the man. The C-Spine, the Code, and the
+Stance are locked, rolled once and never touched; each of the six books rolls its own local color (the run, the place,
+the foe, the obstacle) against that fixed spine. A focused clone of the Episode Plot Generator, pinned to the Drifter."
+---
+<script type="module" src="/assets/controllers/drifter_saga_controller.js"></script>
+
+<style>
+  /* Self-contained; adapts to the site's light/dark theme. Drifter indigo. */
+  .saga { --accent: #4f46e5; --line: rgba(127, 127, 127, 0.25); }
+  :root[data-color-scheme="dark"] .saga { --accent: #818cf8; }
+
+  .saga button.roll,
+  .saga button.copy-btn,
+  .saga button.reroll { font: inherit; cursor: pointer; }
+
+  /* Locked spine panel */
+  .saga .spine {
+    border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+    border-radius: 0.5rem; padding: 1.25rem 1.5rem; margin: 0 0 2.5rem;
+    background: color-mix(in srgb, var(--accent) 6%, transparent);
+  }
+  .saga .spine .lock-head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem; }
+  .saga .spine h2 { font-size: 1rem; font-weight: 700; margin: 0; }
+  .saga .spine .badge {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: #fff; background: var(--accent); border-radius: 9999px; padding: 0.15rem 0.6rem;
+  }
+  .saga .spine dl { display: grid; grid-template-columns: 1fr; gap: 0.6rem; margin: 0; }
+  .saga .spine .row { display: flex; gap: 0.75rem; align-items: flex-start; }
+  .saga .spine dt { width: 6rem; flex-shrink: 0; font-weight: 600; color: var(--accent); margin: 0; }
+  .saga .spine dd { flex: 1; margin: 0; }
+  .saga .spine .note { margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); font-size: 0.85rem; font-style: italic; opacity: 0.85; }
+
+  /* logline */
+  .saga .logline {
+    position: relative; font-size: 1.25rem; line-height: 1.6; text-align: center;
+    border-left: 4px solid var(--accent); padding: 1rem 1.5rem; margin: 0 0 1.5rem;
+    border-radius: 0.375rem; background: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+  .saga .copy-btn {
+    position: absolute; top: 0.5rem; right: 0.5rem;
+    border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+    background: transparent; color: inherit; border-radius: 0.375rem; padding: 0.2rem 0.5rem;
+    font-size: 0.75rem; line-height: 1.2; opacity: 0.55;
+    transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+  }
+  .saga .copy-btn:hover { opacity: 1; background: color-mix(in srgb, var(--accent) 12%, transparent); }
+  .saga .copy-btn.copied { opacity: 1; color: #fff; background: var(--accent); border-color: var(--accent); }
+
+  .saga .controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1.5rem; margin-bottom: 2.5rem; }
+  .saga button.roll {
+    border: 1px solid currentColor; border-radius: 9999px; background: transparent; color: inherit;
+    font-weight: 600; line-height: 1.2; padding: 0.5rem 1.5rem; box-shadow: 0 0 0 2px var(--accent);
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .saga button.roll:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* skeleton switch */
+  .saga .dial { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; }
+  .saga .dial-label { font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.6; }
+  .saga .switch { position: relative; display: inline-flex; align-items: center; cursor: pointer; }
+  .saga .switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .saga .switch .track {
+    width: 2.25rem; height: 1.25rem; border-radius: 9999px; position: relative;
+    background: color-mix(in srgb, currentColor 22%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+  .saga .switch .track::after {
+    content: ''; position: absolute; top: 50%; left: 2px; transform: translateY(-50%);
+    width: 0.95rem; height: 0.95rem; border-radius: 50%; background: currentColor; opacity: 0.8;
+    transition: left 0.15s ease, background-color 0.15s ease;
+  }
+  .saga .switch input:checked + .track { background: var(--accent); border-color: var(--accent); }
+  .saga .switch input:checked + .track::after { left: calc(100% - 0.95rem - 2px); background: #fff; opacity: 1; }
+
+  .saga h2.slot-head { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.6; margin-bottom: 0.75rem; }
+  .saga dl.slots { display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--line); border-radius: 0.375rem; overflow: hidden; margin: 0 0 2.5rem; }
+  .saga dl.slots > .row { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--page-bg, transparent); }
+  .saga dl.slots dt { width: 8rem; flex-shrink: 0; font-weight: 600; color: var(--accent); margin: 0; }
+  .saga dl.slots dd { flex: 1; margin: 0; }
+  .saga dl.slots .seed dt { width: 7rem; }
+  .saga button.reroll { flex-shrink: 0; background: transparent; border: 0; color: inherit; opacity: 0.5; font-size: 1.125rem; line-height: 1; padding: 0; align-self: center; }
+  .saga button.reroll:hover { opacity: 1; }
+
+  @media (max-width: 480px) {
+    .saga .spine dt, .saga dl.slots dt, .saga dl.slots .seed dt { width: 100%; }
+    .saga .spine .row, .saga dl.slots > .row { flex-wrap: wrap; }
+  }
+</style>
+
+<aside class="prosed text-left" style="margin-bottom: 2rem;">
+  <p>
+    Season 1 of the saga is a <strong>Drifter</strong> season — of the four archetypes that sustain an episodic A/B/C
+    run, the Drifter is the one whose spine lives <em>inside the man</em>. The season Question is whether the road is
+    all there is for him or whether he will find a reason worth riding it for: a Stance question, not an institution
+    question. So the <strong>C-Spine</strong>, the <strong>Code</strong>, and the <strong>Stance</strong> are locked —
+    rolled once and never touched — and each of the six books rolls only its own <em>local color</em> against them.
+  </p>
+  <p>
+    Re-roll the place and the foe freely; each book's run, destination, obstacle, and antagonist-of-the-week is local.
+    Do not pin the Edge or the System — a Drifter who keeps returning to the same place and the same foe quietly
+    becomes a Lawman or a Homesteader, and the form goes soft. That's why the spine panel below is the only thing held.
+  </p>
+</aside>
+
+<div class="saga" data-controller="drifter-saga">
+
+  <!-- LOCKED SPINE — rolled once per season, never touched -->
+  <div class="spine">
+    <div class="lock-head">
+      <span class="badge">🔒 Locked</span>
+      <h2>Season 1 — The C-Spine (Drifter)</h2>
+    </div>
+    <dl>
+      <div class="row"><dt>Question</dt><dd data-drifter-saga-target="spineQuestion">Is the road all there is for a man like him, or will he find a reason worth riding it for?</dd></div>
+      <div class="row"><dt>Stake</dt><dd data-drifter-saga-target="spineStake">The bird is the last of his mentor and the only home he has, and a ship has to fly to stay a ship: dock fees, fuel, a living, earned one run at a time. But hulls and lanes are both too scarce to leave idle, so both fall under the old escheat law: a corridor untraveled, a hull unflown, escheats to the state, and the Scout Service is the state. Sit still to grieve and the Service takes the last thing the old man left him. Keep moving and the only runs that pay are the runs that feed the machine, while every dead lane he reopens maps where he's been, for the Service to claim and the gang to follow.</dd></div>
+      <div class="row"><dt>Terminus</dt><dd data-drifter-saga-target="spineTerminus">The last run ends with the one it was meant for already lost to the dark, but somewhere along it he stopped riding to keep the ship and started riding to keep the promise, and he cannot unknow it. He rides on, no longer adrift, carrying for the first time the dangerous thought that the runs are too important to leave to desperate men, and that someone ought to build a thing that outlasts them.</dd></div>
+      <div class="row"><dt>Key</dt><dd data-drifter-saga-target="spineKey">The aimless road become a calling, the calling not yet a home.</dd></div>
+      <div class="row"><dt>Code</dt><dd data-drifter-saga-target="spineCode">A delivery is a bond worth dying for. The C-story exists to test it, so every re-rolled run is a fresh trial of the same value.</dd></div>
+      <div class="row"><dt>Stance</dt><dd data-drifter-saga-target="spineStance">Adrift. The road as identity and as escape; the man who keeps moving so that nothing can hold him, and tells himself that is freedom. The Terminus is this stance cracking.</dd></div>
+    </dl>
+    <p class="note" data-drifter-saga-target="spineLocke">
+      Stoddard Locke is the standing antagonist for the whole saga, but in Season 1 he is <em>weather</em>, not the
+      per-book villain — the ambient pressure the season rides under, felt at the edges and named in the C-clicks. The
+      foe each book turns on is rolled fresh and left behind. The moment Locke becomes the recurring nemesis squared
+      off with book after book, the season has changed archetype.
+    </p>
+  </div>
+
+  <!-- This book's logline -->
+  <blockquote class="logline">
+    <button type="button" class="copy-btn" data-drifter-saga-target="copyBtn"
+      data-action="click->drifter-saga#copy" aria-label="Copy book premise to clipboard">Copy</button>
+    <span data-drifter-saga-target="premise"></span>
+  </blockquote>
+
+  <div class="controls">
+    <button type="button" class="roll" data-action="click->drifter-saga#roll">Roll This Book</button>
+    <span class="dial">
+      <span class="dial-label">Skeleton</span>
+      <label class="switch" title="Fold the expansion skeleton into the premise">
+        <input type="checkbox" data-drifter-saga-target="expandToggle"
+          data-action="change->drifter-saga#toggleExpansion" aria-label="Fold the expansion skeleton into the premise">
+        <span class="track"></span>
+      </label>
+    </span>
+  </div>
+
+  <!-- This book's local color (re-rolled per book) -->
+  <h2 class="slot-head">This Book — Seed</h2>
+  <dl class="slots seed">
+    {% assign seeds = "edge:Edge,system:System,enforcer:Enforcer,squeeze:Squeeze,job:Job" | split: "," %}
+    {% for s in seeds %}
+      {% assign pair = s | split: ":" %}
+      <div class="row">
+        <dt>{{ pair[1] }}</dt>
+        <dd data-drifter-saga-target="{{ pair[0] }}"></dd>
+        <button type="button" class="reroll" title="Reroll {{ pair[1] }}"
+          data-action="click->drifter-saga#reroll" data-drifter-saga-slot-param="{{ pair[0] }}">⟳</button>
+      </div>
+    {% endfor %}
+  </dl>
+
+  <h2 class="slot-head">This Book — Expansion</h2>
+  <dl class="slots">
+    {% assign exp = "reversal:Reversal,oneWorthSaving:One Worth Saving,turn:Turn,reckoning:Reckoning,disposition:Disposition,wildcard:Wildcard" | split: "," %}
+    {% for s in exp %}
+      {% assign pair = s | split: ":" %}
+      <div class="row">
+        <dt>{{ pair[1] }}</dt>
+        <dd data-drifter-saga-target="{{ pair[0] }}"></dd>
+        <button type="button" class="reroll" title="Reroll {{ pair[1] }}"
+          data-action="click->drifter-saga#reroll" data-drifter-saga-slot-param="{{ pair[0] }}">⟳</button>
+      </div>
+    {% endfor %}
+  </dl>
+
+</div>
