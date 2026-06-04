@@ -9,10 +9,15 @@ keep track of the setting. It helps me measure superluminal travel distances."
 <!-- To use a custom JSON file, add data-astromap-data-url-value="/path/to/your/file.json" -->
 <article class='w-prose h-full' data-controller='astromap' data-astromap-data-url-value="/assets/teradoma-archipelago.json">
   <div class='text-center space-y-2'>
-    <label for='coordinate' class=' text-xl'>Coordinate:</label>
-    <div class='w-28 mx-auto'>
-      <input name='coordinate' id='coordinate' value='' type='number' data-astromap-target='coordinates'
-        data-action='keyup->astromap#showVolumeDetails' class='form-input' placeholder='Loading...'>
+    <label for='coordinate' class=' text-xl'>Search:</label>
+    <div class='relative w-72 mx-auto'>
+      <input name='coordinate' id='coordinate' value='' type='text' autocomplete='off'
+        data-astromap-target='coordinates'
+        data-action='input->astromap#search keydown->astromap#onKeydown blur->astromap#onBlur'
+        class='form-input w-full text-center' placeholder='Coordinate (0812) or system name…'>
+      <ul data-astromap-target='suggestions'
+        class='hidden absolute z-10 left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-brand dark:border-brand-light rounded shadow-lg text-left max-h-64 overflow-y-auto'>
+      </ul>
     </div>
   </div>
   <aside class='my-8'>

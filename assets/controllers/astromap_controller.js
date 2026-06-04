@@ -20,9 +20,12 @@ String.prototype.template = function (data) {
 
 // Connects to data-controller="astromap"
 Stimulus.register("astromap", class extends Controller {
-  static targets = ['coordinates', 'newCoordinate', 'bases', 'factions', 'location', 'name', 'orbits', 'star', 'temp', 'trade_codes', 'travel_code', 'uwp', 'description', 'routableVolumes', 'mapTitle'];
+  static targets = ['coordinates', 'newCoordinate', 'bases', 'factions', 'location', 'name', 'orbits', 'star', 'temp', 'trade_codes', 'travel_code', 'uwp', 'description', 'routableVolumes', 'mapTitle', 'suggestions'];
   static values = { dataUrl: String }
   volumes = {};
+  names = [];
+  matches = [];
+  activeIndex = -1;
   connect() {
     console.log("Loading Astromap Controller")
     this.loadData();
@@ -30,8 +33,8 @@ Stimulus.register("astromap", class extends Controller {
   ternary(source, key, alternate) {
     return source.hasOwnProperty(key) ? source[key] : alternate
   }
-  showVolumeDetails() {
-    var coord = this.coordinatesTarget.value;
+  showVolumeDetails(coordArg) {
+    var coord = (typeof coordArg === 'string') ? coordArg : this.coordinatesTarget.value;
     var orbits = "";
     var onum = 0;
     
@@ -228,6 +231,11 @@ Stimulus.register("astromap", class extends Controller {
         // Store volumes - already in hash format with zero-padded keys
         this.volumes = data["volumes"] || {};
         console.log("Loaded data. Volume count:", Object.keys(this.volumes).length);
+
+        // Build a name index for lookahead search by system name
+        this.names = Object.keys(this.volumes)
+          .map(coord => ({ coord: coord, name: this.volumes[coord]["name"] || "" }))
+          .filter(entry => entry.name !== "");
         
         // Update map title if JSON has a name field
         if (data["name"] && this.hasMapTitleTarget) {
@@ -378,6 +386,103 @@ Stimulus.register("astromap", class extends Controller {
     event.preventDefault();
     this.coordinatesTarget.value = event.target.innerHTML;
     this.showVolumeDetails()
+  }
+
+  // Unified search: digits => coordinate lookup, letters => system-name lookahead
+  search() {
+    var q = this.coordinatesTarget.value.trim();
+    this.matches = [];
+    this.activeIndex = -1;
+
+    if (q.length === 0) { this.hideSuggestions(); return; }
+
+    // Coordinate mode when the first character is a digit
+    if (q[0] >= '0' && q[0] <= '9') {
+      this.hideSuggestions();
+      if (q.length === 4) { this.showVolumeDetails(q); }
+      return;
+    }
+
+    // Name mode: prefix matches first, then any substring match
+    var ql = q.toLowerCase();
+    this.matches = this.names
+      .filter(entry => entry.name.toLowerCase().includes(ql))
+      .sort((a, b) => {
+        var ap = a.name.toLowerCase().startsWith(ql) ? 0 : 1;
+        var bp = b.name.toLowerCase().startsWith(ql) ? 0 : 1;
+        return ap - bp || a.name.localeCompare(b.name);
+      })
+      .slice(0, 8);
+
+    this.renderSuggestions();
+  }
+
+  renderSuggestions() {
+    if (!this.hasSuggestionsTarget) { return; }
+
+    if (this.matches.length === 0) {
+      this.suggestionsTarget.innerHTML = `<li class='px-3 py-2 text-shade text-sm'>No systems found</li>`;
+      this.suggestionsTarget.classList.remove('hidden');
+      return;
+    }
+
+    this.suggestionsTarget.innerHTML = this.matches.map((m, i) => {
+      var active = i === this.activeIndex ? ' bg-primary-50 dark:bg-primary-50/10' : '';
+      return `<li class='px-3 py-2 cursor-pointer flex justify-between gap-3 hover:bg-primary-50 dark:hover:bg-primary-50/10${active}' data-action='mousedown->astromap#selectSuggestion' data-coord='${m.coord}'><span>${m.name}</span><span class='font-code text-shade'>${m.coord}</span></li>`;
+    }).join('');
+    this.suggestionsTarget.classList.remove('hidden');
+  }
+
+  selectSuggestion(event) {
+    var li = event.target.closest('[data-coord]');
+    if (!li) { return; }
+    event.preventDefault();
+    var coord = li.getAttribute('data-coord');
+    this.coordinatesTarget.value = coord;
+    this.hideSuggestions();
+    this.showVolumeDetails(coord);
+  }
+
+  onKeydown(event) {
+    if (!this.hasSuggestionsTarget || this.suggestionsTarget.classList.contains('hidden')) { return; }
+
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        this.activeIndex = Math.min(this.activeIndex + 1, this.matches.length - 1);
+        this.renderSuggestions();
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        this.activeIndex = Math.max(this.activeIndex - 1, 0);
+        this.renderSuggestions();
+        break;
+      case 'Enter':
+        if (this.activeIndex >= 0 && this.matches[this.activeIndex]) {
+          event.preventDefault();
+          var m = this.matches[this.activeIndex];
+          this.coordinatesTarget.value = m.coord;
+          this.hideSuggestions();
+          this.showVolumeDetails(m.coord);
+        }
+        break;
+      case 'Escape':
+        this.hideSuggestions();
+        break;
+    }
+  }
+
+  onBlur() {
+    // Delay so a mousedown selection registers before the list is hidden
+    setTimeout(() => this.hideSuggestions(), 150);
+  }
+
+  hideSuggestions() {
+    if (this.hasSuggestionsTarget) {
+      this.suggestionsTarget.classList.add('hidden');
+      this.suggestionsTarget.innerHTML = '';
+    }
+    this.activeIndex = -1;
   }
   
   metadata = {
