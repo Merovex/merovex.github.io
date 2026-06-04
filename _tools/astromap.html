@@ -10,13 +10,14 @@ keep track of the setting. It helps me measure superluminal travel distances."
 <article class='w-prose h-full' data-controller='astromap' data-astromap-data-url-value="/assets/teradoma-archipelago.json">
   <div class='text-center space-y-2'>
     <label for='coordinate' class=' text-xl'>Search:</label>
-    <div class='relative w-72 mx-auto'>
+    <div class='relative w-56 mx-auto'>
       <input name='coordinate' id='coordinate' value='' type='text' autocomplete='off'
         data-astromap-target='coordinates'
         data-action='input->astromap#search keydown->astromap#onKeydown blur->astromap#onBlur'
-        class='form-input w-full text-center' placeholder='Coordinate (0812) or system name…'>
+        class='form-input w-full text-center' placeholder='0812 or system name…'>
       <ul data-astromap-target='suggestions'
-        class='hidden absolute z-10 left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-brand dark:border-brand-light rounded shadow-lg text-left max-h-64 overflow-y-auto'>
+        class='hidden absolute left-0 w-full surface-1 border rounded shadow-lg text-left'
+        style='z-index: 10; margin-top: 0.25rem; max-height: 16rem; overflow-y: auto;'>
       </ul>
     </div>
   </div>

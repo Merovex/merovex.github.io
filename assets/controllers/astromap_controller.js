@@ -421,14 +421,14 @@ Stimulus.register("astromap", class extends Controller {
     if (!this.hasSuggestionsTarget) { return; }
 
     if (this.matches.length === 0) {
-      this.suggestionsTarget.innerHTML = `<li class='px-3 py-2 text-shade text-sm'>No systems found</li>`;
+      this.suggestionsTarget.innerHTML = `<li class='px-3 py-2'>No systems found</li>`;
       this.suggestionsTarget.classList.remove('hidden');
       return;
     }
 
     this.suggestionsTarget.innerHTML = this.matches.map((m, i) => {
-      var active = i === this.activeIndex ? ' bg-primary-50 dark:bg-primary-50/10' : '';
-      return `<li class='px-3 py-2 cursor-pointer flex justify-between gap-3 hover:bg-primary-50 dark:hover:bg-primary-50/10${active}' data-action='mousedown->astromap#selectSuggestion' data-coord='${m.coord}'><span>${m.name}</span><span class='font-code text-shade'>${m.coord}</span></li>`;
+      var active = i === this.activeIndex ? ' surface-2' : '';
+      return `<li class='px-3 py-2 cursor-pointer flex hover:bg-gray-500/10${active}' data-action='mousedown->astromap#selectSuggestion' data-coord='${m.coord}'><span class='flex-1'>${m.name}</span><span class='font-code'>${m.coord}</span></li>`;
     }).join('');
     this.suggestionsTarget.classList.remove('hidden');
   }
