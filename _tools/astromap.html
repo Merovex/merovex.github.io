@@ -7,7 +7,9 @@ keep track of the setting. It helps me measure superluminal travel distances."
 
 <script type="module" src="/assets/controllers/astromap_controller.js"></script>
 <!-- To use a custom JSON file, add data-astromap-data-url-value="/path/to/your/file.json" -->
-<article class='w-prose h-full' data-controller='astromap' data-astromap-data-url-value="/assets/teradoma-archipelago.json" data-astromap-svg-url-value="/assets/teradoma-archipelago.svg">
+<article class='w-prose h-full' data-controller='astromap'
+  data-astromap-data-url-value="/assets/teradoma-archipelago.json"
+  data-astromap-svg-url-value="/assets/teradoma-archipelago.svg">
   <div class='text-center space-y-2'>
     <label for='coordinate' class=' text-xl'>Search:</label>
     <div class='relative w-56 mx-auto'>
@@ -104,8 +106,12 @@ keep track of the setting. It helps me measure superluminal travel distances."
       <p>This is the comprehensive map of known humanity in Terradoma. You can pan and zoom. The volume report above
         relies on the coordinates of this map.</p>
     </div>
-    <div data-astromap-target='map' class='w-full border-2 border-brand dark:border-brand-light'
-      style='height: 70vh; min-height: 420px; overflow: hidden;'>
+    <!-- Wrapper height tracks the map's true aspect (2806/1940 = 144.64%) so the map
+         fills the width edge-to-edge with no side letterboxing. The padding gives a
+         definite height, which svg-pan-zoom needs to compute its fit at init. -->
+    <div class='w-full border-2 border-brand dark:border-brand-light'
+      style='position: relative; width: 100%; padding-top: 144.64%; overflow: hidden;'>
+      <div data-astromap-target='map' style='position: absolute; inset: 0; overflow: hidden;'></div>
     </div>
   </section>
 </article>

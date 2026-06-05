@@ -287,8 +287,13 @@ Stimulus.register("astromap", class extends Controller {
           var h = parseFloat(svg.getAttribute('height')) || 2806;
           svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
         }
-        svg.setAttribute('width', '100%');
-        svg.setAttribute('height', '100%');
+        // display:block + 100% CSS makes an inline SVG reliably fill the (definite-height)
+        // container; attribute sizing alone can leave it at intrinsic/inline dimensions.
+        svg.removeAttribute('width');
+        svg.removeAttribute('height');
+        svg.style.display = 'block';
+        svg.style.width = '100%';
+        svg.style.height = '100%';
 
         if (!window.svgPanZoom) {
           console.warn("svg-pan-zoom library not loaded; map is static.");
@@ -305,22 +310,42 @@ Stimulus.register("astromap", class extends Controller {
           zoomScaleSensitivity: 0.3
         });
 
+        // svg-pan-zoom caches the SVG's pixel size at init. Re-measure and re-fit on the
+        // next frame so the fit is computed against the container's final laid-out height,
+        // not whatever it happened to be at construction time.
+        requestAnimationFrame(() => {
+          if (this.panZoom) { this.panZoom.resize(); this.panZoom.fit(); this.panZoom.center(); }
+        });
+
         // A marker placed inside the pan/zoom viewport tracks the map as it moves,
         // so the selected system is visible after we pan to it.
         var viewport = svg.querySelector('.svg-pan-zoom_viewport');
         if (viewport) {
           var marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-          marker.setAttribute('r', '34');
-          marker.setAttribute('fill', 'none');
-          marker.setAttribute('stroke', '#ff4d4d');
-          marker.setAttribute('stroke-width', '6');
-          marker.setAttribute('opacity', '0');
+          marker.setAttribute('r', '44');
           marker.setAttribute('pointer-events', 'none');
+          // Inline styles beat the SVG's own <style> circle{fill:...} rules, so the
+          // marker stays a hollow red ring instead of a filled disk hiding the hex.
+          marker.style.fill = 'none';
+          marker.style.stroke = '#ff3b30';
+          marker.style.strokeWidth = '7';
+          marker.style.opacity = '0';
           viewport.appendChild(marker);
           this.marker = marker;
         }
+
+        // The container height is fixed (vh/min-height); re-fit on viewport resize.
+        this.resizeHandler = () => {
+          if (this.panZoom) { this.panZoom.resize(); this.panZoom.fit(); this.panZoom.center(); }
+        };
+        window.addEventListener('resize', this.resizeHandler);
       })
       .catch(error => console.error("Error loading map SVG: ", error));
+  }
+
+  disconnect() {
+    if (this.resizeHandler) { window.removeEventListener('resize', this.resizeHandler); }
+    if (this.panZoom) { this.panZoom.destroy(); this.panZoom = null; }
   }
 
   panToCoordinate(coord) {
@@ -344,7 +369,7 @@ Stimulus.register("astromap", class extends Controller {
     if (this.marker) {
       this.marker.setAttribute('cx', px);
       this.marker.setAttribute('cy', py);
-      this.marker.setAttribute('opacity', '1');
+      this.marker.style.opacity = '1';
     }
   }
 
