@@ -20,7 +20,7 @@ String.prototype.template = function (data) {
 
 // Connects to data-controller="astromap"
 Stimulus.register("astromap", class extends Controller {
-  static targets = ['coordinates', 'newCoordinate', 'bases', 'factions', 'location', 'name', 'orbits', 'star', 'temp', 'trade_codes', 'travel_code', 'uwp', 'description', 'routableVolumes', 'mapTitle', 'suggestions', 'map'];
+  static targets = ['coordinates', 'newCoordinate', 'bases', 'factions', 'location', 'name', 'orbits', 'star', 'temp', 'trade_codes', 'travel_code', 'uwp', 'description', 'narrative', 'routableVolumes', 'mapTitle', 'suggestions', 'map', 'importance', 'economic', 'cultural', 'resourceUnits', 'settlement'];
   static values = { dataUrl: String, svgUrl: String }
   volumes = {};
   names = [];
@@ -40,6 +40,7 @@ Stimulus.register("astromap", class extends Controller {
     var coord = (typeof coordArg === 'string') ? coordArg : this.coordinatesTarget.value;
     var orbits = "";
     var onum = 0;
+    var world = null;
     
     if (coord.length != 4 || this.volumes[coord] == undefined) { return; }
 
@@ -110,13 +111,18 @@ Stimulus.register("astromap", class extends Controller {
       
       // Get world data if present
       if (data["star"]["world"]) {
-        var world = data["star"]["world"];
-        this.basesTarget.innerHTML = world.bases || '';
-        this.factionsTarget.innerHTML = (world.factions || []).join(' ');
-        this.tempTarget.innerHTML = world.temperature || '';
-        this.trade_codesTarget.innerHTML = (world.trade_codes || []).join(' ');
-        this.travel_codeTarget.innerHTML = world.travel_code || '';
+        world = data["star"]["world"];
+        this.basesTarget.innerHTML = this.decodeBases(world.bases);
+        this.factionsTarget.innerHTML = (world.factions || []).join(', ') || '&mdash;';
+        this.tempTarget.innerHTML = this.TEMPERATURES[world.temperature] || world.temperature || '&mdash;';
+        this.trade_codesTarget.innerHTML = this.expandTradeCodes(world.trade_codes);
+        this.travel_codeTarget.innerHTML = this.decodeTravel(world.travel_code);
         this.uwpTarget.innerHTML = this.formatUWP(world);
+        if (this.hasImportanceTarget) { this.importanceTarget.innerHTML = this.formatImportance(world.ix); }
+        if (this.hasEconomicTarget) { this.economicTarget.innerHTML = this.formatEx(world.ex); }
+        if (this.hasCulturalTarget) { this.culturalTarget.innerHTML = this.formatCx(world.cx); }
+        if (this.hasResourceUnitsTarget) { this.resourceUnitsTarget.innerHTML = (world.ru != null ? world.ru : '&mdash;'); }
+        if (this.hasSettlementTarget) { this.settlementTarget.innerHTML = world.native || '&mdash;'; }
       }
       
       // Set star classification
@@ -173,7 +179,7 @@ Stimulus.register("astromap", class extends Controller {
     // Get UWP for description
     var uwp = this.uwpTarget.innerHTML || data["uwp"] || '';
     if (uwp && uwp !== '') {
-      this.uwpTranslate(data["name"], uwp);
+      this.uwpTranslate(data["name"], uwp, world);
     }
     
     this.routableVolumes(coord);
@@ -373,7 +379,7 @@ Stimulus.register("astromap", class extends Controller {
     }
   }
 
-  uwpTranslate(name, uwp) {
+  uwpTranslate(name, uwp, world) {
     var keys = ['port', 'size', 'atmos', 'hydro', 'popx', 'govt', 'law', 'tech'];
     var bits = uwp.split('').filter(bit => bit !== '-');
     var description = name;
@@ -390,8 +396,145 @@ Stimulus.register("astromap", class extends Controller {
         description += ' ';
       }
     });
+
     this.descriptionTarget.innerHTML = description;
+
+    if (this.hasNarrativeTarget) {
+      this.narrativeTarget.innerHTML = this.worldNarrative(world);
+    }
   }
+
+  // Build the richer trade/extension metadata as its own prose paragraph.
+  worldNarrative(world) {
+    if (!world) { return ''; }
+    var parts = [];
+
+    if (world.native) {
+      parts.push('It is a <strong>' + world.native.toLowerCase() + '</strong> world.');
+    }
+    var temp = this.TEMPERATURES[world.temperature];
+    if (temp) { parts.push('The climate runs <strong>' + temp.toLowerCase() + '</strong>.'); }
+
+    var trade = this.expandTradeCodes(world.trade_codes, true);
+    if (trade) { parts.push('It is classified as ' + trade + '.'); }
+
+    var bases = this.decodeBases(world.bases, true);
+    if (bases) { parts.push('Facilities on hand: ' + bases + '.'); }
+
+    if (world.travel_code === 'AZ') {
+      parts.push('The world carries an <strong>Amber Zone</strong> advisory &mdash; travellers should exercise caution.');
+    } else if (world.travel_code === 'RZ') {
+      parts.push('The world is an interdicted <strong>Red Zone</strong> &mdash; entry is forbidden.');
+    }
+
+    if (world.ix != null) {
+      parts.push('In regional terms it is <strong>' + this.importanceLabel(world.ix) + '</strong> (Ix ' + this.formatImportance(world.ix) + ').');
+    }
+    if (world.ex) { parts.push(this.economicNarrative(world.ex, world.ru)); }
+    if (world.cx) { parts.push(this.culturalNarrative(world.cx)); }
+
+    return parts.join(' ');
+  }
+
+  expandTradeCodes(codes, namesOnly) {
+    if (!codes || !codes.length) { return namesOnly ? '' : '&mdash;'; }
+    var labels = codes.map(c => {
+      var name = this.TRADE_CODES[c];
+      if (!name) { return c; }
+      return namesOnly ? name : name + ' (' + c + ')';
+    });
+    if (!namesOnly) { return labels.join(', '); }
+    if (labels.length === 1) { return labels[0]; }
+    return labels.slice(0, -1).join(', ') + ' and ' + labels[labels.length - 1];
+  }
+
+  decodeBases(str, namesOnly) {
+    var letters = (str || '').split('').filter(ch => ch !== '.');
+    if (!letters.length) { return namesOnly ? '' : '&mdash;'; }
+    return letters.map(ch => this.BASE_CODES[ch] || ch).join(', ');
+  }
+
+  decodeTravel(code) {
+    if (code == null || code === '' || code === '..') { return '&mdash;'; }
+    return this.TRAVEL_CODES[code] || code;
+  }
+
+  formatImportance(ix) {
+    if (ix == null) { return '&mdash;'; }
+    return '{' + (ix >= 0 ? '+' : '') + ix + '}';
+  }
+
+  importanceLabel(ix) {
+    if (ix >= 4) { return 'a very important world'; }
+    if (ix >= 2) { return 'an important world'; }
+    if (ix === 1) { return 'a notable world'; }
+    if (ix === 0) { return 'an ordinary world'; }
+    if (ix === -1) { return 'a minor world'; }
+    if (ix === -2) { return 'a backwater'; }
+    return 'a remote backwater';
+  }
+
+  formatEx(ex) {
+    if (!ex) { return '&mdash;'; }
+    var eff = ex.eff || 0;
+    return '(' + this.toHex(ex.res || 0) + this.toHex(ex.lab || 0) + this.toHex(ex.inf || 0) +
+      (eff >= 0 ? '+' : '-') + this.toHex(Math.abs(eff)) + ')';
+  }
+
+  formatCx(cx) {
+    if (!cx) { return '&mdash;'; }
+    return '[' + this.toHex(cx.homo || 0) + this.toHex(cx.acc || 0) + this.toHex(cx.str || 0) + this.toHex(cx.sym || 0) + ']';
+  }
+
+  // Map a numeric rating to the first band whose ceiling it falls under.
+  bandLabel(value, bands) {
+    for (var i = 0; i < bands.length; i++) {
+      if (value <= bands[i][0]) { return bands[i][1]; }
+    }
+    return bands[bands.length - 1][1];
+  }
+
+  // Economic Extension (resources / labour / infrastructure / efficiency) in plain English.
+  economicNarrative(ex, ru) {
+    var res = this.bandLabel(ex.res || 0, [[2, 'scarce resources'], [5, 'modest resources'], [8, 'abundant resources'], [Infinity, 'vast resources']]);
+    var inf = this.bandLabel(ex.inf || 0, [[2, 'almost no infrastructure'], [5, 'limited infrastructure'], [8, 'solid infrastructure'], [Infinity, 'advanced infrastructure']]);
+    var eff = ex.eff || 0;
+    var econ = eff > 1 ? 'a thriving, efficient economy'
+      : (eff >= 0 ? 'a stable economy'
+        : (eff >= -2 ? 'a sluggish economy' : 'a faltering economy'));
+    return 'Its economy pairs ' + res + ' with ' + inf + ', making for ' + econ +
+      ' (Ex ' + this.formatEx(ex) + (ru != null ? ', ' + ru + ' RU' : '') + ').';
+  }
+
+  // Cultural Extension (homogeneity / acceptance / strangeness / symbols) in plain English.
+  culturalNarrative(cx) {
+    var homo = this.bandLabel(cx.homo || 0, [[3, 'culturally fragmented'], [6, 'moderately cohesive'], [9, 'strongly unified'], [Infinity, 'all but monolithic']]);
+    var acc = this.bandLabel(cx.acc || 0, [[3, 'wary of outsiders'], [6, 'tolerant of outsiders'], [9, 'welcoming to outsiders'], [Infinity, 'eager for outside contact']]);
+    var str = this.bandLabel(cx.str || 0, [[2, 'familiar to travellers'], [5, 'mildly unusual'], [8, 'noticeably strange'], [Infinity, 'deeply alien']]);
+    var sym = this.bandLabel(cx.sym || 0, [[3, 'simple symbology'], [6, 'moderate symbology'], [9, 'rich symbology'], [Infinity, 'elaborate symbology']]);
+    return 'Its people are ' + homo + ' and ' + acc + '; their ways feel ' + str + ', expressed through ' + sym + ' (Cx ' + this.formatCx(cx) + ').';
+  }
+
+  TEMPERATURES = { F: 'Frozen', C: 'Cold', T: 'Temperate', H: 'Hot', R: 'Roasting' };
+
+  TRAVEL_CODES = { 'AZ': 'Amber Zone', 'RZ': 'Red Zone (Interdicted)' };
+
+  BASE_CODES = {
+    N: 'Naval Base', S: 'Scout Base', G: 'Gas Giant Refueling',
+    C: 'Corsair Base', P: 'Pirate Base', D: 'Depot', M: 'Military Base',
+    W: 'Way Station', R: 'Research Station'
+  };
+
+  TRADE_CODES = {
+    Ag: 'Agricultural', As: 'Asteroid Belt', Ba: 'Barren', Co: 'Cold',
+    De: 'Desert', Fl: 'Fluid Oceans', Ga: 'Garden', He: 'Hellworld',
+    Hi: 'High Population', Ho: 'Hot', Ic: 'Ice-Capped', In: 'Industrial',
+    Lo: 'Low Population', Lt: 'Low Technology', Na: 'Non-Agricultural',
+    Ni: 'Non-Industrial', Oc: 'Ocean', Pa: 'Pre-Agricultural',
+    Ph: 'Pre-High Population', Pi: 'Pre-Industrial', Po: 'Poor',
+    Pr: 'Pre-Rich', Ri: 'Rich', Tr: 'Tropic', Tu: 'Tundra',
+    Va: 'Vacuum', Wa: 'Water World'
+  };
   
   EMPTY_TEMPLATE = `<tr class='text-sm text-center striped text-shade'><td class='py-2'>{orbit}</td><td class='py-2'>&mdash; Empty &mdash;</td><td class='py-2'>{distance}</td><td class='py-2'>&nbsp;</td></tr>`;
   ORBIT_TEMPLATE = `<tr class='text-center{klass}'><td class='py-2'>{orbit}</td><td class='py-2'>{type}</td><td class='py-2'>{distance}</td><td class='py-2'>{uwp}</td></tr>`;
