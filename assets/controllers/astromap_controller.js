@@ -20,15 +20,18 @@ String.prototype.template = function (data) {
 
 // Connects to data-controller="astromap"
 Stimulus.register("astromap", class extends Controller {
-  static targets = ['coordinates', 'newCoordinate', 'bases', 'factions', 'location', 'name', 'orbits', 'star', 'temp', 'trade_codes', 'travel_code', 'uwp', 'description', 'routableVolumes', 'mapTitle', 'suggestions'];
-  static values = { dataUrl: String }
+  static targets = ['coordinates', 'newCoordinate', 'bases', 'factions', 'location', 'name', 'orbits', 'star', 'temp', 'trade_codes', 'travel_code', 'uwp', 'description', 'routableVolumes', 'mapTitle', 'suggestions', 'map'];
+  static values = { dataUrl: String, svgUrl: String }
   volumes = {};
   names = [];
   matches = [];
   activeIndex = -1;
+  panZoom = null;
+  marker = null;
   connect() {
     console.log("Loading Astromap Controller")
     this.loadData();
+    this.loadMap();
   }
   ternary(source, key, alternate) {
     return source.hasOwnProperty(key) ? source[key] : alternate
@@ -262,6 +265,89 @@ Stimulus.register("astromap", class extends Controller {
       .catch(error => console.error("Error fetching data: ", error));
   }
 
+  loadMap() {
+    if (!this.hasMapTarget) { return; }
+
+    var svgUrl = this.hasSvgUrlValue
+      ? this.svgUrlValue
+      : (this.hasDataUrlValue ? this.dataUrlValue.replace(/\.json$/, '.svg') : '/assets/teradoma.svg');
+
+    fetch(svgUrl)
+      .then(response => response.ok ? response.text() : Promise.reject(new Error("SVG response was not ok.")))
+      .then(svgText => {
+        this.mapTarget.innerHTML = svgText;
+        var svg = this.mapTarget.querySelector('svg');
+        if (!svg) { return; }
+
+        // The generated SVG ships with px width/height but no viewBox; without one
+        // svg-pan-zoom's fit math is tied to native pixels and can never show the
+        // whole map. Derive a viewBox from the declared size and let it scale.
+        if (!svg.getAttribute('viewBox')) {
+          var w = parseFloat(svg.getAttribute('width')) || 1940;
+          var h = parseFloat(svg.getAttribute('height')) || 2806;
+          svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+        }
+        svg.setAttribute('width', '100%');
+        svg.setAttribute('height', '100%');
+
+        if (!window.svgPanZoom) {
+          console.warn("svg-pan-zoom library not loaded; map is static.");
+          return;
+        }
+
+        this.panZoom = window.svgPanZoom(svg, {
+          zoomEnabled: true,
+          controlIconsEnabled: true,
+          fit: true,
+          center: true,
+          minZoom: 0.5,
+          maxZoom: 10,
+          zoomScaleSensitivity: 0.3
+        });
+
+        // A marker placed inside the pan/zoom viewport tracks the map as it moves,
+        // so the selected system is visible after we pan to it.
+        var viewport = svg.querySelector('.svg-pan-zoom_viewport');
+        if (viewport) {
+          var marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          marker.setAttribute('r', '34');
+          marker.setAttribute('fill', 'none');
+          marker.setAttribute('stroke', '#ff4d4d');
+          marker.setAttribute('stroke-width', '6');
+          marker.setAttribute('opacity', '0');
+          marker.setAttribute('pointer-events', 'none');
+          viewport.appendChild(marker);
+          this.marker = marker;
+        }
+      })
+      .catch(error => console.error("Error loading map SVG: ", error));
+  }
+
+  panToCoordinate(coord) {
+    if (!this.panZoom || !coord || !this.volumes[coord]) { return; }
+
+    var volume = this.volumes[coord];
+    if (volume.column == null || volume.row == null) { return; }
+
+    var center = this.center_of(volume.column, volume.row);
+    var px = parseFloat(center[0]);
+    var py = parseFloat(center[1]);
+
+    // Zoom to a readable focus level, then center the system in the viewport.
+    this.panZoom.zoom(3);
+    var sizes = this.panZoom.getSizes();
+    this.panZoom.pan({
+      x: sizes.width / 2 - px * sizes.realZoom,
+      y: sizes.height / 2 - py * sizes.realZoom
+    });
+
+    if (this.marker) {
+      this.marker.setAttribute('cx', px);
+      this.marker.setAttribute('cy', py);
+      this.marker.setAttribute('opacity', '1');
+    }
+  }
+
   uwpTranslate(name, uwp) {
     var keys = ['port', 'size', 'atmos', 'hydro', 'popx', 'govt', 'law', 'tech'];
     var bits = uwp.split('').filter(bit => bit !== '-');
@@ -386,6 +472,7 @@ Stimulus.register("astromap", class extends Controller {
     event.preventDefault();
     this.coordinatesTarget.value = event.target.innerHTML;
     this.showVolumeDetails()
+    this.panToCoordinate(this.coordinatesTarget.value)
   }
 
   // Unified search: digits => coordinate lookup, letters => system-name lookahead
@@ -399,7 +486,7 @@ Stimulus.register("astromap", class extends Controller {
     // Coordinate mode when the first character is a digit
     if (q[0] >= '0' && q[0] <= '9') {
       this.hideSuggestions();
-      if (q.length === 4) { this.showVolumeDetails(q); }
+      if (q.length === 4) { this.showVolumeDetails(q); this.panToCoordinate(q); }
       return;
     }
 
@@ -441,6 +528,7 @@ Stimulus.register("astromap", class extends Controller {
     this.coordinatesTarget.value = coord;
     this.hideSuggestions();
     this.showVolumeDetails(coord);
+    this.panToCoordinate(coord);
   }
 
   onKeydown(event) {
@@ -464,6 +552,7 @@ Stimulus.register("astromap", class extends Controller {
           this.coordinatesTarget.value = m.coord;
           this.hideSuggestions();
           this.showVolumeDetails(m.coord);
+          this.panToCoordinate(m.coord);
         }
         break;
       case 'Escape':
