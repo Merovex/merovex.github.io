@@ -1,0 +1,362 @@
+<!-- Stellar Drift — Conlang Engine console.
+     All markup and CSS scoped under .conlang-console so it cannot clobber
+     site styles. The controller (data-controller="conlang") is glue only. -->
+
+<style>
+  .conlang-console {
+    --cl-ground: #14110d;
+    --cl-panel: #1c1812;
+    --cl-line: #3a3228;
+    --cl-ink: #e8e0d2;
+    --cl-dim: #9a8f7c;
+    --cl-accent: #e08a2b;        /* single warm accent */
+    --cl-accent-soft: #6b4a1f;
+    --cl-mono: "JetBrains Mono", "IBM Plex Mono", "Courier New", monospace;
+    --cl-display: "Fjalla One", "Oswald", sans-serif;
+
+    background: var(--cl-ground);
+    color: var(--cl-ink);
+    border: 1px solid var(--cl-line);
+    border-radius: 4px;
+    font-family: var(--cl-mono);
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 0;
+    margin: 1.5rem 0;
+    overflow: hidden;
+  }
+
+  .conlang-console *,
+  .conlang-console *::before,
+  .conlang-console *::after { box-sizing: border-box; }
+
+  .conlang-console .cl-banner {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 0.9rem 1.1rem;
+    border-bottom: 1px solid var(--cl-line);
+    background: linear-gradient(180deg, #211b13, var(--cl-ground));
+  }
+  .conlang-console .cl-title {
+    font-family: var(--cl-display);
+    font-size: 1.5rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 0;
+    color: var(--cl-ink);
+  }
+  .conlang-console .cl-title .cl-mark { color: var(--cl-accent); }
+  .conlang-console .cl-tagline {
+    color: var(--cl-dim);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .conlang-console .cl-body {
+    display: grid;
+    grid-template-columns: minmax(240px, 320px) 1fr;
+    gap: 0;
+  }
+  @media (max-width: 760px) {
+    .conlang-console .cl-body { grid-template-columns: 1fr; }
+  }
+
+  /* ---- Control panel ---- */
+  .conlang-console .cl-panel {
+    background: var(--cl-panel);
+    border-right: 1px solid var(--cl-line);
+    padding: 1.1rem;
+  }
+  @media (max-width: 760px) {
+    .conlang-console .cl-panel { border-right: 0; border-bottom: 1px solid var(--cl-line); }
+  }
+
+  .conlang-console .cl-field { margin-bottom: 1.05rem; }
+  .conlang-console .cl-label {
+    display: block;
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cl-accent);
+    margin-bottom: 0.3rem;
+  }
+  .conlang-console .cl-hint {
+    display: block;
+    font-size: 0.66rem;
+    color: var(--cl-dim);
+    margin-top: 0.2rem;
+    letter-spacing: 0.02em;
+  }
+
+  .conlang-console select,
+  .conlang-console input[type="number"] {
+    width: 100%;
+    background: var(--cl-ground);
+    border: 1px solid var(--cl-line);
+    color: var(--cl-ink);
+    font-family: var(--cl-mono);
+    font-size: 0.85rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 3px;
+  }
+  .conlang-console select:focus,
+  .conlang-console input:focus {
+    outline: none;
+    border-color: var(--cl-accent);
+  }
+
+  .conlang-console input[type="range"] {
+    width: 100%;
+    accent-color: var(--cl-accent);
+    background: transparent;
+    margin: 0.25rem 0 0;
+  }
+
+  .conlang-console .cl-seedrow { display: flex; gap: 0.4rem; }
+  .conlang-console .cl-seedrow input { flex: 1; }
+
+  .conlang-console .cl-btn {
+    background: var(--cl-ground);
+    border: 1px solid var(--cl-line);
+    color: var(--cl-ink);
+    font-family: var(--cl-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.4rem 0.6rem;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .conlang-console .cl-btn:hover { border-color: var(--cl-accent); color: var(--cl-accent); }
+  .conlang-console .cl-btn-primary {
+    width: 100%;
+    margin-top: 0.4rem;
+    border-color: var(--cl-accent-soft);
+    color: var(--cl-accent);
+  }
+  .conlang-console .cl-btn-primary:hover { background: var(--cl-accent-soft); color: var(--cl-ink); }
+
+  .conlang-console .cl-checks { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem 0.6rem; }
+  .conlang-console .cl-check {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.76rem;
+    color: var(--cl-ink);
+    cursor: pointer;
+  }
+  .conlang-console .cl-check input { accent-color: var(--cl-accent); }
+
+  .conlang-console .cl-meterval {
+    font-size: 0.72rem;
+    color: var(--cl-dim);
+    margin-top: 0.25rem;
+    letter-spacing: 0.04em;
+  }
+
+  /* ---- Readout ---- */
+  .conlang-console .cl-readout { padding: 1.1rem; min-width: 0; }
+
+  .conlang-console .cl-readout-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    border-bottom: 1px dashed var(--cl-line);
+    padding-bottom: 0.8rem;
+    margin-bottom: 0.9rem;
+  }
+  .conlang-console .cl-meta,
+  .conlang-console .cl-phon {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.15rem 0.7rem;
+    align-items: baseline;
+  }
+  .conlang-console .cl-k {
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cl-dim);
+  }
+  .conlang-console .cl-v { color: var(--cl-ink); font-size: 0.82rem; }
+
+  .conlang-console .cl-flag {
+    align-self: center;
+    border: 1px solid var(--cl-accent);
+    color: var(--cl-accent);
+    font-size: 0.64rem;
+    letter-spacing: 0.12em;
+    padding: 0.2rem 0.45rem;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .conlang-console .cl-block { margin-bottom: 1.1rem; }
+  .conlang-console .cl-h {
+    font-family: var(--cl-display);
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cl-accent);
+    margin: 0 0 0.5rem;
+    border-bottom: 1px solid var(--cl-line);
+    padding-bottom: 0.25rem;
+  }
+  .conlang-console .cl-h .cl-sub {
+    font-family: var(--cl-mono);
+    font-size: 0.64rem;
+    color: var(--cl-dim);
+    letter-spacing: 0.06em;
+    text-transform: none;
+  }
+
+  .conlang-console .cl-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.4rem;
+  }
+  .conlang-console .cl-cell {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--cl-line);
+    border-radius: 3px;
+    padding: 0.35rem 0.5rem;
+    background: var(--cl-panel);
+  }
+  .conlang-console .cl-en {
+    font-size: 0.62rem;
+    color: var(--cl-dim);
+    letter-spacing: 0.04em;
+  }
+  .conlang-console .cl-en em { color: var(--cl-accent); font-style: normal; }
+  .conlang-console .cl-word {
+    font-size: 1.05rem;
+    color: var(--cl-ink);
+    letter-spacing: 0.02em;
+  }
+  .conlang-console .cl-word.cl-sacred { color: var(--cl-accent); }
+
+  .conlang-console .cl-sentences { display: flex; flex-direction: column; gap: 0.55rem; }
+  .conlang-console .cl-sentence {
+    border-left: 2px solid var(--cl-accent);
+    padding: 0.3rem 0 0.3rem 0.7rem;
+  }
+  .conlang-console .cl-surface { font-size: 1.15rem; color: var(--cl-ink); letter-spacing: 0.03em; }
+  .conlang-console .cl-gloss { font-size: 0.72rem; color: var(--cl-dim); letter-spacing: 0.06em; margin-top: 0.1rem; }
+
+  .conlang-console .cl-empty { color: var(--cl-dim); font-size: 0.78rem; font-style: italic; }
+
+  .conlang-console .cl-log { margin-top: 1rem; border-top: 1px solid var(--cl-line); padding-top: 0.6rem; }
+  .conlang-console .cl-log summary {
+    cursor: pointer;
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cl-dim);
+  }
+  .conlang-console .cl-log summary:hover { color: var(--cl-accent); }
+  .conlang-console .cl-log ol {
+    margin: 0.6rem 0 0;
+    padding-left: 1.2rem;
+    color: var(--cl-dim);
+    font-size: 0.74rem;
+    line-height: 1.6;
+  }
+  .conlang-console .cl-error { color: #e0653b; }
+</style>
+
+<div class="conlang-console" data-controller="conlang">
+  <div class="cl-banner">
+    <h2 class="cl-title">Stellar<span class="cl-mark">·</span>Drift</h2>
+    <span class="cl-tagline">conlang drift engine · one world · one thousand years</span>
+  </div>
+
+  <div class="cl-body">
+    <!-- ================= CONTROL PANEL ================= -->
+    <div class="cl-panel">
+      <div class="cl-field">
+        <label class="cl-label" for="cl-seed">Seed · fixes the entire result</label>
+        <div class="cl-seedrow">
+          <input type="number" id="cl-seed" value="42" step="1"
+                 data-conlang-target="seed"
+                 data-action="input->conlang#generate">
+          <button type="button" class="cl-btn"
+                  data-action="click->conlang#randomize">roll</button>
+        </div>
+      </div>
+
+      <div class="cl-field">
+        <label class="cl-label" for="cl-primary">Primary founder</label>
+        <select id="cl-primary" data-conlang-target="primary"
+                data-action="input->conlang#generate"></select>
+      </div>
+
+      <div class="cl-field">
+        <label class="cl-label" for="cl-secondary">Secondary founder</label>
+        <select id="cl-secondary" data-conlang-target="secondary"
+                data-action="input->conlang#generate"></select>
+        <span class="cl-hint">match primary to settle a single founder</span>
+      </div>
+
+      <div class="cl-field">
+        <label class="cl-label" for="cl-share">Founder mix · primary share</label>
+        <input type="range" id="cl-share" min="0.3" max="1" step="0.01" value="0.7"
+               data-conlang-target="share"
+               data-action="input->conlang#generate">
+        <div class="cl-meterval" data-conlang-target="shareReadout"></div>
+        <span class="cl-hint">below 55% dominant triggers a creole</span>
+      </div>
+
+      <div class="cl-field">
+        <label class="cl-label" for="cl-years">Isolation · more years, more drift</label>
+        <input type="range" id="cl-years" min="200" max="2000" step="50" value="1000"
+               data-conlang-target="years"
+               data-action="input->conlang#generate">
+        <div class="cl-meterval" data-conlang-target="yearsReadout"></div>
+      </div>
+
+      <div class="cl-field">
+        <label class="cl-label" for="cl-brake">Tech brake · drift unleashed to frozen</label>
+        <input type="range" id="cl-brake" min="0" max="1" step="0.05" value="0.1"
+               data-conlang-target="brake"
+               data-action="input->conlang#generate">
+        <div class="cl-meterval" data-conlang-target="brakeReadout"></div>
+      </div>
+
+      <div class="cl-field">
+        <label class="cl-label">Environment · adds &amp; removes vocabulary</label>
+        <div class="cl-checks">
+          <label class="cl-check"><input type="checkbox" value="desert"
+            data-conlang-target="environment" data-action="input->conlang#generate"> desert</label>
+          <label class="cl-check"><input type="checkbox" value="lowgrav"
+            data-conlang-target="environment" data-action="input->conlang#generate"> lowgrav</label>
+          <label class="cl-check"><input type="checkbox" value="tidallock"
+            data-conlang-target="environment" data-action="input->conlang#generate"> tidallock</label>
+          <label class="cl-check"><input type="checkbox" value="ice"
+            data-conlang-target="environment" data-action="input->conlang#generate"> ice</label>
+          <label class="cl-check"><input type="checkbox" value="ocean"
+            data-conlang-target="environment" data-action="input->conlang#generate"> ocean</label>
+        </div>
+      </div>
+
+      <div class="cl-field">
+        <label class="cl-label" for="cl-sacred">Sacred · frozen liturgical register</label>
+        <select id="cl-sacred" data-conlang-target="sacred"
+                data-action="input->conlang#generate"></select>
+      </div>
+
+      <button type="button" class="cl-btn cl-btn-primary"
+              data-action="click->conlang#generate">regenerate</button>
+    </div>
+
+    <!-- ================= READOUT ================= -->
+    <div class="cl-readout" data-conlang-target="output"></div>
+  </div>
+</div>

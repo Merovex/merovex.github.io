@@ -225,7 +225,7 @@ Stimulus.register("astromap", class extends Controller {
   
   loadData() {
     // Use the data-astromap-data-url-value attribute if provided, otherwise use default
-    const dataUrl = this.hasDataUrlValue ? this.dataUrlValue : '/assets/teradoma.json';
+    const dataUrl = this.hasDataUrlValue ? this.dataUrlValue : '/assets/gendaldea.json';
     console.log("Loading data from:", dataUrl);
     
     fetch(dataUrl)
@@ -276,7 +276,7 @@ Stimulus.register("astromap", class extends Controller {
 
     var svgUrl = this.hasSvgUrlValue
       ? this.svgUrlValue
-      : (this.hasDataUrlValue ? this.dataUrlValue.replace(/\.json$/, '.svg') : '/assets/teradoma.svg');
+      : (this.hasDataUrlValue ? this.dataUrlValue.replace(/\.json$/, '.svg') : '/assets/gendaldea.svg');
 
     fetch(svgUrl)
       .then(response => response.ok ? response.text() : Promise.reject(new Error("SVG response was not ok.")))

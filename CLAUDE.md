@@ -66,7 +66,7 @@ Located in `assets/controllers/`:
 - **_tools** - Interactive web utilities
 
 ### Data Files
-- `assets/teradoma.json` - Worldbuilding data for science fiction setting
+- `assets/gendaldea.json` - Worldbuilding data for science fiction setting
 - `assets/wordcount.json` - Writing progress tracking
 - Various CSV/JSON files supporting interactive tools
 

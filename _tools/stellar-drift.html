@@ -1,0 +1,22 @@
+---
+layout: tool
+title: Stellar Drift — Conlang Engine
+description: "Seed a language onto a world, isolate it for a thousand years, and read back the daughter tongue. Deterministic: the same seed and world card always rebuild the identical language."
+---
+
+<script type="module" src="/assets/js/controllers/conlang_controller.js"></script>
+
+<article class="w-prose h-full">
+  <p>
+    Take roughly today's top languages, seed them across 150 worlds around 2700&nbsp;AD,
+    and isolate each world for a thousand years &mdash; the Beowulf-to-now gap. This engine
+    models that drift for a single world. Every output is mutually unintelligible with its
+    parent, and one parent seeded onto several worlds yields a family as diverse as Romance.
+  </p>
+  <p>
+    A <strong>seed plus a world card is the save file.</strong> Identical inputs always
+    rebuild the identical language &mdash; sentences, glossary, and log byte for byte.
+  </p>
+
+  {% include conlang.html %}
+</article>
