@@ -56,6 +56,7 @@
   --amber-200: #fde68a;
   --amber-300: #fcd34d;
   --amber-600: #d97706;
+  --amber-900: #78350f;
   --blue-300: #93c5fd;
   --blue-400: #60a5fa;
   --blue-700: #1d4ed8;
@@ -374,6 +375,11 @@ img, svg, video, canvas { max-width: 100%; }
 .prosed ol > li::marker { color: var(--tw-prose-counters); font-weight: 400; }
 .prosed ul > li::marker { color: var(--tw-prose-bullets); }
 .prosed hr { border-color: var(--tw-prose-hr); border-top-width: 1px; margin-block: 3em; }
+.uwp-codes { width: 100%; border-collapse: collapse; margin-block: 1em 1.5em; font-size: 0.95em; }
+.uwp-codes th, .uwp-codes td { text-align: left; padding: 0.35em 0.75em; border-bottom: 1px solid var(--surface-3, #ddd); vertical-align: top; }
+.uwp-codes thead th { font-weight: 600; border-bottom-width: 2px; }
+.uwp-codes tbody th { font-weight: 600; white-space: nowrap; }
+.uwp-codes .uwp-code { font-family: var(--font-mono, monospace); text-align: center; }
 .prosed blockquote {
   border-left: 0.25rem solid var(--tw-prose-quote-borders);
   color: var(--tw-prose-quotes);
@@ -474,8 +480,9 @@ img, svg, video, canvas { max-width: 100%; }
 .bg-amber-100 { background-color: var(--amber-100); }
 .bg-amber-300 { background-color: var(--amber-300); }
 .text-black { color: #000; }
+.text-amber-900 { color: var(--amber-900); }
 :root[data-color-scheme="dark"] .dark\:bg-amber-600 { background-color: var(--amber-600); }
-.highlight { transition: background-color 1.5s ease-in-out; }
+.highlight { transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out; }
 
 /* ---------------------------------------------------------------------
    7. UTILITY LAYER (only utilities actually used by templates/controllers)

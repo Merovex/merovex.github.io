@@ -3,76 +3,142 @@ import { Application, Controller } from "https://unpkg.com/@hotwired/stimulus/di
 window.Stimulus = Application.start()
 
 // Connects to data-controller="uwp-translator"
-// export default class extends Controller {
 Stimulus.register("uwp-translator", class extends Controller {
   connect() {
     console.log("connected uwp-translator")
     this.translate();
   }
-  static targets = ["name", "uwp", "code", "output",
+  static targets = ["name", "uwp", "code", "output", "list",
     'port', 'size', 'atmos', 'popx', 'hydro', 'govt', 'law', 'tech',
   ];
 
+  // Display order and labels for the UWP fields (standard SAEHPGLT order).
+  static keys = ['port', 'size', 'atmos', 'hydro', 'popx', 'govt', 'law', 'tech'];
+  static names = {
+    port: 'Starport', size: 'Size', atmos: 'Atmosphere', hydro: 'Hydrographics',
+    popx: 'Population', govt: 'Government', law: 'Law Level', tech: 'Tech Level',
+  };
+
   highlight(target) {
-    this[`${target}Target`].classList.add('bg-amber-100');
-    setTimeout(() => { this[`${target}Target`].classList.remove('bg-amber-100'); }, 1500);
+    let el = this[`${target}Target`];
+    el.classList.add('bg-amber-100', 'text-amber-900');
+    setTimeout(() => { el.classList.remove('bg-amber-100', 'text-amber-900'); }, 1000);
   }
 
   translate() {
-    // Your translation logic here
-    let name = this.nameTarget.value || 'Unnamed World';
-
-    let keys = ['port', 'size', 'atmos', 'hydro', 'popx', 'govt', 'law', 'tech'];
+    let keys = this.constructor.keys;
+    let names = this.constructor.names;
     let bits = this.uwpTarget.value.split('').filter(bit => bit !== '-');
-    let checksum = this.codeTarget.innerHTML.split('').filter(bit => bit !== '-');
+    let prev = this.codeTarget.innerHTML.split('').filter(bit => bit !== '-');
     if (bits.length !== keys.length) { return; }
 
+    // Itemized quick-reference table, rebuilt each change.
+    this.listTarget.innerHTML = keys.map((key, i) =>
+      `<tr><th scope='row'>${names[key]}</th><td class='uwp-code'>${bits[i]}</td><td>${this.shortFor(key, bits[i])}</td></tr>`
+    ).join('');
+
+    // Narrative prose: only re-render and flash the fields that changed.
     keys.forEach((key, i) => {
-      if (checksum[i] !== bits[i]) {
-        let template = this.metadata.templates[key];
-        let datum = this.metadata.code[key][bits[i]];
-        this.highlight(key)
-        if (Array.isArray(datum)) {
-          this[`${key}Target`].innerHTML = template.replace('{0}', datum[0]).replace('{1}', datum[1]);
-        } else {
-          this[`${key}Target`].innerHTML = template.replace('{0}', datum);
-        }
+      if (prev[i] !== bits[i]) {
+        this[`${key}Target`].innerHTML = this.narrativeFor(key, bits[i]);
+        this.highlight(key);
       }
     });
     this.codeTarget.innerHTML = this.uwpTarget.value;
   }
+
+  // Terse label for the itemized list.
+  shortFor(key, value) {
+    let datum = this.metadata.code[key][value];
+    if (datum === undefined) return '&mdash;';
+    switch (key) {
+      case 'port':  return this.metadata.short.port[value] || '&mdash;';
+      case 'atmos': return this.metadata.short.atmos[value] || '&mdash;';
+      case 'size':  return `${datum[0]}, ${datum[1]} km`;
+      case 'hydro': return `${datum[0]}% water, ${datum[1]}`;
+      case 'popx':  return `${datum[0]}, ${datum[1]}`;
+      case 'govt':  return datum[0];
+      case 'law':   return datum[1];
+      default:      return datum; // tech
+    }
+  }
+
+  // Concise narrative clause for the prose paragraph.
+  narrativeFor(key, value) {
+    let datum = this.metadata.code[key][value];
+    let template = this.metadata.templates[key];
+    if (datum === undefined) return '';
+    if (Array.isArray(datum)) {
+      return template.replace('{0}', datum[0]).replace('{1}', datum[1]);
+    }
+    return template.replace('{0}', datum);
+  }
+
   metadata = {
     "templates": {
-      "name": "{0} {1}.",
-      "port": "{0}",
-      "size": "The main world is roughly {1} kilometers in diameter, and is <strong>{0}</strong>.",
+      "size":  "The main world is <strong>{0}</strong>, roughly {1} km across.",
+      "port":  "{0}",
       "atmos": "{0}",
-      "hydro": "The surface is roughly {0} percent surface water (or similar fluid), which qualifies it as a <strong>{1}</strong> world.",
-      "popx": "The main world has a general population of {1} local residents, which qualifies it as a <strong>{0} population</strong> world.",
-      "govt": "The local government is characterized as <strong>{0}</strong>, with {1}.",
-      "law": "Visitors may find the law {0}restrictive as <strong>{1}</strong> are regulated or restricted by local authorities.",
-      "tech": "Technology is described as {0} (See <a href='http://wiki.travellerrpg.com/Tech_Level_Comparison_Chart'>TL chart</a>)."
+      "hydro": "Its surface is <strong>{0}%</strong> water, a <strong>{1}</strong>.",
+      "popx":  "It holds a <strong>{0}</strong> population of {1} residents.",
+      "govt":  "Government is a <strong>{0}</strong>.",
+      "law":   "The law is <strong>{0}</strong>, regulating {1}.",
+      "tech":  "Technology is <strong>{0}</strong>."
+    },
+    // Terse labels for the itemized list (port/atmos only; others derive
+    // from the narrative data in shortFor()).
+    "short": {
+      "port": {
+        "A": "Excellent &mdash; shipyards, refined fuel",
+        "B": "Good &mdash; shipyards, refined fuel",
+        "C": "Routine &mdash; major repairs, unrefined fuel",
+        "D": "Poor &mdash; major repairs, unrefined fuel",
+        "E": "Frontier &mdash; no fuel or repairs",
+        "F": "Good spaceport &mdash; minor repairs, unrefined fuel",
+        "G": "Basic spaceport &mdash; superficial repairs, unrefined fuel",
+        "H": "Primitive spaceport &mdash; no fuel or repairs",
+        "X": "None",
+        "Y": "None"
+      },
+      "atmos": {
+        "0": "Vacuum &mdash; vacc suit",
+        "1": "Trace &mdash; vacc suit",
+        "2": "Very thin, tainted &mdash; respirator",
+        "3": "Very thin &mdash; compressor",
+        "4": "Thin &mdash; breathable",
+        "5": "Thin &mdash; breathable",
+        "6": "Standard &mdash; breathable",
+        "7": "Standard, tainted &mdash; filter mask",
+        "8": "Dense &mdash; breathable",
+        "9": "Dense, tainted &mdash; filter mask",
+        "A": "Exotic &mdash; oxygen tanks",
+        "B": "Corrosive &mdash; protective suit",
+        "C": "Insidious &mdash; extreme corrosion",
+        "D": "High pressure &mdash; breathable at altitude",
+        "E": "Ellipsoidal &mdash; pressure varies",
+        "F": "Thin &mdash; breathable in lowlands"
+      }
     },
     "code": {
       "port": {
-        "A": "has an Excellent Starport with shipyards able of handling Starships up to the Overhaul level, and provides <b>Refined</b> fuel",
-        "B": "has a Good Starport with shipyards able of handling Spacecraft up to the Overhaul level, and provides <b>Refined</b> fuel",
-        "C": "has a Routine Starport without shipyards, can perform Major repairs, and provides <b>Unrefined</b> fuel",
-        "D": "has a Poor Starport without shipyards, can perform Major repairs, and provides <b>Unrefined</b> fuel",
-        "E": "has a frontier Starport without shipyards or repair facilities, and provides no fuel",
-        "F": "has a Good Spaceport without shipyards, can perform Minor repairs, and provides <b>Unrefined</b> fuel",
-        "G": "has a Good Spaceport without shipyards, can perform Superficial repairs, and provides <b>Unrefined</b> fuel",
-        "H": "has a Primitive Spaceport without shipyards or repair facilities, and provides no fuel",
-        "X": "has no spaceport or starport",
-        "Y": "has no spaceport or starport"
+        "A": "Its <strong>Excellent</strong> starport has shipyards and sells refined fuel.",
+        "B": "Its <strong>Good</strong> starport has shipyards and sells refined fuel.",
+        "C": "Its <strong>Routine</strong> starport handles major repairs and sells unrefined fuel.",
+        "D": "Its <strong>Poor</strong> starport handles major repairs and sells unrefined fuel.",
+        "E": "Its <strong>Frontier</strong> starport offers no fuel or repair facilities.",
+        "F": "Its <strong>Good</strong> spaceport handles minor repairs and sells unrefined fuel.",
+        "G": "Its <strong>Basic</strong> spaceport handles superficial repairs and sells unrefined fuel.",
+        "H": "Its <strong>Primitive</strong> spaceport offers no fuel or repair facilities.",
+        "X": "It has <strong>no</strong> starport or spaceport.",
+        "Y": "It has <strong>no</strong> starport or spaceport."
       },
       "size": {
-        "R": ["a Asteroid/Planetary Ring (around world)", "Multiple < 1"],
-        "0": ["a Asteroid/Planetary Belt (around star)", "Multiple < 200"],
-        "D": ["Debris", "< 200"],
+        "R": ["an Asteroid/Planetary Ring", "multiple &lt; 1"],
+        "0": ["an Asteroid/Planetary Belt", "multiple &lt; 200"],
+        "D": ["Debris", "&lt; 200"],
         "S": ["a Very Small terrestrial (e.g. Luna)", "200&ndash;6,399"],
-        "1": ["a Tiny terrestrial (e.g. Mars)", " 6,400&ndash;7,199"],
-        "2": ["a Small terrestrial ", "7,200&ndash;7,999"],
+        "1": ["a Tiny terrestrial (e.g. Mars)", "6,400&ndash;7,199"],
+        "2": ["a Small terrestrial", "7,200&ndash;7,999"],
         "3": ["a Small terrestrial", "8,000&ndash;8,799"],
         "4": ["a Small terrestrial", "8,800&ndash;9,599"],
         "5": ["a Medium terrestrial", "9,600&ndash;10,399"],
@@ -84,22 +150,22 @@ Stimulus.register("uwp-translator", class extends Controller {
         "B": ["a Huge terrestrial", "16,800+"]
       },
       "atmos": {
-        "0": "The atmosphere has a pressure of less than 0.1 atmosphere, which requires the use of a vacc suit.",
-        "1": "The atmosphere has a pressure of less than 0.1 atmosphere, which requires the use of a vacc suit.",
-        "2": "The atmosphere has a pressure of 0 1 to 0.42 atmospheres and contains contains an unusual taint such as such as disease, a hazardous gas mix, pollutants, or sulfur compounds. This requires a combination respirator/filter mask for survival.",
-        "3": "The atmosphere has a pressure of 0.1 to 0.42 atmospheres, which requires the use of a compressor to ensure sufficient oxygen.",
-        "4": "The atmosphere has a pressure of 0.71 to 1.49 atmospheres. The atmosphere is a standard oxygen/nitrogen mix, which is breathable without assistance.",
-        "5": "The atmosphere has a pressure of 0.43 to 0.70 atmospheres. The atmosphere is a standard oxygen/nitrogen mix, which is breathable without assistance.",
-        "6": "The atmosphere has a pressure of 0.71 to 1.49 atmospheres The atmosphere is a standard oxygen/nitrogen mix, which is breathable without assistance.",
-        "7": "The otherwise standard atmosphere (0.71&ndash;1.49 atm) contains an unusual taint such as such as disease, a hazardous gas mix, pollutants, or sulfur compounds which requires the use of a filter mask.",
-        "8": "The atmosphere has a pressure of 1.50 to 2.49 atmospheres The atmosphere is a standard oxygen/nitrogen mix, which is breathable without assistance.",
-        "9": "The dense atmosphere (0.71&ndash;1.49 atm) contains an unusual taint such as such as disease, a hazardous gas mix, pollutants, or sulfur compounds which requires the use of a filter mask. Tainted, very thin atmospheres require a combination respirator/filter mask for survival.",
-        "A": "An unusual gas mix which requires the use of oxygen tanks, but protective suits are not needed.",
-        "B": "A concentrated gas mix or unusual temperature creates a corrosive environment, which requires the use of a protective suit or vacc suit.",
-        "C": "The atmosphere is similar to a corrosive atmosphere, but extreme conditions cause the corrosive effects to defeat any protective measures in a few hours.",
-        "D": "Pressure at or below sea level is too great to support life but is breathable at higher altitudes.",
-        "E": "The world’s surface is ellipsoidal, not spherical. Because the atmosphere remains spherical, surface atmospheric pressure ranges from very high at the middle to very low at the ends Breathable bands may exist at some point within the range of pressure.",
-        "F": "The world is large and massive, with a thin atmosphere which settles to the lowest levels of the terrain. The atmosphere is unbreathable at most altitudes except the very low ones (as in depressions or deep valleys)."
+        "0": "The atmosphere is a near-vacuum, requiring a vacc suit.",
+        "1": "The atmosphere is a trace, requiring a vacc suit.",
+        "2": "The very thin atmosphere is tainted, requiring a respirator.",
+        "3": "The atmosphere is very thin, requiring a compressor for adequate oxygen.",
+        "4": "The thin atmosphere is breathable without aid.",
+        "5": "The thin atmosphere is breathable without aid.",
+        "6": "The standard atmosphere is breathable without aid.",
+        "7": "The standard atmosphere is tainted, requiring a filter mask.",
+        "8": "The dense atmosphere is breathable without aid.",
+        "9": "The dense atmosphere is tainted, requiring a filter mask.",
+        "A": "An exotic gas mix requires oxygen tanks (but no protective suit).",
+        "B": "A corrosive atmosphere requires a protective suit.",
+        "C": "An insidious atmosphere defeats protective gear within hours.",
+        "D": "Pressure is too high at sea level but breathable at altitude.",
+        "E": "The world is ellipsoidal; pressure varies and is breathable only in some bands.",
+        "F": "A thin atmosphere settles into the lowlands, breathable only there."
       },
       "hydro": {
         "0": ["0&ndash;4", "Desert world"], "1": ["5&ndash;14", "Dry world"],
@@ -110,7 +176,7 @@ Stimulus.register("uwp-translator", class extends Controller {
         "A": ["95&ndash;100", "Water world"]
       },
       "popx": {
-        "0": ["Low", "<10 (P)"], "1": ["Low", "10 to 100 (P0)"],
+        "0": ["Low", "&lt;10 (P)"], "1": ["Low", "10 to 100 (P0)"],
         "2": ["Low", "100 to 1,000 (P00)"], "3": ["Low", "1,000 to 10,000 (P,000)"],
         "4": ["Moderate", "10,000 to 100,000 (P0,000)"],
         "5": ["Moderate", "100,000 to 1,000,000 (P00,000)"],
@@ -122,58 +188,58 @@ Stimulus.register("uwp-translator", class extends Controller {
         "B": ["High", "100 Billion to 1 Trillion (P00,000,000,000)"]
       },
       "govt": {
-        "0": ["No Government Structure", "In many cases, tribal, clan or family bonds predominate"],
-        "1": ["Company/Corporation", "government by a company managerial elite, citizens are company employees"],
-        "2": ["Participating Democracy", "government by advice and consent of the citizen"],
-        "3": ["Self-Perpetuating Oligarchy", "government by a restricted minority, with little or no input from the masses"],
-        "4": ["Representative Democracy", "government by elected representatives"],
-        "5": ["Feudal Technocracy", "government by specific individuals for those who agree to be ruled Relationships are based on the performance of technical activities which are mutually beneficial"],
-        "6": ["Captive Government/Colony", "government by a leadership answerable to an outside group, a colony or conquered area"],
-        "7": ["Balkanization", "No central ruling authority exists", "rival governments compete for control"],
-        "8": ["Civil Service Bureaucracy", "government by agencies employing individuals selected for their expertise"],
-        "9": ["Impersonal Bureaucracy", "government by agencies which are insulated from the governed"],
-        "A": ["Charismatic Dictator", "government by a single leader enjoying the confidence of the citizens"],
-        "B": ["Non-Charismatic Leader", "A previous charismatic dictator has been replaced by a leader through normal channels"],
-        "C": ["Charismatic Oligarchy", "government by a select group, organization, or class enjoying overwhelming confidence of the citizenry"],
-        "D": ["Religious Dictatorship", "government by a religious minority which has little regard for the needs of the citizenry"],
-        "E": ["Religious Autocracy", "government by a single religious leader having absolute power over the citizenry"],
-        "F": ["Totalitarian Oligarchy", "government by an all-powerful minority which maintains absolute control through widespread coercion and oppression"]
+        "0": ["No Government Structure"],
+        "1": ["Company/Corporation"],
+        "2": ["Participating Democracy"],
+        "3": ["Self-Perpetuating Oligarchy"],
+        "4": ["Representative Democracy"],
+        "5": ["Feudal Technocracy"],
+        "6": ["Captive Government/Colony"],
+        "7": ["Balkanized State"],
+        "8": ["Civil Service Bureaucracy"],
+        "9": ["Impersonal Bureaucracy"],
+        "A": ["Charismatic Dictatorship"],
+        "B": ["Non-Charismatic Leadership"],
+        "C": ["Charismatic Oligarchy"],
+        "D": ["Religious Dictatorship"],
+        "E": ["Religious Autocracy"],
+        "F": ["Totalitarian Oligarchy"]
       },
       "law": {
-        "0": ["unrestricted", "no prohibitions (nuclear weapons)"],
-        "1": ["barely ", "only body pistols, explosives, poison gas"],
-        "2": ["barely ", "portable energy weapons"],
-        "3": ["barely ", "machine guns, automatic weapons"],
-        "4": ["moderately ", "light assault weapons"],
-        "5": ["moderately ", "personal concealable weapons"],
-        "6": ["moderately ", "all firearms except shotguns"],
-        "7": ["moderately ", "Shotguns"],
-        "8": ["highly ", "Blade Weapons Controlled"],
-        "9": ["highly ", "weapons outside the home"],
-        "A": ["extremely ", "Weapon possession"],
-        "B": ["extremely ", "Rigid control of civilian movement"],
-        "C": ["extremely ", "Unrestricted invasion of privacy"],
-        "D": ["extremely ", "Paramilitary law enforcement"],
-        "E": ["extremely ", "Full-fledged police state"],
-        "F": ["extremely ", "All facets of daily life rigidly controlled"],
-        "G": ["extremely ", "Severe punishment for petty infractions"],
-        "H": ["extremely ", "Legalized oppressive practices"],
-        "J": ["extremely ", "Routinely oppressive and restrictive"],
-        "K": ["extremely ", "Excessively oppressive and restrictive"],
-        "L": ["extremely ", "Totally oppressive and restrictive"]
+        "0": ["unrestricted", "no weapons (even nuclear)"],
+        "1": ["barely restrictive", "only body pistols, explosives, poison gas"],
+        "2": ["barely restrictive", "portable energy weapons"],
+        "3": ["barely restrictive", "machine guns and automatic weapons"],
+        "4": ["moderately restrictive", "light assault weapons"],
+        "5": ["moderately restrictive", "personal concealable weapons"],
+        "6": ["moderately restrictive", "all firearms except shotguns"],
+        "7": ["moderately restrictive", "shotguns"],
+        "8": ["highly restrictive", "blade weapons"],
+        "9": ["highly restrictive", "weapons outside the home"],
+        "A": ["extremely restrictive", "weapon possession"],
+        "B": ["extremely restrictive", "civilian movement"],
+        "C": ["extremely restrictive", "privacy"],
+        "D": ["extremely restrictive", "daily life via paramilitary police"],
+        "E": ["extremely restrictive", "daily life in a police state"],
+        "F": ["extremely restrictive", "all facets of daily life"],
+        "G": ["extremely restrictive", "petty infractions with severe punishment"],
+        "H": ["extremely restrictive", "daily life via legalized oppression"],
+        "J": ["extremely restrictive", "daily life, routinely oppressive"],
+        "K": ["extremely restrictive", "daily life, excessively oppressive"],
+        "L": ["extremely restrictive", "daily life, totally oppressive"]
       },
       "tech": {
         "0": "Stone Age (fire)",
-        "1": "Pre-Industrial (3500 BC to 600 AD)",
-        "2": "Age of Sail (1450 AD)",
-        "3": "Industrial Revolution (1730 AD)",
-        "4": "Mechanized Age (1880 AD)",
-        "5": "Circa 1910 AD",
-        "6": "Nuclear Age (1940 AD)",
-        "7": "Circa 1970 AD",
-        "8": "Digital Age (1990 AD)",
-        "9": "Early Stellar (2050 AD)",
-        "A": "Early Stellar (2120 AD)",
+        "1": "Pre-Industrial (3500 BC&ndash;600 AD)",
+        "2": "Age of Sail (c. 1450 AD)",
+        "3": "Industrial Revolution (c. 1730 AD)",
+        "4": "Mechanized Age (c. 1880 AD)",
+        "5": "Broadcast Age (c. 1910 AD)",
+        "6": "Nuclear Age (c. 1940 AD)",
+        "7": "Digital precursor (c. 1970 AD)",
+        "8": "Digital Age (c. 1990 AD)",
+        "9": "Early Stellar (c. 2050 AD)",
+        "A": "Early Stellar (c. 2120 AD)",
         "B": "Average Stellar",
         "C": "Average Imperial",
         "D": "Average Stellar",
