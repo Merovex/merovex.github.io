@@ -21,7 +21,6 @@ Stimulus.register("uwp-translator", class extends Controller {
   translate() {
     // Your translation logic here
     let name = this.nameTarget.value || 'Unnamed World';
-    let s = [];
 
     let keys = ['port', 'size', 'atmos', 'hydro', 'popx', 'govt', 'law', 'tech'];
     let bits = this.uwpTarget.value.split('').filter(bit => bit !== '-');

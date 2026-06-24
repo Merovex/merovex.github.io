@@ -4,6 +4,7 @@ title: UWP Translator
 description: "A tool to translate Traveller's Universal World Profile (UWP) codes into a human-readable format."
 ---
 <script type="module" src="/assets/controllers/uwp_translator_controller.js"></script>
+<script type="module" src="/assets/controllers/ix_translator_controller.js"></script>
 <article id='uwp-translator' data-controller='uwp-translator'>
   <div class='p-4 mb-12 card'>
     <div class='my-8 md:flex'>
@@ -33,21 +34,41 @@ description: "A tool to translate Traveller's Universal World Profile (UWP) code
   </div>
 
 
-  <section class='w-prose text-lg'>
-    <span class='highlight' data-uwp-translator-target='size'></span>
-    <span class='highlight' data-uwp-translator-target='port'></span>
-    <span class='highlight' data-uwp-translator-target='atmos'></span>
-    <span class='highlight' data-uwp-translator-target='hydro'></span>
-    <span class='highlight' data-uwp-translator-target='popx'></span>
-    <span class='highlight' data-uwp-translator-target='govt'></span>
-    <span class='highlight' data-uwp-translator-target='law'></span>
-    <span class='highlight' data-uwp-translator-target='tech'></span>
-  </section>
-
   <section class='prosed'>
     <h3>UWP <span id='code' data-uwp-translator-target='code'>HERE</span> Defined:</h3>
-    <p id='output' data-uwp-translator-target='output' class='transition ease-in-out delay-100 duration-700'>Translation
-      will be generated here...</p>
+    <p id='output' data-uwp-translator-target='output' class='w-prose text-lg'>
+      <span class='highlight' data-uwp-translator-target='size'></span>
+      <span class='highlight' data-uwp-translator-target='port'></span>
+      <span class='highlight' data-uwp-translator-target='atmos'></span>
+      <span class='highlight' data-uwp-translator-target='hydro'></span>
+      <span class='highlight' data-uwp-translator-target='popx'></span>
+      <span class='highlight' data-uwp-translator-target='govt'></span>
+      <span class='highlight' data-uwp-translator-target='law'></span>
+      <span class='highlight' data-uwp-translator-target='tech'></span>
+    </p>
   </section>
 
+</article>
+
+<article id='ix-translator' data-controller='ix-translator'>
+  <div class='p-4 mb-12 card'>
+    <div class='md:flex'>
+      <div class='flex-initial w-1/3'>
+        <label for='ix'>Importance (Ix):</label>
+      </div>
+      <div class='flex-initial w-2/3'>
+        <input type='text' class='w-full px-2 py-1 surface-2 border rounded border-shade' id='ix'
+          placeholder='Enter Importance (e.g. { 2 })' data-ix-translator-target='ix'
+          data-action='keyup->ix-translator#translate' value='{ 2 }'>
+        <p class='text-sm text-opacity-80'>The Traveller5 Importance Extension is a signed value written in braces,
+          e.g. <code>{ 2 }</code>. More information provided
+          <a href='https://wiki.travellerrpg.com/Importance_Extension'>on the Traveller RPG Wiki</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <section class='prosed'>
+    <h3>Importance <span data-ix-translator-target='code'></span> Defined:</h3>
+    <p data-ix-translator-target='output' class='w-prose text-lg'></p>
+  </section>
 </article>
