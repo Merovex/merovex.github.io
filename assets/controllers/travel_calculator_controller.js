@@ -17,6 +17,7 @@ Stimulus.register("travel-calculator", class extends Controller {
     "noDeceleration",
     "observerTime",
     "planetSize",
+    "roemetric",
     "spaceshipMass",
     "starSize",
     "timeTravel",
@@ -27,6 +28,12 @@ Stimulus.register("travel-calculator", class extends Controller {
   ACCELERATION_IN_G = 0.0098
   KM_PER_AU = 149597870.700
   SUN_DIAMETER = 1390000
+  // Roemetric measures. The base unit (Roemer) is one light-second, approximated
+  // in meters behind the scenes so the breakdown adjusts with the other settings.
+  // 1 Roemer = 1 light-second = 20 Rods; 1 Rod = 12 Cables.
+  ROEMER_IN_METERS = 299792458 // == SPEED_OF_LIGHT, one light-second
+  RODS_PER_ROEMER = 20
+  CABLES_PER_ROD = 12
   // Fuel Conversion Rate is HALF whatever is said in TNE: Fire, Fusion & Steel.
   // FUEL_CONVERSION_RATE = 0.00125; // HEPlaR 
   FUEL_CONVERSION_RATE = 0.0025; // M-Drive
@@ -84,6 +91,7 @@ Stimulus.register("travel-calculator", class extends Controller {
     this.setKM(km);
     this.setGM(km)
     this.setLightSeconds(km);
+    this.setRoemetric(km);
     this.calculate();
   }
   setDistanceFromKM() {
@@ -91,6 +99,7 @@ Stimulus.register("travel-calculator", class extends Controller {
     this.setAU(km);
     this.setGM(km)
     this.setLightSeconds(km);
+    this.setRoemetric(km);
     this.calculate();
   }
   setDistanceFromPlanetSize() {
@@ -99,6 +108,7 @@ Stimulus.register("travel-calculator", class extends Controller {
     this.setGM(km);
     this.setKM(km);
     this.setLightSeconds(km);
+    this.setRoemetric(km);
     this.calculate()
   }
   setDistanceFromStarSize() {
@@ -108,6 +118,7 @@ Stimulus.register("travel-calculator", class extends Controller {
     this.setGM(km);
     this.setKM(km);
     this.setLightSeconds(km);
+    this.setRoemetric(km);
     calculate()
   }
   setKM(km) { this.distanceTarget.value = km }
@@ -116,6 +127,21 @@ Stimulus.register("travel-calculator", class extends Controller {
     var seconds = Math.round(km / 299792.558)
     this.distanceLsTarget.innerHTML = seconds;
     this.mlsTarget.innerHTML = Math.round(seconds / 0.864);
+  }
+  setRoemetric(km) {
+    // Work in meters so the unit sizes stay approximate, then split the distance
+    // into whole Roemers, Rods, and Cables.
+    var meters = km * 1000;
+    var roemerTotal = meters / this.ROEMER_IN_METERS;
+    var roemers = Math.floor(roemerTotal);
+    var rodTotal = (roemerTotal - roemers) * this.RODS_PER_ROEMER;
+    var rods = Math.floor(rodTotal);
+    var cables = Math.round((rodTotal - rods) * this.CABLES_PER_ROD);
+    // Carry rounded-up cables/rods so we never display the unit maximum.
+    if (cables >= this.CABLES_PER_ROD) { cables -= this.CABLES_PER_ROD; rods += 1; }
+    if (rods >= this.RODS_PER_ROEMER) { rods -= this.RODS_PER_ROEMER; roemers += 1; }
+    this.roemetricTarget.innerHTML =
+      this.format(roemers) + " Roemers, " + rods + " Rods, " + cables + " Cables";
   }
 
   // =================================================================================================
@@ -171,6 +197,7 @@ Stimulus.register("travel-calculator", class extends Controller {
     this.setKM(km);
     this.setGM(km);
     this.setLightSeconds(km);
+    this.setRoemetric(km);
     this.calcMaxVelocity(time * 2)
   }
 
