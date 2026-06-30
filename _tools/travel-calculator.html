@@ -56,10 +56,28 @@ travel."
     </div>
 
     <div class="flexed-row">
-      <label class="flex-1">Roemetric distance:</label>
+      <label class="flex-1" for="roemers">Roemers:</label>
       <div class="flex-1">
-        <strong data-travel-calculator-target="roemetric">&hellip;</strong>
+        <input type="number" name="roemers" id="roemers" value="0" min="0"
+          class="block w-full rounded-md px-3 py-2 shadow-sm placeholder-gray-400 placeholder:text-gray-400 dark:placeholder-gray-300/50 focus:border-primary-500 focus:outline-none focus:ring-primary-600 dark:focus:ring-primary-500 border-0 text-gray-900 sm:leading-6 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset surface-2 dark:ring-gray-600 dark:text-gray-50 "
+          data-travel-calculator-target="roemers" data-action="change->travel-calculator#setDistanceFromRoemetric">
         <p class="text-sm opacity-50 help-text">1 Roemer = 1 light-second = 20 Rods; 1 Rod = 12 Cables.</p>
+      </div>
+    </div>
+    <div class="flexed-row">
+      <label class="flex-1" for="rods">Rods:</label>
+      <div class="flex-1">
+        <input type="number" name="rods" id="rods" value="0" min="0" max="19"
+          class="block w-full rounded-md px-3 py-2 shadow-sm placeholder-gray-400 placeholder:text-gray-400 dark:placeholder-gray-300/50 focus:border-primary-500 focus:outline-none focus:ring-primary-600 dark:focus:ring-primary-500 border-0 text-gray-900 sm:leading-6 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset surface-2 dark:ring-gray-600 dark:text-gray-50 "
+          data-travel-calculator-target="rods" data-action="change->travel-calculator#setDistanceFromRoemetric">
+      </div>
+    </div>
+    <div class="flexed-row">
+      <label class="flex-1" for="cables">Cables:</label>
+      <div class="flex-1">
+        <input type="number" name="cables" id="cables" value="0" min="0" max="11"
+          class="block w-full rounded-md px-3 py-2 shadow-sm placeholder-gray-400 placeholder:text-gray-400 dark:placeholder-gray-300/50 focus:border-primary-500 focus:outline-none focus:ring-primary-600 dark:focus:ring-primary-500 border-0 text-gray-900 sm:leading-6 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset surface-2 dark:ring-gray-600 dark:text-gray-50 "
+          data-travel-calculator-target="cables" data-action="change->travel-calculator#setDistanceFromRoemetric">
       </div>
     </div>
 
