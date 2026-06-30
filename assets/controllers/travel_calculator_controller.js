@@ -26,6 +26,9 @@ Stimulus.register("travel-calculator", class extends Controller {
   SPEED_OF_LIGHT_SQUARED = 89875517873681760;
   SPEED_OF_LIGHT = 299792458;
   ACCELERATION_IN_G = 0.0098
+  // Hard speed limit: never exceed 1% of light speed, no matter the distance.
+  // Once reached, the ship stops accelerating and coasts.
+  VELOCITY_CAP_FRACTION = 0.01
   KM_PER_AU = 149597870.700
   SUN_DIAMETER = 1390000
   // Roemetric measures. The base unit (Roemer) is one light-second, approximated
@@ -146,11 +149,48 @@ Stimulus.register("travel-calculator", class extends Controller {
 
   // =================================================================================================
   // Calculations
+  // Speed cap expressed in km/sec (matches the km/sec^2 acceleration).
+  velocityCap() { return this.VELOCITY_CAP_FRACTION * this.SPEED_OF_LIGHT / 1000 }
+  // True when the ship decelerates to a complete stop at the destination,
+  // false when it keeps accelerating and flies past (No-Deceleration toggle).
+  stopsAtDestination() { return !this.noDecelerationTarget.checked }
+
+  // Newtonian flight profile. The 1% c cap keeps relativistic effects negligible,
+  // so this stays accurate while covering both flight modes plus the coast phase.
+  // Returns { time (sec), maxVelocity (km/sec) }.
+  kinematics() {
+    var a = this.acceleration();                    // km/sec^2
+    var d = parseFloat(this.distanceTarget.value);  // km
+    if (!(a > 0) || !(d > 0)) return { time: 0, maxVelocity: 0 };
+
+    var vCap = this.velocityCap();
+    var tRamp = vCap / a;                            // time to spin up to the cap
+    var dRamp = (vCap * vCap) / (2 * a);             // distance covered in one ramp
+
+    if (this.stopsAtDestination()) {
+      // Accelerate to the midpoint, then decelerate to rest.
+      var vPeak = Math.sqrt(a * d);
+      if (vPeak <= vCap) return { time: 2 * Math.sqrt(d / a), maxVelocity: vPeak };
+      // Capped: ramp up, coast at the cap, ramp down.
+      var tCoast = (d - 2 * dRamp) / vCap;
+      return { time: 2 * tRamp + tCoast, maxVelocity: vCap };
+    } else {
+      // Accelerate the whole way and fly past at full speed.
+      var vFinal = Math.sqrt(2 * a * d);
+      if (vFinal <= vCap) return { time: Math.sqrt(2 * d / a), maxVelocity: vFinal };
+      // Capped: ramp up, then coast at the cap to the destination.
+      return { time: tRamp + (d - dRamp) / vCap, maxVelocity: vCap };
+    }
+  }
+
   calculate() {
-    var ttSeconds = parseInt(this.calcObserverTime())
+    var flight = this.kinematics();
+    var ttSeconds = parseInt(flight.time)
     var mwh = this.calcMWHConsumed(ttSeconds)
+    this.maxVelocityTarget.innerHTML = flight.maxVelocity.toFixed(0);
+    this.observerTimeTarget.innerHTML = this.secondsToDhms(ttSeconds);
     this.travelTimeDmhsTarget.innerHTML = this.secondsToDhms(ttSeconds) + this.secondsToCycles(ttSeconds);
-    this.fuelConsumedTarget.innerHTML = this.format(this.calcFuelMass(ttSeconds))
+    this.fuelConsumedTarget.innerHTML = this.format(this.calcFuelMass(flight.maxVelocity))
     this.mwConsumedTarget.innerHTML = (mwh > 10) ? mwh.toFixed(0) : mwh.toFixed(2)
   }
 
@@ -162,7 +202,7 @@ Stimulus.register("travel-calculator", class extends Controller {
     return result;
   }
 
-  calcFuelMass(ttSeconds) {
+  calcFuelMass(maxVelocity) {
     // Liquid Hydrogen weighs 71kg
     // HEPlaR is 0.25 cubic meter of liquid hydrogen per Megawatt Hour
 
@@ -173,21 +213,9 @@ Stimulus.register("travel-calculator", class extends Controller {
 
     // This is a more scientific calculation.
     var mass = parseInt(this.spaceshipMassTarget.value) * 1000; // Mass in Metric tons to KGs
-    var max_velocity = this.calcMaxVelocity(ttSeconds)
-    var vel_to_c = max_velocity / this.SPEED_OF_LIGHT;
+    var vel_to_c = maxVelocity / this.SPEED_OF_LIGHT;
     var per_kg_100percent = 2 * vel_to_c / (1 - vel_to_c);
     return per_kg_100percent * mass / this.fuel_conversion_rate();
-  }
-
-  calcObserverTime() {
-    var distance = parseFloat(this.distanceTarget.value);
-    var k = this.SPEED_OF_LIGHT_SQUARED / this.acceleration();
-    var k_over_a = k / this.acceleration();
-    var sqrt_term_operand = Math.pow(distance / (2 * k) + 1, 2);
-    var sqrt_term = k_over_a * (sqrt_term_operand - 1);
-    var result = 2 * Math.sqrt(sqrt_term);
-    this.observerTimeTarget.innerHTML = this.secondsToDhms(result);
-    return result;
   }
 
   calcDistanceFromAcceleration() {

@@ -118,18 +118,14 @@ travel."
       </select>
     </div>
 
-    <div class="flex justify-center hidden">
-      <label for="" class="flex cursor-pointer items-right">
-        <div class="px-2">No Deceleration</div>
-        <!-- toggle -->
-        <div class="relative">
-          <input id="noDeceleration" data-travel-calculator-target="noDeceleration" type="checkbox" class="hidden">
-          <!-- path -->
-          <div class="h-5 rounded-full shadow-inner bg-shade toggle-path w-9"></div>
-          <!-- circle -->
-          <div class="absolute inset-y-0 left-0 w-3.5 h-3.5 rounded-full shadow toggle-circle bg-grey-800"></div>
-        </div>
-      </label>
+    <div class="flexed-row">
+      <label class="flex-1" for="noDeceleration">Fly past destination:</label>
+      <div class="flex-1">
+        <input type="checkbox" id="noDeceleration" data-travel-calculator-target="noDeceleration"
+          data-action="change->travel-calculator#calculate">
+        <p class="text-sm opacity-50 help-text">On: keep accelerating and fly past at full speed (no deceleration).
+          Off: decelerate to a complete stop at the destination. Speed is capped at 1% of light either way.</p>
+      </div>
     </div>
   </section>
   <table class="table-fixed w-prose">
