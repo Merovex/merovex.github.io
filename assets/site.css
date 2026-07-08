@@ -204,9 +204,10 @@ img, svg, video, canvas { max-width: 100%; }
 
 /* tools grid — single column on mobile, 3 abreast at md+ */
 .tools-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; max-width: 72rem; margin-inline: auto; }
-.tools-grid .post-card { max-width: none; margin: 0; padding: 1.25rem 1.5rem; aspect-ratio: auto; }
+.tools-grid .post-card { max-width: none; margin: 0; padding: 1.25rem 1.5rem; aspect-ratio: auto; display: flex; flex-direction: column; }
 .tools-grid .post-card header h2 { font-size: 1.25rem; line-height: 1.75rem; }
 .tools-grid .post-card .prosed { font-size: 0.875rem; line-height: 1.375rem; }
+.tools-grid .post-card footer { margin-top: auto; }
 @media (min-width: 768px) { .tools-grid { grid-template-columns: repeat(3, 1fr); } }
 
 .clamped {
