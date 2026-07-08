@@ -202,6 +202,13 @@ img, svg, video, canvas { max-width: 100%; }
 :root[data-color-scheme="dark"] .post-card header span,
 :root[data-color-scheme="dark"] .post-card footer span { color: var(--gray-400); }
 
+/* tools grid — single column on mobile, 3 abreast at md+ */
+.tools-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; max-width: 72rem; margin-inline: auto; }
+.tools-grid .post-card { max-width: none; margin: 0; padding: 1.25rem 1.5rem; aspect-ratio: auto; }
+.tools-grid .post-card header h2 { font-size: 1.25rem; line-height: 1.75rem; }
+.tools-grid .post-card .prosed { font-size: 0.875rem; line-height: 1.375rem; }
+@media (min-width: 768px) { .tools-grid { grid-template-columns: repeat(3, 1fr); } }
+
 .clamped {
   display: -webkit-box;
   -webkit-line-clamp: 5;
