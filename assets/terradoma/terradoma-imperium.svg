@@ -1698,7 +1698,7 @@
       </g>
     <text x='784' y='717'>F0</text>
 
-<!-- Volume: 1611 B917111-B F G .. // Ic,Lo // N,N // F0V // Manjamio -->
+<!-- Volume: 1611 B917111-B F G .. // Ic,Lo // N,N // F0V/DB // Manjamio -->
     <circle class='planet' cx='940' cy='762' r='5' />
     <text class='spaceport' x='940' y='782'>B</text>
     <text x='940' y='792'>B917111-B</text>
@@ -1708,6 +1708,7 @@
         <circle  cx='962' cy='775' r='2' />
       </g>
     <text x='964' y='752'>F0</text>
+    <text x='967' y='759'>DB</text>
 
 <!-- Volume: 1911 C6A4322-7 Tz SG AZ // Fl,Lo,Tz // F,M // K2V/DB // Menteshio -->
     <circle class='planet' cx='1120' cy='727' r='5' />
@@ -1750,13 +1751,14 @@
     <!-- W --><text class='symbol W' x='1707' y='732'>⚐</text>
     <text x='1744' y='717'>K2</text>
 
-<!-- Volume: 0912 B676333-7 T S .. // Lo // M // M4III // Zahnah -->
+<!-- Volume: 0912 B676333-7 T S .. // Lo // M // M4III/M4III // Zahnah -->
     <circle class='planet' cx='520' cy='796' r='5' />
     <text class='spaceport' x='520' y='816'>B</text>
     <text x='520' y='827'>B676333-7</text>
     <text x='520' y='777'>Zahnah</text>
     <!-- S --><text class='symbol S' x='497' y='813'>⚜</text>
     <text x='544' y='786'>M4</text>
+    <text x='547' y='793'>M4</text>
 
 <!-- Volume: 1112 C646845-8 T G RZ // Ph,Pa,Pi // M,O,M // F2II // Keicha -->
     <circle class='planet' cx='640' cy='796' r='5' />
@@ -1874,20 +1876,22 @@
     <text x='484' y='890'>G8</text>
     <text x='487' y='897'>DB</text>
 
-<!-- Volume: 1413 D95979D-7 C . AZ // Co // N // A2V // Shexio -->
+<!-- Volume: 1413 D95979D-7 C . AZ // Co // N // A2V/A5V // Shexio -->
     <circle class='planet' cx='820' cy='900' r='5' />
     <text class='spaceport' x='820' y='920'>D</text>
     <text x='820' y='931'>D95979D-7</text>
     <text x='820' y='881'>Shexio</text>
     <path class='zone' d='M 810 886 a 20 20 0 1 0 20 0' />
     <text x='844' y='890'>A2</text>
+    <text x='847' y='897'>A5</text>
 
-<!-- Volume: 2113 C474555-8 T . .. // Ni,Ag // F,S // F5V // Krepuskio -->
+<!-- Volume: 2113 C474555-8 T . .. // Ni,Ag // F,S // F5V/M2VI // Krepuskio -->
     <circle class='planet' cx='1240' cy='866' r='5' />
     <text class='spaceport' x='1240' y='886'>C</text>
     <text x='1240' y='896'>C474555-8</text>
     <text x='1240' y='846'>Krepuskio</text>
     <text x='1264' y='856'>F5</text>
+    <text x='1267' y='863'>M2</text>
 
 <!-- Volume: 2713 B7747B7-A T G .. // Ag,Pi // O,O // G0V // Gunesho -->
     <circle class='planet' cx='1600' cy='866' r='5' />
@@ -1942,7 +1946,7 @@
       </g>
     <text x='1084' y='959'>F5</text>
 
-<!-- Volume: 2414 B748999-9 T NSG AZ // Hi,In // S // M2V // Riojier -->
+<!-- Volume: 2414 B748999-9 T NSG AZ // Hi,In // S // M2V/DB // Riojier -->
     <circle class='planet' cx='1420' cy='969' r='5' />
     <text class='spaceport' x='1420' y='989'>B</text>
     <text x='1420' y='1000'>B748999-9</text>
@@ -1955,6 +1959,7 @@
         <circle  cx='1442' cy='982' r='2' />
       </g>
     <text x='1444' y='959'>M2</text>
+    <text x='1447' y='966'>DB</text>
 
 <!-- Volume: 2614 D41056B-9 T . AZ // Ni //  // G8V // Clom -->
     <circle class='planet' cx='1540' cy='969' r='5' />
@@ -1977,13 +1982,14 @@
     <text x='1624' y='925'>K2</text>
     <text x='1627' y='932'>DB</text>
 
-<!-- Volume: 3014 E679789-7 T . AZ // Pi // N,F // M6V // Karesitio -->
+<!-- Volume: 3014 E679789-7 T . AZ // Pi // N,F // M6V/M4V // Karesitio -->
     <circle class='planet' cx='1780' cy='969' r='5' />
     <text class='spaceport' x='1780' y='989'>E</text>
     <text x='1780' y='1000'>E679789-7</text>
     <text x='1780' y='950'>Karesitio</text>
     <path class='zone' d='M 1770 955 a 20 20 0 1 0 20 0' />
     <text x='1804' y='959'>M6</text>
+    <text x='1807' y='966'>M4</text>
 
 <!-- Volume: 0415 C630479-7 T SG AZ // De,Ni,Po // F,M,S // G5V // Roobo -->
     <circle class='planet' cx='220' cy='1039' r='5' />
@@ -1998,7 +2004,7 @@
       </g>
     <text x='244' y='1029'>G5</text>
 
-<!-- Volume: 1315 E977899-8 H G AZ // Ph,Pa,Pi,Ho,Tr // N,F // M6V // Pendrakeentio -->
+<!-- Volume: 1315 E977899-8 H G AZ // Ph,Pa,Pi,Ho,Tr // N,F // M6V/M4V // Pendrakeentio -->
     <circle class='planet' cx='760' cy='1004' r='5' />
     <text class='spaceport' x='760' y='1024'>E</text>
     <text x='760' y='1035'>E977899-8</text>
@@ -2009,14 +2015,16 @@
         <circle  cx='782' cy='1017' r='2' />
       </g>
     <text x='784' y='994'>M6</text>
+    <text x='787' y='1001'>M4</text>
 
-<!-- Volume: 1415 A838779-B T . AZ //  // O // M6V // Hadriu -->
+<!-- Volume: 1415 A838779-B T . AZ //  // O // M6V/DB // Hadriu -->
     <circle class='planet' cx='820' cy='1039' r='5' />
     <text class='spaceport' x='820' y='1059'>A</text>
     <text x='820' y='1069'>A838779-B</text>
     <text x='820' y='1020'>Hadriu</text>
     <path class='zone' d='M 810 1024 a 20 20 0 1 0 20 0' />
     <text x='844' y='1029'>M6</text>
+    <text x='847' y='1036'>DB</text>
 
 <!-- Volume: 1515 B738112-A T SG .. // Lo // M // F0III // Quinnio -->
     <circle class='planet' cx='880' cy='1004' r='5' />
@@ -2030,13 +2038,14 @@
       </g>
     <text x='904' y='994'>F0</text>
 
-<!-- Volume: 2015 B95A7AA-A F . AZ // Wa // F // F5V // Mollan -->
+<!-- Volume: 2015 B95A7AA-A F . AZ // Wa // F // F5V/K0V // Mollan -->
     <circle class='planet' cx='1180' cy='1039' r='5' />
     <text class='spaceport' x='1180' y='1059'>B</text>
     <text x='1180' y='1069'>B95A7AA-A</text>
     <text x='1180' y='1020'>Mollan</text>
     <path class='zone' d='M 1170 1024 a 20 20 0 1 0 20 0' />
     <text x='1204' y='1029'>F5</text>
+    <text x='1207' y='1036'>K0</text>
 
 <!-- Volume: 2515 D58A322-7 Tz SG .. // Wa,Lo,Tz // M // G0VI/DB // Saruhano -->
     <circle class='planet' cx='1480' cy='1004' r='5' />
@@ -2063,7 +2072,7 @@
     <text x='424' y='1063'>G0</text>
     <text x='427' y='1070'>G5</text>
 
-<!-- Volume: 1316 CA38655-9 T G .. // Ni // N // M6V // Guna -->
+<!-- Volume: 1316 CA38655-9 T G .. // Ni // N // M6V/DB // Guna -->
     <circle class='planet' cx='760' cy='1073' r='5' />
     <text class='spaceport' x='760' y='1093'>C</text>
     <text x='760' y='1104'>CA38655-9</text>
@@ -2073,6 +2082,7 @@
         <circle  cx='782' cy='1086' r='2' />
       </g>
     <text x='784' y='1063'>M6</text>
+    <text x='787' y='1070'>DB</text>
 
 <!-- Volume: 1416 B629666-A F NSG .. // Ni // F,N // M4V // Tesheuquio -->
     <circle class='planet' cx='820' cy='1108' r='5' />
@@ -2087,7 +2097,7 @@
       </g>
     <text x='844' y='1098'>M4</text>
 
-<!-- Volume: 2316 E566000-0 F G AZ // Ba,Lt //  // M0V // Moyaba -->
+<!-- Volume: 2316 E566000-0 F G AZ // Ba,Lt //  // M0V/M0V // Moyaba -->
     <circle class='planet' cx='1360' cy='1073' r='5' />
     <text class='spaceport' x='1360' y='1093'>E</text>
     <text x='1360' y='1104'>E566000-0</text>
@@ -2098,6 +2108,7 @@
         <circle  cx='1382' cy='1086' r='2' />
       </g>
     <text x='1384' y='1063'>M0</text>
+    <text x='1387' y='1070'>M0</text>
 
 <!-- Volume: 3116 C6A3467-7 C SG AZ // Fl,Ni,Co // F,F,S // G8V // Magalaneso -->
     <circle class='planet' cx='1840' cy='1073' r='5' />
@@ -2121,7 +2132,7 @@
     <text x='544' y='1133'>G8</text>
     <text x='547' y='1140'>DB</text>
 
-<!-- Volume: 1217 B6669CC-9 T NSG AZ // Ga,Hi,Pr // F // G2V // Naimio -->
+<!-- Volume: 1217 B6669CC-9 T NSG AZ // Ga,Hi,Pr // F // G2V/M2III // Naimio -->
     <circle class='planet' cx='700' cy='1177' r='5' />
     <text class='spaceport' x='700' y='1197'>B</text>
     <text x='700' y='1208'>B6669CC-9</text>
@@ -2134,6 +2145,7 @@
         <circle  cx='722' cy='1190' r='2' />
       </g>
     <text x='724' y='1167'>G2</text>
+    <text x='727' y='1174'>M2</text>
 
 <!-- Volume: 1417 B665630-9 T . .. // Ga,Ni,Ag,Ri // N,O // F2V/DB // Korundio -->
     <circle class='planet' cx='820' cy='1177' r='5' />
@@ -2200,7 +2212,7 @@
       </g>
     <text x='484' y='1237'>G0</text>
 
-<!-- Volume: 1818 EA8A8AA-8 T G AZ // Oc,Ph,Ri // N // F0V // Pellinio -->
+<!-- Volume: 1818 EA8A8AA-8 T G AZ // Oc,Ph,Ri // N // F0V/M4IV // Pellinio -->
     <circle class='planet' cx='1060' cy='1247' r='5' />
     <text class='spaceport' x='1060' y='1267'>E</text>
     <text x='1060' y='1277'>EA8A8AA-8</text>
@@ -2211,6 +2223,7 @@
         <circle  cx='1082' cy='1260' r='2' />
       </g>
     <text x='1084' y='1237'>F0</text>
+    <text x='1087' y='1244'>M4</text>
 
 <!-- Volume: 2018 A535888-B T N .. // Ph // F,M,N // M2V // Sovaĝio -->
     <circle class='planet' cx='1180' cy='1247' r='5' />
@@ -2332,7 +2345,7 @@
       </g>
     <text x='1024' y='1271'>G5</text>
 
-<!-- Volume: 1819 B616999-9 F NS .. // Ic,Hi,In // M,M // A0IV // Difektĝintio -->
+<!-- Volume: 1819 B616999-9 F NS .. // Ic,Hi,In // M,M // A0IV/DB // Difektĝintio -->
     <circle class='planet' cx='1060' cy='1316' r='5' />
     <text class='spaceport' x='1060' y='1336'>B</text>
     <text x='1060' y='1347'>B616999-9</text>
@@ -2340,6 +2353,7 @@
     <!-- N --><text class='symbol N' x='1037' y='1310'>⚓</text>
     <!-- S --><text class='symbol S' x='1037' y='1332'>⚜</text>
     <text x='1084' y='1306'>A0</text>
+    <text x='1087' y='1313'>DB</text>
 
 <!-- Volume: 2519 D400556-7 Tz G .. // Va,Ni,Tz // P // M6V // Savanaho -->
     <circle class='planet' cx='1480' cy='1281' r='5' />
@@ -2412,7 +2426,7 @@
     <text x='604' y='1375'>K0</text>
     <text x='607' y='1382'>M0</text>
 
-<!-- Volume: 1620 B244658-A T G .. // Ni,Ag // P // M0V // Sabanio -->
+<!-- Volume: 1620 B244658-A T G .. // Ni,Ag // P // M0V/DB // Sabanio -->
     <circle class='planet' cx='940' cy='1385' r='5' />
     <text class='spaceport' x='940' y='1405'>B</text>
     <text x='940' y='1416'>B244658-A</text>
@@ -2422,6 +2436,7 @@
         <circle  cx='962' cy='1398' r='2' />
       </g>
     <text x='964' y='1375'>M0</text>
+    <text x='967' y='1382'>DB</text>
 
 <!-- Volume: 1820 D457477-6 T SG .. // Ni,Pa // M // M0V // Xaryio -->
     <circle class='planet' cx='1060' cy='1385' r='5' />
@@ -2609,7 +2624,7 @@
       </g>
     <text x='604' y='1514'>M4</text>
 
-<!-- Volume: 1922 A666955-B T NSG .. // Ga,Hi // N // G0V // Kuko -->
+<!-- Volume: 1922 A666955-B T NSG .. // Ga,Hi // N // G0V/M0V // Kuko -->
     <circle class='planet' cx='1120' cy='1489' r='5' />
     <text class='spaceport' x='1120' y='1509'>A</text>
     <text x='1120' y='1520'>A666955-B</text>
@@ -2621,8 +2636,9 @@
         <circle  cx='1142' cy='1502' r='2' />
       </g>
     <text x='1144' y='1479'>G0</text>
+    <text x='1147' y='1486'>M0</text>
 
-<!-- Volume: 2122 B868558-B T G .. // Ni,Ag,Pr // N,N,S // F5V // Rymok -->
+<!-- Volume: 2122 B868558-B T G .. // Ni,Ag,Pr // N,N,S // F5V/DB // Rymok -->
     <circle class='planet' cx='1240' cy='1489' r='5' />
     <text class='spaceport' x='1240' y='1509'>B</text>
     <text x='1240' y='1520'>B868558-B</text>
@@ -2632,6 +2648,7 @@
         <circle  cx='1262' cy='1502' r='2' />
       </g>
     <text x='1264' y='1479'>F5</text>
+    <text x='1267' y='1486'>DB</text>
 
 <!-- Volume: 2222 C100751-B T . .. // Va,Na,Pi // S,N // G2V // Bafino -->
     <circle class='planet' cx='1300' cy='1524' r='5' />
@@ -2840,20 +2857,22 @@
       </g>
     <text x='1324' y='1652'>M0</text>
 
-<!-- Volume: 2524 B676444-7 T S .. // Ni,Pa // N,S,M // M2V // Monio -->
+<!-- Volume: 2524 B676444-7 T S .. // Ni,Pa // N,S,M // M2V/M6III // Monio -->
     <circle class='planet' cx='1480' cy='1628' r='5' />
     <text class='spaceport' x='1480' y='1648'>B</text>
     <text x='1480' y='1658'>B676444-7</text>
     <text x='1480' y='1609'>Monio</text>
     <!-- S --><text class='symbol S' x='1457' y='1644'>⚜</text>
     <text x='1504' y='1618'>M2</text>
+    <text x='1507' y='1625'>M6</text>
 
-<!-- Volume: 2624 C677666-7 T . .. // Ni,Ag // M,S,M // M2V // Albanio -->
+<!-- Volume: 2624 C677666-7 T . .. // Ni,Ag // M,S,M // M2V/DB // Albanio -->
     <circle class='planet' cx='1540' cy='1662' r='5' />
     <text class='spaceport' x='1540' y='1682'>C</text>
     <text x='1540' y='1693'>C677666-7</text>
     <text x='1540' y='1643'>Albanio</text>
     <text x='1564' y='1652'>M2</text>
+    <text x='1567' y='1659'>DB</text>
 
 <!-- Volume: 0825 D621564-7 Tz SG .. // Ni,Po,Tz // N,M // F2VI // Frontenacio -->
     <circle class='planet' cx='460' cy='1732' r='5' />
@@ -5197,7 +5216,5 @@
 <text x='1900' y='2813'>3241</text>
 </g>
     <polyline class='frame' points='0,0 1940,0 1940,2806 0,2806 0,0' />
-
-<!--/canon-->
 <!--/islands-->
 </svg>

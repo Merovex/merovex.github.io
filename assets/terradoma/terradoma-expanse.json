@@ -7629,7 +7629,8 @@
       "data": {
        "au": 11.3,
        "orbit_number": 5,
-       "orbit_type": "S"
+       "orbit_type": "S",
+       "star_classification": "M4III"
       }
      }
     ],
@@ -7671,7 +7672,21 @@
      },
      "ru": 28,
      "native": "Colony"
-    }
+    },
+    "companions": [
+     {
+      "star_type": "M",
+      "star_size": 3,
+      "spectral": "M4",
+      "bode_constant": 0.3,
+      "type_dm": 0,
+      "size_dm": 0,
+      "has_gas_giant": false,
+      "orbit": 5,
+      "orbits": [],
+      "classified_by": "bin/terradoma-build.py classify_companions (2026-09-13): legacy record carried a bare companion orbit"
+     }
+    ]
    },
    "origin": {
     "city": "Yaroslav",
@@ -12990,7 +13005,8 @@
       "data": {
        "au": 19.2,
        "orbit_number": 6,
-       "orbit_type": "S"
+       "orbit_type": "S",
+       "star_classification": "M2III"
       }
      }
     ],
@@ -13036,7 +13052,21 @@
      "factions": [
       "F"
      ]
-    }
+    },
+    "companions": [
+     {
+      "star_type": "M",
+      "star_size": 3,
+      "spectral": "M2",
+      "bode_constant": 0.3,
+      "type_dm": 0,
+      "size_dm": 0,
+      "has_gas_giant": false,
+      "orbit": 6,
+      "orbits": [],
+      "classified_by": "bin/terradoma-build.py classify_companions (2026-09-13): legacy record carried a bare companion orbit"
+     }
+    ]
    },
    "origin": {
     "city": "Pskov",
@@ -15610,7 +15640,8 @@
       "data": {
        "au": 12.8,
        "orbit_number": 6,
-       "orbit_type": "S"
+       "orbit_type": "S",
+       "star_classification": "M4V"
       }
      }
     ],
@@ -15657,7 +15688,21 @@
      },
      "ru": -1260,
      "native": "Settled"
-    }
+    },
+    "companions": [
+     {
+      "star_type": "M",
+      "star_size": 5,
+      "spectral": "M4",
+      "bode_constant": 0.3,
+      "type_dm": 0,
+      "size_dm": 0,
+      "has_gas_giant": false,
+      "orbit": 6,
+      "orbits": [],
+      "classified_by": "bin/terradoma-build.py classify_companions (2026-09-13): legacy record carried a bare companion orbit"
+     }
+    ]
    },
    "origin": {
     "city": "Orsha",
@@ -15876,7 +15921,8 @@
       "data": {
        "au": 25.6,
        "orbit_number": 7,
-       "orbit_type": "S"
+       "orbit_type": "S",
+       "star_classification": "DB"
       }
      }
     ],
@@ -15918,7 +15964,22 @@
      },
      "ru": -486,
      "native": "Colony"
-    }
+    },
+    "companions": [
+     {
+      "star_type": "D",
+      "star_size": 500,
+      "spectral": "M4",
+      "bode_constant": 0.3,
+      "type_dm": 0,
+      "size_dm": 0,
+      "has_gas_giant": false,
+      "orbit": 7,
+      "orbits": [],
+      "classified_by": "bin/terradoma-build.py classify_companions (2026-09-13): legacy record carried a bare companion orbit",
+      "star_subtype": "B"
+     }
+    ]
    },
    "origin": {
     "city": "Vitebsk",
@@ -18058,7 +18119,8 @@
       "data": {
        "au": 25.6,
        "orbit_number": 6,
-       "orbit_type": "S"
+       "orbit_type": "S",
+       "star_classification": "A5V"
       }
      }
     ],
@@ -18102,7 +18164,21 @@
      },
      "ru": -240,
      "native": "Settled"
-    }
+    },
+    "companions": [
+     {
+      "star_type": "A",
+      "star_size": 5,
+      "spectral": "A5",
+      "bode_constant": 0.3,
+      "type_dm": 0,
+      "size_dm": 0,
+      "has_gas_giant": false,
+      "orbit": 6,
+      "orbits": [],
+      "classified_by": "bin/terradoma-build.py classify_companions (2026-09-13): legacy record carried a bare companion orbit"
+     }
+    ]
    },
    "origin": {
     "city": "Bryansk",
@@ -18238,7 +18314,8 @@
       "data": {
        "au": 25.6,
        "orbit_number": 7,
-       "orbit_type": "S"
+       "orbit_type": "S",
+       "star_classification": "DB"
       }
      }
     ],
@@ -18281,7 +18358,22 @@
      "factions": [
       "O"
      ]
-    }
+    },
+    "companions": [
+     {
+      "star_type": "D",
+      "star_size": 500,
+      "spectral": "M4",
+      "bode_constant": 0.3,
+      "type_dm": 0,
+      "size_dm": 0,
+      "has_gas_giant": false,
+      "orbit": 7,
+      "orbits": [],
+      "classified_by": "bin/terradoma-build.py classify_companions (2026-09-13): legacy record carried a bare companion orbit",
+      "star_subtype": "B"
+     }
+    ]
    },
    "origin": {
     "city": "Mogilev",
@@ -21112,7 +21204,8 @@
       "data": {
        "au": 9.6,
        "orbit_number": 5,
-       "orbit_type": "S"
+       "orbit_type": "S",
+       "star_classification": "DB"
       }
      }
     ],
@@ -21157,7 +21250,22 @@
      },
      "ru": 9,
      "native": "Colony"
-    }
+    },
+    "companions": [
+     {
+      "star_type": "D",
+      "star_size": 500,
+      "spectral": "G2",
+      "bode_constant": 0.3,
+      "type_dm": 0,
+      "size_dm": 0,
+      "has_gas_giant": false,
+      "orbit": 5,
+      "orbits": [],
+      "classified_by": "bin/terradoma-build.py classify_companions (2026-09-13): legacy record carried a bare companion orbit",
+      "star_subtype": "B"
+     }
+    ]
    },
    "origin": {
     "city": "Kharkiv",
@@ -21412,7 +21520,8 @@
       "data": {
        "au": 102.4,
        "orbit_number": 9,
-       "orbit_type": "S"
+       "orbit_type": "S",
+       "star_classification": "DB"
       }
      }
     ],
@@ -21455,7 +21564,22 @@
      },
      "ru": 39,
      "native": "Colony"
-    }
+    },
+    "companions": [
+     {
+      "star_type": "D",
+      "star_size": 500,
+      "spectral": "M6",
+      "bode_constant": 0.3,
+      "type_dm": 0,
+      "size_dm": 0,
+      "has_gas_giant": false,
+      "orbit": 9,
+      "orbits": [],
+      "classified_by": "bin/terradoma-build.py classify_companions (2026-09-13): legacy record carried a bare companion orbit",
+      "star_subtype": "B"
+     }
+    ]
    },
    "origin": {
     "city": "Kaliningrad",
@@ -25086,7 +25210,8 @@
       "data": {
        "au": 9.6,
        "orbit_number": 5,
-       "orbit_type": "S"
+       "orbit_type": "S",
+       "star_classification": "M4IV"
       }
      }
     ],
@@ -25130,7 +25255,21 @@
      },
      "ru": 160,
      "native": "Settled"
-    }
+    },
+    "companions": [
+     {
+      "star_type": "M",
+      "star_size": 4,
+      "spectral": "M4",
+      "bode_constant": 0.3,
+      "type_dm": 0,
+      "size_dm": 0,
+      "has_gas_giant": false,
+      "orbit": 5,
+      "orbits": [],
+      "classified_by": "bin/terradoma-build.py classify_companions (2026-09-13): legacy record carried a bare companion orbit"
+     }
+    ]
    },
    "origin": {
     "city": "Brest",
@@ -25177,7 +25316,8 @@
       "data": {
        "au": 0.4,
        "orbit_number": 0,
-       "orbit_type": "S"
+       "orbit_type": "S",
+       "star_classification": "DB"
       }
      },
      {
@@ -25277,7 +25417,22 @@
       "M",
       "M"
      ]
-    }
+    },
+    "companions": [
+     {
+      "star_type": "D",
+      "star_size": 500,
+      "spectral": "K2",
+      "bode_constant": 0.3,
+      "type_dm": 0,
+      "size_dm": 0,
+      "has_gas_giant": false,
+      "orbit": 0,
+      "orbits": [],
+      "classified_by": "bin/terradoma-build.py classify_companions (2026-09-13): legacy record carried a bare companion orbit",
+      "star_subtype": "B"
+     }
+    ]
    },
    "origin": {
     "city": "Warszawa",
@@ -27882,7 +28037,8 @@
       "data": {
        "au": 9.6,
        "orbit_number": 5,
-       "orbit_type": "S"
+       "orbit_type": "S",
+       "star_classification": "M0V"
       }
      }
     ],
@@ -27925,7 +28081,21 @@
      },
      "ru": -84,
      "native": "Colony"
-    }
+    },
+    "companions": [
+     {
+      "star_type": "M",
+      "star_size": 5,
+      "spectral": "M0",
+      "bode_constant": 0.3,
+      "type_dm": 0,
+      "size_dm": 0,
+      "has_gas_giant": false,
+      "orbit": 5,
+      "orbits": [],
+      "classified_by": "bin/terradoma-build.py classify_companions (2026-09-13): legacy record carried a bare companion orbit"
+     }
+    ]
    },
    "origin": {
     "city": "Wrocław",
@@ -29794,7 +29964,8 @@
       "data": {
        "au": 9.6,
        "orbit_number": 5,
-       "orbit_type": "S"
+       "orbit_type": "S",
+       "star_classification": "K0V"
       }
      }
     ],
@@ -29837,7 +30008,21 @@
      },
      "ru": 672,
      "native": "Settled"
-    }
+    },
+    "companions": [
+     {
+      "star_type": "K",
+      "star_size": 5,
+      "spectral": "K0",
+      "bode_constant": 0.3,
+      "type_dm": 0,
+      "size_dm": 0,
+      "has_gas_giant": false,
+      "orbit": 5,
+      "orbits": [],
+      "classified_by": "bin/terradoma-build.py classify_companions (2026-09-13): legacy record carried a bare companion orbit"
+     }
+    ]
    },
    "origin": {
     "city": "Vinnytsia",
@@ -32104,7 +32289,8 @@
       "data": {
        "au": 19.2,
        "orbit_number": 6,
-       "orbit_type": "S"
+       "orbit_type": "S",
+       "star_classification": "M2VI"
       }
      }
     ],
@@ -32148,7 +32334,21 @@
      },
      "ru": 36,
      "native": "Colony"
-    }
+    },
+    "companions": [
+     {
+      "star_type": "M",
+      "star_size": 6,
+      "spectral": "M2",
+      "bode_constant": 0.3,
+      "type_dm": 0,
+      "size_dm": 0,
+      "has_gas_giant": false,
+      "orbit": 6,
+      "orbits": [],
+      "classified_by": "bin/terradoma-build.py classify_companions (2026-09-13): legacy record carried a bare companion orbit"
+     }
+    ]
    },
    "origin": {
     "city": "Odesa",
@@ -32276,7 +32476,8 @@
       "data": {
        "au": 51.2,
        "orbit_number": 7,
-       "orbit_type": "S"
+       "orbit_type": "S",
+       "star_classification": "DB"
       }
      }
     ],
@@ -32321,7 +32522,22 @@
      },
      "ru": -72,
      "native": "Colony"
-    }
+    },
+    "companions": [
+     {
+      "star_type": "D",
+      "star_size": 500,
+      "spectral": "M0",
+      "bode_constant": 0.3,
+      "type_dm": 0,
+      "size_dm": 0,
+      "has_gas_giant": false,
+      "orbit": 7,
+      "orbits": [],
+      "classified_by": "bin/terradoma-build.py classify_companions (2026-09-13): legacy record carried a bare companion orbit",
+      "star_subtype": "B"
+     }
+    ]
    },
    "origin": {
     "city": "Brno",
@@ -34674,7 +34890,8 @@
       "data": {
        "au": 102.4,
        "orbit_number": 9,
-       "orbit_type": "S"
+       "orbit_type": "S",
+       "star_classification": "M0V"
       }
      }
     ],
@@ -34715,7 +34932,21 @@
       "sym": 7
      },
      "ru": 84
-    }
+    },
+    "companions": [
+     {
+      "star_type": "M",
+      "star_size": 5,
+      "spectral": "M0",
+      "bode_constant": 0.3,
+      "type_dm": 0,
+      "size_dm": 0,
+      "has_gas_giant": false,
+      "orbit": 9,
+      "orbits": [],
+      "classified_by": "bin/terradoma-build.py classify_companions (2026-09-13): legacy record carried a bare companion orbit"
+     }
+    ]
    },
    "origin": {
     "city": "Braşov",
@@ -36013,7 +36244,8 @@
       "data": {
        "au": 3.2,
        "orbit_number": 4,
-       "orbit_type": "S"
+       "orbit_type": "S",
+       "star_classification": "DB"
       }
      }
     ],
@@ -36057,7 +36289,22 @@
      },
      "ru": -336,
      "native": "Settled"
-    }
+    },
+    "companions": [
+     {
+      "star_type": "D",
+      "star_size": 500,
+      "spectral": "M2",
+      "bode_constant": 0.3,
+      "type_dm": 0,
+      "size_dm": 0,
+      "has_gas_giant": false,
+      "orbit": 4,
+      "orbits": [],
+      "classified_by": "bin/terradoma-build.py classify_companions (2026-09-13): legacy record carried a bare companion orbit",
+      "star_subtype": "B"
+     }
+    ]
    },
    "origin": {
     "city": "Constanţa",
@@ -38075,7 +38322,8 @@
       "data": {
        "au": 25.6,
        "orbit_number": 7,
-       "orbit_type": "S"
+       "orbit_type": "S",
+       "star_classification": "M6III"
       }
      }
     ],
@@ -38120,7 +38368,21 @@
      },
      "ru": -220,
      "native": "Colony"
-    }
+    },
+    "companions": [
+     {
+      "star_type": "M",
+      "star_size": 3,
+      "spectral": "M6",
+      "bode_constant": 0.3,
+      "type_dm": 0,
+      "size_dm": 0,
+      "has_gas_giant": false,
+      "orbit": 7,
+      "orbits": [],
+      "classified_by": "bin/terradoma-build.py classify_companions (2026-09-13): legacy record carried a bare companion orbit"
+     }
+    ]
    },
    "origin": {
     "city": "Verona",
@@ -40627,7 +40889,8 @@
       "data": {
        "au": 3.2,
        "orbit_number": 4,
-       "orbit_type": "S"
+       "orbit_type": "S",
+       "star_classification": "DB"
       }
      }
     ],
@@ -40673,7 +40936,22 @@
      },
      "ru": 60,
      "native": "Colony"
-    }
+    },
+    "companions": [
+     {
+      "star_type": "D",
+      "star_size": 500,
+      "spectral": "M2",
+      "bode_constant": 0.3,
+      "type_dm": 0,
+      "size_dm": 0,
+      "has_gas_giant": false,
+      "orbit": 4,
+      "orbits": [],
+      "classified_by": "bin/terradoma-build.py classify_companions (2026-09-13): legacy record carried a bare companion orbit",
+      "star_subtype": "B"
+     }
+    ]
    },
    "origin": {
     "city": "Bologna",
@@ -51147,7 +51425,8 @@
       "data": {
        "au": 102.4,
        "orbit_number": 9,
-       "orbit_type": "S"
+       "orbit_type": "S",
+       "star_classification": "M4V"
       }
      }
     ],
@@ -51191,7 +51470,21 @@
      },
      "ru": -288,
      "native": "Settled"
-    }
+    },
+    "companions": [
+     {
+      "star_type": "M",
+      "star_size": 5,
+      "spectral": "M4",
+      "bode_constant": 0.3,
+      "type_dm": 0,
+      "size_dm": 0,
+      "has_gas_giant": false,
+      "orbit": 9,
+      "orbits": [],
+      "classified_by": "bin/terradoma-build.py classify_companions (2026-09-13): legacy record carried a bare companion orbit"
+     }
+    ]
    },
    "origin": {
     "city": "İzmir",

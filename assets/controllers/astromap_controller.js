@@ -47,6 +47,7 @@ Stimulus.register("astromap", class extends Controller {
     if (coord.length != 4 || this.volumes[coord] == undefined) { return; }
 
     var data = this.volumes[coord];
+    this.currentStar = data["star"] || null;
     
     // Handle new JSON format with star and nested orbits structure
     if (data["star"] && data["star"]["orbits"]) {
@@ -127,11 +128,10 @@ Stimulus.register("astromap", class extends Controller {
         if (this.hasSettlementTarget) { this.settlementTarget.innerHTML = world.native || '&mdash;'; }
       }
       
-      // Set star classification
-      var starClass = '';
-      if (data["star"]["spectral"]) {
-        starClass = data["star"]["spectral"] + this.toRoman(data["star"]["star_size"]);
-      }
+      // Set star classification: primary, then each companion's class (from its orbit row)
+      var starClass = this.primaryClass(data["star"]);
+      var comps = this.companionsOf(data["star"]).map(c => c.cls);
+      if (comps.length) { starClass += ' / ' + comps.join(' / '); }
       this.starTarget.innerHTML = starClass;
       
     } else if (data["orbits"]) {
@@ -221,8 +221,69 @@ Stimulus.register("astromap", class extends Controller {
   
   toRoman(n) {
     if (n === 500) return 'D';
-    var romans = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'];
+    var romans = ['Ia', 'Ib', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'];
     return romans[n] || n.toString();
+  }
+
+  // Primary star as the chart prints it: spectral plus luminosity class, "DB" for a white dwarf.
+  primaryClass(star) {
+    if (!star) { return ''; }
+    if (star.star_type === 'D') { return 'D' + (star.star_subtype || 'B'); }
+    if (!star.spectral) { return ''; }
+    return star.spectral + this.toRoman(star.star_size);
+  }
+
+  // Companions are stored as orbit rows of type "companion" carrying star_classification and au.
+  companionsOf(star) {
+    if (!star || !star.orbits) { return []; }
+    return star.orbits
+      .filter(o => o.type === 'companion' && o.data)
+      .map(o => ({ cls: o.data.star_classification || 'unclassified', au: o.data.au, orbit: o.data.orbit_number }));
+  }
+
+  // Plain words for a classification string such as "A0IV", "K5 V" or "DB".
+  describeStar(cls) {
+    if (!cls) { return 'a star of unrecorded class'; }
+    var c = cls.replace(/\s+/g, '');
+    if (c[0] === 'D') { return 'a white dwarf (' + c + ')'; }
+    var color = { O: 'blue', B: 'blue-white', A: 'white', F: 'yellow-white', G: 'yellow', K: 'orange', M: 'red' }[c[0]] || '';
+    var lum = c.replace(/^[OBAFGKM]\d?/, '');
+    var kind = { Ia: 'supergiant', Ib: 'supergiant', II: 'bright giant', III: 'giant', IV: 'subgiant', V: 'main-sequence star', VI: 'subdwarf' }[lum] || 'star';
+    var spectral = c.match(/^[OBAFGKM]\d?/); spectral = spectral ? spectral[0] : c;
+    return 'a ' + (color ? color + ' ' : '') + kind + ' (' + spectral + (lum ? ' ' + lum : '') + ')';
+  }
+
+  // One paragraph on the star system itself: primary, companions, and what else orbits.
+  stellarNarrative(star) {
+    if (!star) { return ''; }
+    var parts = [];
+    var primary = this.describeStar(this.primaryClass(star));
+    var comps = this.companionsOf(star);
+    if (comps.length === 0) {
+      parts.push('The primary is ' + primary + ', with no stellar companion.');
+    } else if (comps.length === 1) {
+      parts.push('The primary is ' + primary + '; a companion, ' + this.describeStar(comps[0].cls) + ', orbits it at ' + comps[0].au + ' AU.');
+    } else {
+      var list = comps.map(c => this.describeStar(c.cls) + ' at ' + c.au + ' AU');
+      parts.push('The primary is ' + primary + '; it has ' + comps.length + ' stellar companions: ' + list.slice(0, -1).join(', ') + ' and ' + list[list.length - 1] + '.');
+    }
+    var orbits = star.orbits || [];
+    var gg = orbits.filter(o => o.type === 'gas_giant').length;
+    var belts = orbits.filter(o => o.type === 'belt').length;
+    var others = orbits.filter(o => o.type === 'rockball' || o.type === 'hostile').length;
+    var bits = [];
+    if (gg) { bits.push(gg + (gg === 1 ? ' gas giant' : ' gas giants')); }
+    if (belts) { bits.push(belts + (belts === 1 ? ' planetoid belt' : ' planetoid belts')); }
+    if (others) { bits.push(others + (others === 1 ? ' other world' : ' other worlds')); }
+    if (bits.length) {
+      parts.push('Besides the mainworld the system holds ' + (bits.length > 1 ? bits.slice(0, -1).join(', ') + ' and ' + bits[bits.length - 1] : bits[0]) + ' across ' + orbits.length + ' orbits.');
+    } else {
+      parts.push('The mainworld is the only body of note in its ' + orbits.length + ' orbits.');
+    }
+    if (star.world && star.world.au != null) {
+      parts.push('The mainworld sits in orbit ' + star.world.orbit_number + ' at ' + star.world.au + ' AU.');
+    }
+    return parts.join(' ');
   }
   
   loadData() {
@@ -487,6 +548,9 @@ Stimulus.register("astromap", class extends Controller {
   worldNarrative(world) {
     if (!world) { return ''; }
     var parts = [];
+
+    var stellar = this.stellarNarrative(this.currentStar);
+    if (stellar) { parts.push(stellar); }
 
     if (world.native) {
       parts.push('It is a <strong>' + world.native.toLowerCase() + '</strong> world.');
