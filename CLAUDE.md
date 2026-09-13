@@ -69,7 +69,8 @@ Most controllers self-start the Stimulus application with `window.Stimulus = App
 - **_tools** - Interactive web utilities
 
 ### Data Files
-- `assets/gendaldea.json` - Worldbuilding data for science fiction setting
+- `assets/terradoma/` - The Terradoma star chart (Imperium, Decline and Expanse layers as JSON + SVG), copied from the Postal Marines repo; the astromap tool reads the Imperium layer. See its README.
+- `assets/gendaldea*.json` - The retired Gendaldea chart, kept for reference
 - `assets/wordcount.json` - Writing progress tracking
 - Various CSV/JSON files supporting interactive tools
 

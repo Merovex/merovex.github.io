@@ -1,16 +1,16 @@
 ---
 layout: tool
 order: 40
-title: Gendaldea Astromap
-description: "A tool to explore Gendaldea, the setting for the Postal Marines series. I use this to plan the story and
+title: Terradoma Astromap
+description: "A tool to explore Terradoma, the star chart of the Postal Marines series and its prequels. I use this to plan the story and
 keep track of the setting. It helps me measure superluminal travel distances."
 ---
 
 <script type="module" src="/assets/controllers/astromap_controller.js"></script>
 <!-- To use a custom JSON file, add data-astromap-data-url-value="/path/to/your/file.json" -->
 <article class='w-prose h-full' data-controller='astromap'
-  data-astromap-data-url-value="/assets/gendaldea-archipelago.json"
-  data-astromap-svg-url-value="/assets/gendaldea-archipelago.svg">
+  data-astromap-data-url-value="/assets/terradoma/terradoma-imperium.json"
+  data-astromap-svg-url-value="/assets/terradoma/terradoma-imperium.svg">
   <div class='text-center space-y-2'>
     <label for='coordinate' class=' text-xl'>Search:</label>
     <div class='relative w-56 mx-auto'>
@@ -122,8 +122,12 @@ keep track of the setting. It helps me measure superluminal travel distances."
     <h3 class='h3 m' data-astromap-target='mapTitle'>Terradoma Map</h3>
     <a href='#coordinate'>back to top</a>
     <div class='prosed'>
-      <p>This is the comprehensive map of known humanity in Terradoma. You can pan and zoom. The volume report above
+      <p>This is the comprehensive map of known humanity in Terradoma, the Imperium-era layer. You can pan and zoom. The volume report above
         relies on the coordinates of this map.</p>
+    </div>
+    <div class='flex space-x-4 my-2' aria-label='map layers'>
+      <label class='cursor-pointer'><input type='checkbox' checked data-action='change->astromap#toggleIslandLabels'> Island names</label>
+      <label class='cursor-pointer'><input type='checkbox' checked data-action='change->astromap#toggleIslandBorders'> Island borders</label>
     </div>
     <!-- Wrapper height tracks the map's true aspect (2806/1940 = 144.64%) so the map
          fills the width edge-to-edge with no side letterboxing. The padding gives a

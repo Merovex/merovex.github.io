@@ -28,6 +28,8 @@ Stimulus.register("astromap", class extends Controller {
   activeIndex = -1;
   panZoom = null;
   marker = null;
+  showIslandLabels = true;
+  showIslandBorders = true;
   connect() {
     console.log("Loading Astromap Controller")
     this.loadData();
@@ -340,6 +342,9 @@ Stimulus.register("astromap", class extends Controller {
           this.marker = marker;
         }
 
+        // Island layer visibility (checkboxes may have been toggled before the SVG arrived).
+        this.applyIslandVisibility();
+
         // The container height is fixed (vh/min-height); re-fit on viewport resize.
         this.resizeHandler = () => {
           if (this.panZoom) { this.panZoom.resize(); this.panZoom.fit(); this.panZoom.center(); }
@@ -352,6 +357,22 @@ Stimulus.register("astromap", class extends Controller {
   disconnect() {
     if (this.resizeHandler) { window.removeEventListener('resize', this.resizeHandler); }
     if (this.panZoom) { this.panZoom.destroy(); this.panZoom = null; }
+  }
+
+  // Island names and borders live in the SVG's <g class='islands'> layer as
+  // <text class='island-label'> and <polygon class='island-border'> (bin/terradoma-svg-polish.py).
+  toggleIslandLabels(event) {
+    this.showIslandLabels = event.target.checked;
+    this.applyIslandVisibility();
+  }
+  toggleIslandBorders(event) {
+    this.showIslandBorders = event.target.checked;
+    this.applyIslandVisibility();
+  }
+  applyIslandVisibility() {
+    if (!this.hasMapTarget) { return; }
+    this.mapTarget.querySelectorAll('.islands .island-label').forEach(el => { el.style.display = this.showIslandLabels ? '' : 'none'; });
+    this.mapTarget.querySelectorAll('.islands .island-border').forEach(el => { el.style.display = this.showIslandBorders ? '' : 'none'; });
   }
 
   panToCoordinate(coord) {
