@@ -6,7 +6,7 @@ description: "A tool to explore Terradoma, the star chart of the Postal Marines 
 keep track of the setting. It helps me measure superluminal travel distances."
 ---
 
-<script type="module" src="/assets/controllers/astromap_controller.js?v=20260913b"></script>
+<script type="module" src="/assets/controllers/astromap_controller.js?v=20260913c"></script>
 <!-- To use a custom JSON file, add data-astromap-data-url-value="/path/to/your/file.json" -->
 <article class='w-prose h-full' data-controller='astromap'
   data-astromap-data-url-value="/assets/terradoma/terradoma-imperium.json"
@@ -123,7 +123,7 @@ keep track of the setting. It helps me measure superluminal travel distances."
     <a href='#coordinate'>back to top</a>
     <div class='prosed'>
       <p>This is the comprehensive map of known humanity in Terradoma, the Imperium-era layer. You can pan and zoom. The volume report above
-        relies on the coordinates of this map.</p>
+        relies on the coordinates of this map. Double-click a system to load it.</p>
     </div>
     <div class='flex space-x-4 my-2' aria-label='map layers'>
       <label class='cursor-pointer'><input type='checkbox' checked data-action='change->astromap#toggleIslandLabels'> Island names</label>

@@ -311,12 +311,18 @@ Stimulus.register("astromap", class extends Controller {
         this.panZoom = window.svgPanZoom(svg, {
           zoomEnabled: true,
           controlIconsEnabled: true,
+          dblClickZoomEnabled: false,   // double-click selects the system under the pointer instead
           fit: true,
           center: true,
           minZoom: 0.5,
           maxZoom: 10,
-          zoomScaleSensitivity: 0.3
+          zoomScaleSensitivity: 0.3,
+          beforePan: (oldPan, newPan) => this.clampPan(newPan)
         });
+
+        // Double-click on the map: if a system sits in that hex, show it.
+        this.dblClickHandler = (event) => this.selectAtPointer(event);
+        svg.addEventListener('dblclick', this.dblClickHandler);
 
         // svg-pan-zoom caches the SVG's pixel size at init. Re-measure and re-fit on the
         // next frame so the fit is computed against the container's final laid-out height,
@@ -356,6 +362,8 @@ Stimulus.register("astromap", class extends Controller {
 
   disconnect() {
     if (this.resizeHandler) { window.removeEventListener('resize', this.resizeHandler); }
+    var svgEl = this.hasMapTarget ? this.mapTarget.querySelector('svg') : null;
+    if (svgEl && this.dblClickHandler) { svgEl.removeEventListener('dblclick', this.dblClickHandler); }
     if (this.panZoom) { this.panZoom.destroy(); this.panZoom = null; }
   }
 
@@ -373,6 +381,56 @@ Stimulus.register("astromap", class extends Controller {
     if (!this.hasMapTarget) { return; }
     this.mapTarget.querySelectorAll('.islands .island-label').forEach(el => { el.style.display = this.showIslandLabels ? '' : 'none'; });
     this.mapTarget.querySelectorAll('.islands .island-border').forEach(el => { el.style.display = this.showIslandBorders ? '' : 'none'; });
+  }
+
+  // Keep the map inside its frame: when the zoomed map is larger than the viewport its
+  // edges may not come inside the frame; when smaller, the whole map stays inside.
+  clampPan(newPan) {
+    if (!this.panZoom) { return newPan; }
+    var sizes = this.panZoom.getSizes();
+    var rz = sizes.realZoom;
+    var contentW = sizes.viewBox.width * rz;
+    var contentH = sizes.viewBox.height * rz;
+    var offX = sizes.viewBox.x * rz;
+    var offY = sizes.viewBox.y * rz;
+    var xA = -offX, xB = sizes.width - contentW - offX;
+    var yA = -offY, yB = sizes.height - contentH - offY;
+    var xMin = Math.min(xA, xB), xMax = Math.max(xA, xB);
+    var yMin = Math.min(yA, yB), yMax = Math.max(yA, yB);
+    return {
+      x: Math.max(xMin, Math.min(xMax, newPan.x)),
+      y: Math.max(yMin, Math.min(yMax, newPan.y))
+    };
+  }
+
+  // Map a pointer event to the hex under it (nearest system center within one hex side)
+  // and show that system. Pointer coordinates are converted through the pan/zoom viewport's
+  // screen matrix, so they land in the SVG's own coordinate space, the one center_of() uses.
+  selectAtPointer(event) {
+    if (!this.hasMapTarget) { return; }
+    var svg = this.mapTarget.querySelector('svg');
+    var viewport = svg && svg.querySelector('.svg-pan-zoom_viewport');
+    if (!viewport) { return; }
+    var pt = new DOMPoint(event.clientX, event.clientY).matrixTransform(viewport.getScreenCTM().inverse());
+    var best = null, bestD = Infinity;
+    for (var coord in this.volumes) {
+      var v = this.volumes[coord];
+      if (v.column == null || v.row == null) { continue; }
+      var c = this.center_of(v.column, v.row);
+      var d = Math.hypot(pt.x - c[0], pt.y - c[1]);
+      if (d < bestD) { bestD = d; best = coord; }
+    }
+    if (best == null || bestD > 40) { return; }   // 40 = hex side: outside every system's hex
+    event.preventDefault();
+    this.coordinatesTarget.value = best;
+    this.hideSuggestions();
+    this.showVolumeDetails(best);
+    if (this.marker) {
+      var c2 = this.center_of(this.volumes[best].column, this.volumes[best].row);
+      this.marker.setAttribute('cx', c2[0]);
+      this.marker.setAttribute('cy', c2[1]);
+      this.marker.style.opacity = '1';
+    }
   }
 
   panToCoordinate(coord) {
