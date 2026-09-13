@@ -30372,9 +30372,9 @@
    "column": 20,
    "row": 21,
    "star": {
-    "star_type": "M",
+    "star_type": "G",
     "star_size": 5,
-    "spectral": "M2",
+    "spectral": "G2",
     "bode_constant": 0.2,
     "type_dm": 0,
     "size_dm": 0,
@@ -30382,15 +30382,31 @@
     "orbit": 0,
     "orbits": [
      {
+      "type": "empty",
+      "data": {
+       "au": 0.4,
+       "orbit_number": 0,
+       "orbit_type": "."
+      }
+     },
+     {
+      "type": "empty",
+      "data": {
+       "au": 0.8,
+       "orbit_number": 1,
+       "orbit_type": "."
+      }
+     },
+     {
       "type": "world",
       "data": {
        "atmosphere": 3,
-       "au": 0.2,
+       "au": 1.6,
        "distant": false,
        "government": 9,
        "hydrographics": 8,
        "law_level": 9,
-       "orbit_number": 0,
+       "orbit_number": 2,
        "orbit_type": "W",
        "population": 5,
        "size": 8,
@@ -30412,15 +30428,16 @@
          "atmosphere": 0,
          "hydrographics": 4
         }
-       ]
+       ],
+       "temperature": "T"
       }
      },
      {
       "type": "gas_giant",
       "data": {
-       "au": 0.4,
+       "au": 3.2,
        "giant_size": "L",
-       "orbit_number": 1,
+       "orbit_number": 3,
        "orbit_type": "G",
        "moons": [
         {
@@ -30479,15 +30496,16 @@
          "atmosphere": 0,
          "hydrographics": 0
         }
-       ]
+       ],
+       "distant": false
       }
      },
      {
       "type": "gas_giant",
       "data": {
-       "au": 0.8,
+       "au": 6.4,
        "giant_size": "L",
-       "orbit_number": 2,
+       "orbit_number": 4,
        "orbit_type": "G",
        "moons": [
         {
@@ -30567,15 +30585,16 @@
          "atmosphere": 1,
          "hydrographics": 1
         }
-       ]
+       ],
+       "distant": false
       }
      },
      {
       "type": "gas_giant",
       "data": {
-       "au": 1.6,
+       "au": 12.8,
        "giant_size": "L",
-       "orbit_number": 3,
+       "orbit_number": 5,
        "orbit_type": "G",
        "moons": [
         {
@@ -30620,15 +30639,16 @@
          "atmosphere": 0,
          "hydrographics": 0
         }
-       ]
+       ],
+       "distant": true
       }
      },
      {
       "type": "gas_giant",
       "data": {
-       "au": 3.2,
+       "au": 25.6,
        "giant_size": "L",
-       "orbit_number": 4,
+       "orbit_number": 6,
        "orbit_type": "G",
        "moons": [
         {
@@ -30652,13 +30672,14 @@
          "atmosphere": 0,
          "hydrographics": 0
         }
-       ]
+       ],
+       "distant": true
       }
      }
     ],
     "world": {
-     "orbit_number": 0,
-     "au": 0.2,
+     "orbit_number": 2,
+     "au": 1.6,
      "orbit_type": "W",
      "zone": 0,
      "distant": false,
@@ -30670,7 +30691,7 @@
      "government": 9,
      "law_level": 9,
      "tech_level": 6,
-     "temperature": "F",
+     "temperature": "T",
      "factions": [
       "M",
       "S"
@@ -30695,7 +30716,8 @@
      },
      "ru": 144,
      "native": "Colony"
-    }
+    },
+    "ruling": "Ben, 2026-09-13: the Imperial capital's star should not be a dwarf. Legacy record was M2 V with the mainworld tidally locked in orbit 0 at 0.2 AU. Re-classed G2 V (the star was never novel-pinned); mainworld reseated in the habitable zone, gas giants moved outward, UWP unchanged. Applied by bin/terradoma-build.py stars."
    },
    "origin": {
     "city": "Ostrava",

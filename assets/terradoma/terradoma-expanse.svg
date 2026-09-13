@@ -2474,7 +2474,7 @@
       </g>
     <text x='1084' y='1444'>G0</text>
 
-<!-- Volume: 2021 B838499-9 F G .. // Ni // M,S // M2V // Adiantio -->
+<!-- Volume: 2021 B838499-9 T G .. // Ni // M,S // G2V // Adiantio -->
     <circle class='planet' cx='1180' cy='1454' r='5' />
     <text class='spaceport' x='1180' y='1474'>B</text>
     <text x='1180' y='1485'>B838499-9</text>
@@ -2483,7 +2483,7 @@
         <ellipse cx='1202' cy='1467' rx='6' ry='0.9' />
         <circle  cx='1202' cy='1467' r='2' />
       </g>
-    <text x='1204' y='1444'>M2</text>
+    <text x='1204' y='1444'>G2</text>
 
 <!-- Volume: 2221 C59A564-B T G .. // Wa,Ni // N,M // G5V // Ashfordo -->
     <circle class='planet' cx='1300' cy='1454' r='5' />
