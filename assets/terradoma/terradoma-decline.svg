@@ -1696,11 +1696,11 @@
     <text x='964' y='752'>F0</text>
     <text x='967' y='759'>DB</text>
 
-<!-- Volume: 1911 D6A4272-6 Tz G AZ // Fl,Lo,Tz // F,M // K2V/DB // Menteshio -->
+<!-- Volume: 1911 D6A4272-6 Tz G AZ // Fl,Lo,Tz // F,M // K2V/DB // Trompio -->
     <circle class='planet' cx='1120' cy='727' r='5' />
     <text class='spaceport' x='1120' y='747'>D</text>
     <text x='1120' y='758'>D6A4272-6</text>
-    <text x='1120' y='708'>Menteshio</text>
+    <text x='1120' y='708'>Trompio</text>
     <path class='zone' d='M 1110 713 a 20 20 0 1 0 20 0' />
       <g class='gas-giant'><!-- Has Gas Giant -->
         <ellipse cx='1142' cy='740' rx='6' ry='0.9' />

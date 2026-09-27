@@ -1710,11 +1710,11 @@
     <text x='964' y='752'>F0</text>
     <text x='967' y='759'>DB</text>
 
-<!-- Volume: 1911 C6A4322-7 Tz SG AZ // Fl,Lo,Tz // F,M // K2V/DB // Menteshio -->
+<!-- Volume: 1911 C6A4322-7 Tz SG AZ // Fl,Lo,Tz // F,M // K2V/DB // Trompio -->
     <circle class='planet' cx='1120' cy='727' r='5' />
     <text class='spaceport' x='1120' y='747'>C</text>
     <text x='1120' y='758'>C6A4322-7</text>
-    <text x='1120' y='708'>Menteshio</text>
+    <text x='1120' y='708'>Trompio</text>
     <path class='zone' d='M 1110 713 a 20 20 0 1 0 20 0' />
     <!-- S --><text class='symbol S' x='1097' y='744'>⚜</text>
       <g class='gas-giant'><!-- Has Gas Giant -->
