@@ -1,0 +1,92 @@
+---
+layout: tool
+order: 76
+title: SF & Fantasy Pen Name Generator
+description: "Generate pen names for science fiction and fantasy, from Golden Age initials to cozy fantasy. Choose a
+style and a form, roll eight names at a time, and click any name to copy it. Surnames of well-known SF/F authors are
+never used."
+---
+<script type="module" src="/assets/controllers/pen_name_controller.js"></script>
+
+<style>
+  /* Self-contained styles; adapts to the site's light/dark theme. */
+  .pennames { --accent: #0f766e; --line: rgba(127, 127, 127, 0.25); }
+  :root[data-color-scheme="dark"] .pennames { --accent: #2dd4bf; }
+
+  .pennames .dials { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; font-size: 0.875rem; }
+  .pennames .dial { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.5rem; }
+  .pennames .dial-label { font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.6; }
+  .pennames .pillrow { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.25rem; }
+
+  .pennames button.pill,
+  .pennames button.roll {
+    border: 1px solid currentColor; border-radius: 9999px; background: transparent;
+    color: inherit; cursor: pointer; font: inherit; line-height: 1.2;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .pennames button.pill { padding: 0.25rem 0.75rem; }
+  .pennames button.roll { padding: 0.5rem 1.5rem; font-weight: 600; box-shadow: 0 0 0 2px var(--accent); }
+  .pennames button.pill:hover,
+  .pennames button.roll:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .pennames button.pill[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .pennames ul.names {
+    list-style: none; padding: 0; margin: 0 0 2rem;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: 0.5rem;
+  }
+  .pennames button.name {
+    width: 100%; text-align: center; font: inherit; font-size: 1.15rem; color: inherit; cursor: pointer;
+    padding: 0.75rem 1rem; border: 1px solid var(--line); border-radius: 0.375rem;
+    background: color-mix(in srgb, var(--accent) 6%, transparent);
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+  .pennames button.name:hover { border-color: var(--accent); }
+  .pennames button.name.copied { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .pennames .center { text-align: center; margin-bottom: 2.5rem; }
+</style>
+
+<aside class="prosed text-left" style="margin-bottom: 2rem;">
+  <p>
+    <strong>The SF &amp; Fantasy Pen Name Generator</strong> rolls eight names at a time. Pick a <strong>Style</strong>
+    for the shelf you're writing for, and a <strong>Form</strong>: a female or male first name, or two
+    <em>initials</em>, which SF and fantasy authors have long used and which keep the author's gender off the cover.
+    Click any name to copy it. Surnames of well-known SF and fantasy authors are never used, but search any name
+    you like before you put it on a book.
+  </p>
+</aside>
+
+<div class="pennames" data-controller="pen-name">
+  <script type="application/json" data-pen-name-target="data">{{ site.data.pen_names | jsonify }}</script>
+
+  <div class="dials">
+    <div class="dial">
+      <span class="dial-label">Style</span>
+      <div class="pillrow">
+        {% for s in site.data.pen_names.styles %}
+          <button type="button" class="pill" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+            data-pen-name-target="stylePill"
+            data-action="click->pen-name#setStyle" data-pen-name-style-param="{{ s[0] }}">{{ s[1].label }}</button>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="dial">
+      <span class="dial-label">Form</span>
+      <div class="pillrow">
+        {% assign forms = "any:Any,f:Female,m:Male,initials:Initials" | split: "," %}
+        {% for f in forms %}
+          {% assign pair = f | split: ":" %}
+          <button type="button" class="pill" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+            data-pen-name-target="formPill"
+            data-action="click->pen-name#setForm" data-pen-name-form-param="{{ pair[0] }}">{{ pair[1] }}</button>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <ul class="names" data-pen-name-target="list"></ul>
+
+  <div class="center">
+    <button type="button" class="roll" data-action="click->pen-name#roll">Roll New Names</button>
+  </div>
+</div>

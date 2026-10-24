@@ -1,0 +1,32 @@
+{
+  "algorithm": "Pick a style, then a form (any, female, male, initials). Each name is first + ' ' + last, or two initials + last for the initials form. 8 unique names per roll. Any last name in blocked_surnames is never used, so a name can't collide with a well-known SF/F author.",
+  "styles": {
+    "golden": {
+      "label": "Golden Age SF",
+      "f": ["Eleanor", "Margaret", "Dorothy", "Virginia", "Evelyn", "Lorraine", "Marian", "Beatrice", "Harriet", "Frances", "Mildred", "Josephine", "Lucille", "Edith", "Phyllis", "Constance"],
+      "m": ["Arthur", "Harold", "Walter", "Raymond", "Lester", "Clifford", "Leonard", "Everett", "Milton", "Russell", "Gordon", "Chester", "Warren", "Lloyd", "Vernon", "Franklin"],
+      "l": ["Hartwell", "Ashworth", "Kendrick", "Pemberton", "Lockridge", "Faraday", "Whitcomb", "Danforth", "Holbrook", "Garrison", "Merriman", "Thayer", "Prescott", "Rutledge", "Sheffield", "Corliss"]
+    },
+    "modern": {
+      "label": "Modern SF",
+      "f": ["Mara", "Kira", "Simone", "Naomi", "Tessa", "Iris", "Priya", "Lena", "Talia", "Noor", "Imogen", "Selene", "Jada", "Freya", "Anika", "Celeste"],
+      "m": ["Devin", "Theo", "Elias", "Adrian", "Owen", "Julian", "Malcolm", "Rafael", "Dorian", "Kenji", "Silas", "Mateo", "Nikolai", "Cyrus", "Declan", "Ezra"],
+      "l": ["Okafor", "Reyes", "Thorne", "Castellan", "Mercer", "Kessler", "Navarro", "Lindqvist", "Calder", "Ashby", "Holloway", "Strand", "Maddox", "Varga", "Sorensen", "Achterberg"]
+    },
+    "epic": {
+      "label": "Epic Fantasy",
+      "f": ["Rowena", "Elise", "Brynn", "Ingrid", "Aveline", "Helena", "Sabine", "Maren", "Isolde", "Gwendolyn", "Linnea", "Cordelia", "Astrid", "Mairead", "Rosalind", "Edith"],
+      "m": ["Alaric", "Gareth", "Edric", "Roland", "Brennan", "Tobias", "Cedric", "Lucan", "Duncan", "Ewan", "Garrett", "Anselm", "Torin", "Callum", "Emrys", "Leopold"],
+      "l": ["Ashcombe", "Blackwood", "Greaves", "Marlowe", "Fenwick", "Ravensworth", "Aldridge", "Penhallow", "Carrow", "Westbrook", "Kestrel", "Hawthorne", "Stormont", "Draycott", "Elderfield", "Ashgrove"]
+    },
+    "cozy": {
+      "label": "Cozy Fantasy",
+      "f": ["Hazel", "Tilly", "Rosie", "Wren", "Juniper", "Clara", "Mabel", "Briar", "Willa", "Posy", "Nell", "Ivy", "Marigold", "Elsie", "Bess", "Lottie"],
+      "m": ["Bram", "Felix", "Oliver", "Pip", "Arlo", "Toby", "Hugo", "Jasper", "Rupert", "Barnaby", "Ned", "Alfie", "Percy", "Teddy", "Basil", "Fletcher"],
+      "l": ["Fairweather", "Applegate", "Thistlewood", "Honeycutt", "Larkspur", "Meadowcroft", "Merriweather", "Hollowell", "Goodwin", "Greenaway", "Ambrose", "Ashdown", "Tansley", "Kettering", "Sweeting", "Fernsby"]
+    }
+  },
+  "blocked_surnames": [
+    "Abercrombie", "Adams", "Aldiss", "Anderson", "Anspach", "Asimov", "Asprin", "Atwood", "Bacigalupi", "Baker", "Banks", "Bardugo", "Barker", "Baxter", "Bear", "Beagle", "Bester", "Bishop", "Black", "Bradbury", "Bradley", "Brin", "Brooks", "Brown", "Brust", "Bujold", "Burroughs", "Butcher", "Butler", "Cadigan", "Campbell", "Card", "Carey", "Chambers", "Cherryh", "Clarke", "Clement", "Cook", "Corey", "Cooper", "Crichton", "Delany", "Dick", "Donaldson", "Drake", "Duane", "Dunsany", "Eddings", "Eddison", "Erikson", "Esslemont", "Farmer", "Feist", "Flint", "Forstchen", "Gaiman", "Gibson", "Goodkind", "Haldeman", "Hamilton", "Harrison", "Heinlein", "Herbert", "Hobb", "Howard", "Huxley", "Jemisin", "Jordan", "Kay", "Kerr", "King", "Kloos", "Kowal", "Kress", "Kuang", "Lackey", "Lawrence", "Le Guin", "Leckie", "Leiber", "Lewis", "Liu", "Lovecraft", "Lynch", "MacDonald", "Martin", "McCaffrey", "McDevitt", "McKillip", "Miéville", "Modesitt", "Moon", "Moorcock", "Morgan", "Niven", "Norton", "Novik", "Okorafor", "Orwell", "Peake", "Pohl", "Pournelle", "Pratchett", "Pullman", "Reynolds", "Ringo", "Robinson", "Rothfuss", "Rowling", "Russ", "Salvatore", "Sanderson", "Scalzi", "Schwab", "Silverberg", "Simak", "Simmons", "Smith", "Stephenson", "Stross", "Sturgeon", "Swanwick", "Taylor", "Tchaikovsky", "Tepper", "Tiptree", "Tolkien", "Turtledove", "Valente", "Van Vogt", "Vance", "Verne", "Vinge", "Walton", "Watts", "Weber", "Weeks", "Wells", "Williams", "Willis", "Wolfe", "Wurts", "Wyndham", "Zahn", "Zelazny"
+  ]
+}
