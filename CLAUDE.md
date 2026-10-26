@@ -76,6 +76,18 @@ Most controllers self-start the Stimulus application with `window.Stimulus = App
 - `assets/wordcount.json` - Writing progress tracking
 - Various CSV/JSON files supporting interactive tools
 
+## Tool Page Rules
+
+Every page in `_tools/` must share the same basic view. No tool gets its own look.
+
+- **Layout:** `layout: tool` (back link, centered title), then the intro in `<aside class="mb-4 prosed md:prose-lg">`, then the tool. Don't hide the layout's title or add a custom page header. Dashboard-style tools (Travel, Orbital, UWP Translator) may use the wide `.calc` layout from `assets/calculator.css`. That's the only sanctioned variation.
+- **Colors:** site tokens only (`--surface-*`, `--text-*`, `--gray-*`, `--primary-*` in `assets/site.css`, or the `.calc` tokens in `assets/calculator.css`). No self-contained palettes, and no panels that ignore the theme (Stellar Drift's console was brought into line for this).
+- **Theme:** every tool must work in both light and dark mode (`:root[data-color-scheme="dark"]`). Nothing may stay dark in light mode, or the reverse.
+- **Contrast:** all text must meet WCAG AA in both themes: 4.5:1, or 3:1 for large text (24px+, or 18.66px+ bold). Count opacity and translucent backgrounds. Don't dim text with `opacity` below what passes. Text on an accent fill uses an ink color: white on deep accents, near-black on the bright dark-mode accents. Accent-colored text needs a shade that passes on its actual background, including tinted rows.
+- **Phones:** no horizontal scroll at 320px or 390px. Hover-only UI must also work by tap.
+- **Fonts:** the site fonts (`--font-sans`, `--font-display`). Monospace only for data, such as codes, numbers and generated language.
+- **Before committing a new or restyled tool:** compare it with the other tool pages, and audit its contrast in both themes.
+
 ## Important Notes
 
 - Always check for existing Stimulus controllers before creating new ones
