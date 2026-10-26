@@ -4,7 +4,7 @@
  "height": 40,
  "provenance": {
   "source": "terradoma-map.svg",
-  "converted": "2026-09-13",
+  "converted": "2026-10-19",
   "transform": "rotated 90 deg counter-clockwise (Spain lower right), uniform scale, snapped to nearest hex",
   "merge_rule": "same hex and closer than 0.55 hex pitch -> merged; otherwise pushed to nearest free hex",
   "cities": 265,
@@ -27326,331 +27326,94 @@
    }
   },
   "1911": {
-   "name": "Trompio",
+   "name": "Shoio",
    "column": 19,
    "row": 11,
    "star": {
-    "star_type": "K",
+    "star_type": "M",
     "star_size": 5,
-    "spectral": "K2",
-    "bode_constant": 0.3,
-    "type_dm": 8,
-    "size_dm": 7,
-    "has_gas_giant": true,
+    "spectral": "M6",
+    "bode_constant": 0.2,
+    "type_dm": 0,
+    "size_dm": 0,
+    "has_gas_giant": false,
     "orbit": 0,
     "orbits": [
      {
-      "type": "hostile",
-      "data": {
-       "au": 0.3,
-       "orbit_number": 0,
-       "orbit_type": "H",
-       "zone": -1,
-       "distant": false,
-       "starport": "X",
-       "size": 8,
-       "atmosphere": 14,
-       "hydrographics": 5,
-       "population": 0,
-       "government": 0,
-       "law_level": 0,
-       "tech_level": 0
-      }
-     },
-     {
       "type": "world",
       "data": {
-       "au": 0.6,
-       "orbit_number": 1,
-       "orbit_type": "W",
-       "zone": 0,
+       "atmosphere": 3,
+       "au": 0.2,
        "distant": false,
-       "starport": "D",
-       "size": 6,
-       "atmosphere": 10,
-       "hydrographics": 4,
-       "population": 2,
-       "government": 7,
-       "law_level": 2,
+       "government": 10,
+       "hydrographics": 10,
+       "law_level": 6,
+       "orbit_number": 0,
+       "orbit_type": "W",
+       "population": 5,
+       "size": 11,
+       "starport": "X",
        "tech_level": 6,
+       "zone": 0,
        "moons": [
         {
-         "orbit": 7,
+         "orbit": 0,
          "orbital_radius": 7,
-         "size": 6,
+         "size": 8,
+         "atmosphere": 0,
+         "hydrographics": 0
+        },
+        {
+         "orbit": 1,
+         "orbital_radius": 10,
+         "size": 8,
          "atmosphere": 0,
          "hydrographics": 0
         }
        ]
       }
-     },
-     {
-      "type": "belt",
-      "data": {
-       "au": 1.2,
-       "orbit_number": 2,
-       "orbit_type": "B",
-       "zone": 1,
-       "distant": false
-      }
-     },
-     {
-      "type": "gas_giant",
-      "data": {
-       "au": 2.4,
-       "orbit_number": 3,
-       "orbit_type": "G",
-       "zone": 1,
-       "distant": false,
-       "giant_size": "L"
-      }
-     },
-     {
-      "type": "gas_giant",
-      "data": {
-       "au": 4.8,
-       "orbit_number": 4,
-       "orbit_type": "G",
-       "zone": 1,
-       "distant": false,
-       "giant_size": "L"
-      }
-     },
-     {
-      "type": "empty",
-      "data": {
-       "au": 9.6,
-       "orbit_number": 5,
-       "orbit_type": ".",
-       "zone": 1,
-       "distant": true
-      }
-     },
-     {
-      "type": "empty",
-      "data": {
-       "au": 19.2,
-       "orbit_number": 6,
-       "orbit_type": ".",
-       "zone": 1,
-       "distant": true
-      }
-     },
-     {
-      "type": "empty",
-      "data": {
-       "au": 38.4,
-       "orbit_number": 7,
-       "orbit_type": ".",
-       "zone": 1,
-       "distant": true
-      }
-     },
-     {
-      "type": "empty",
-      "data": {
-       "au": 76.8,
-       "orbit_number": 8,
-       "orbit_type": ".",
-       "zone": 1,
-       "distant": true
-      }
-     },
-     {
-      "type": "empty",
-      "data": {
-       "au": 153.6,
-       "orbit_number": 9,
-       "orbit_type": ".",
-       "zone": 1,
-       "distant": true
-      }
-     },
-     {
-      "type": "companion",
-      "data": {
-       "au": 307.2,
-       "orbit_number": 10,
-       "orbit_type": "S",
-       "zone": 1,
-       "distant": true,
-       "star_classification": "DB"
-      }
-     }
-    ],
-    "companions": [
-     {
-      "star_type": "D",
-      "star_size": 500,
-      "spectral": "M4",
-      "bode_constant": 0.3,
-      "type_dm": 0,
-      "size_dm": 0,
-      "has_gas_giant": true,
-      "orbit": 9.55,
-      "orbits": [
-       {
-        "type": "gas_giant",
-        "data": {
-         "au": 0.3,
-         "orbit_number": 0,
-         "orbit_type": "G",
-         "zone": 1,
-         "distant": false,
-         "giant_size": "S"
-        }
-       },
-       {
-        "type": "gas_giant",
-        "data": {
-         "au": 0.6,
-         "orbit_number": 1,
-         "orbit_type": "G",
-         "zone": 1,
-         "distant": true,
-         "giant_size": "S",
-         "moons": [
-          {
-           "orbit": 1,
-           "orbital_radius": 1,
-           "size": 0,
-           "atmosphere": 0,
-           "hydrographics": 0
-          },
-          {
-           "orbit": 2,
-           "orbital_radius": 2,
-           "size": 0,
-           "atmosphere": 0,
-           "hydrographics": 0
-          },
-          {
-           "orbit": 6,
-           "orbital_radius": 6,
-           "size": 1,
-           "atmosphere": 0,
-           "hydrographics": 2
-          },
-          {
-           "orbit": 11,
-           "orbital_radius": 11,
-           "size": 1,
-           "atmosphere": 0,
-           "hydrographics": 4
-          }
-         ]
-        }
-       },
-       {
-        "type": "gas_giant",
-        "data": {
-         "au": 1.2,
-         "orbit_number": 2,
-         "orbit_type": "G",
-         "zone": 1,
-         "distant": true,
-         "giant_size": "L"
-        }
-       },
-       {
-        "type": "gas_giant",
-        "data": {
-         "au": 2.4,
-         "orbit_number": 3,
-         "orbit_type": "G",
-         "zone": 1,
-         "distant": true,
-         "giant_size": "S"
-        }
-       },
-       {
-        "type": "gas_giant",
-        "data": {
-         "au": 4.8,
-         "orbit_number": 4,
-         "orbit_type": "G",
-         "zone": 1,
-         "distant": true,
-         "giant_size": "S"
-        }
-       },
-       {
-        "type": "gas_giant",
-        "data": {
-         "au": 9.6,
-         "orbit_number": 5,
-         "orbit_type": "G",
-         "zone": 1,
-         "distant": true,
-         "giant_size": "L"
-        }
-       }
-      ],
-      "star_subtype": "B"
      }
     ],
     "world": {
-     "orbit_number": 1,
-     "au": 0.6,
+     "orbit_number": 0,
+     "au": 0.2,
      "orbit_type": "W",
      "zone": 0,
      "distant": false,
-     "starport": "D",
-     "size": 6,
-     "atmosphere": 10,
-     "hydrographics": 4,
-     "population": 2,
-     "government": 7,
-     "law_level": 2,
+     "starport": "X",
+     "size": 11,
+     "atmosphere": 3,
+     "hydrographics": 10,
+     "population": 5,
+     "government": 10,
+     "law_level": 6,
      "tech_level": 6,
-     "temperature": "Tz",
+     "temperature": "T",
      "factions": [
-      "F",
-      "M"
-     ],
-     "faction_detail": [
-      {
-       "strength": "F",
-       "name": "Fringe",
-       "government": 2
-      },
-      {
-       "strength": "M",
-       "name": "Minor",
-       "government": 3
-      }
+      "N",
+      "S"
      ],
      "trade_codes": [
-      "Fl",
-      "Lo",
-      "Tz"
+      "Oc",
+      "Ni"
      ],
-     "bases": "..G..",
-     "travel_code": "AZ",
+     "bases": ".....",
+     "travel_code": "..",
      "ix": -3,
      "ex": {
-      "res": 6,
-      "lab": 1,
-      "inf": -1,
-      "eff": -1
+      "res": 9,
+      "lab": 4,
+      "inf": 1,
+      "eff": 0
      },
      "cx": {
-      "homo": 1,
-      "acc": 1,
-      "str": 2,
-      "sym": 1
+      "homo": 8,
+      "acc": 2,
+      "str": 3,
+      "sym": 10
      },
-     "ru": 6,
-     "native": "Colony",
-     "moons": [
-      {
-       "orbit": 7,
-       "orbital_radius": 7,
-       "size": 6,
-       "atmosphere": 0,
-       "hydrographics": 0
-      }
-     ]
+     "ru": 36,
+     "native": "Colony"
     }
    },
    "origin": {
@@ -27664,31 +27427,19 @@
     "label_confidence": "ok"
    },
    "legacy": {
-    "name": "Arachna",
-    "hex": "0604",
-    "placed_by": "legacy name matched to placeholder by geometry (bin/terradoma-name-placeholders.py, 2026-09-13)"
+    "name": "Shoio",
+    "hex": "0612",
+    "placed_by": "moved from 2312 to 1911 (Ben, 2026-10-19: Shoio is the system and the seat of House Trompio; Trompio is only the clan)"
    },
    "naming": {
     "bloc": "turkic",
-    "basis": "Menteşe",
-    "register": "turkic"
+    "basis": "canon",
+    "register": "novel or legacy-authored; moved from 2312 (Ben, 2026-10-19)"
    },
-   "generated": {
-    "by": "bin/terradoma-generate.rb",
-    "date": "2026-09-13",
-    "seed": 427658500,
-    "tries": 1,
-    "rail": {
-     "degree": 2,
-     "best_class": "5",
-     "merged": 0,
-     "population": 3,
-     "starport": "C"
-    },
-    "ruleset": "t5",
-    "genre": "opera",
-    "tech_cap": 11,
-    "derived": "from the Imperium layer by bin/terradoma-build.py eras (2026-09-13); era framework rules"
+   "carried": {
+    "from": "starmap/legacy-gendaldea/gendaldea-decline-era/gendaldea-decline-era.json",
+    "legacy_hex": "0612",
+    "date": "2026-09-13"
    }
   },
   "1912": {
@@ -34649,94 +34400,211 @@
    }
   },
   "2312": {
-   "name": "Shoio",
+   "name": "Menteshio",
    "column": 23,
    "row": 12,
    "star": {
-    "star_type": "M",
-    "star_size": 5,
-    "spectral": "M6",
-    "bode_constant": 0.2,
-    "type_dm": 0,
-    "size_dm": 0,
-    "has_gas_giant": false,
+    "star_type": "G",
+    "star_size": 3,
+    "spectral": "G2",
+    "bode_constant": 0.35,
+    "type_dm": 6,
+    "size_dm": 3,
+    "has_gas_giant": true,
     "orbit": 0,
     "orbits": [
      {
-      "type": "world",
+      "type": "rockball",
       "data": {
-       "atmosphere": 3,
-       "au": 0.2,
-       "distant": false,
-       "government": 10,
-       "hydrographics": 10,
-       "law_level": 6,
+       "au": 0.5,
        "orbit_number": 0,
-       "orbit_type": "W",
-       "population": 5,
-       "size": 11,
+       "orbit_type": "R",
+       "zone": -1,
+       "distant": false,
        "starport": "X",
-       "tech_level": 6,
-       "zone": 0,
+       "size": 2,
+       "atmosphere": 0,
+       "hydrographics": 0,
+       "population": 0,
+       "government": 0,
+       "law_level": 0,
+       "tech_level": 0
+      }
+     },
+     {
+      "type": "hostile",
+      "data": {
+       "au": 0.8,
+       "orbit_number": 1,
+       "orbit_type": "H",
+       "zone": -1,
+       "distant": false,
+       "starport": "X",
+       "size": 4,
+       "atmosphere": 12,
+       "hydrographics": 8,
+       "population": 0,
+       "government": 0,
+       "law_level": 0,
+       "tech_level": 0,
        "moons": [
         {
-         "orbit": 0,
+         "orbit": 7,
          "orbital_radius": 7,
-         "size": 8,
-         "atmosphere": 0,
-         "hydrographics": 0
-        },
-        {
-         "orbit": 1,
-         "orbital_radius": 10,
-         "size": 8,
+         "size": 3,
          "atmosphere": 0,
          "hydrographics": 0
         }
        ]
       }
+     },
+     {
+      "type": "empty",
+      "data": {
+       "au": 1.5,
+       "orbit_number": 2,
+       "orbit_type": ".",
+       "zone": -1,
+       "distant": false
+      }
+     },
+     {
+      "type": "world",
+      "data": {
+       "au": 2.9,
+       "orbit_number": 3,
+       "orbit_type": "W",
+       "zone": 0,
+       "distant": false,
+       "starport": "X",
+       "size": 7,
+       "atmosphere": 10,
+       "hydrographics": 1,
+       "population": 3,
+       "government": 0,
+       "law_level": 1,
+       "tech_level": 6,
+       "moons": [
+        {
+         "orbit": 2,
+         "orbital_radius": 2,
+         "size": -2,
+         "atmosphere": 0,
+         "hydrographics": 2
+        }
+       ]
+      }
+     },
+     {
+      "type": "empty",
+      "data": {
+       "au": 5.7,
+       "orbit_number": 4,
+       "orbit_type": ".",
+       "zone": 1,
+       "distant": false
+      }
+     },
+     {
+      "type": "empty",
+      "data": {
+       "au": 11.3,
+       "orbit_number": 5,
+       "orbit_type": ".",
+       "zone": 1,
+       "distant": false
+      }
+     },
+     {
+      "type": "gas_giant",
+      "data": {
+       "au": 22.5,
+       "orbit_number": 6,
+       "orbit_type": "G",
+       "zone": 1,
+       "distant": false,
+       "giant_size": "L"
+      }
+     },
+     {
+      "type": "gas_giant",
+      "data": {
+       "au": 44.9,
+       "orbit_number": 7,
+       "orbit_type": "G",
+       "zone": 1,
+       "distant": true,
+       "giant_size": "S"
+      }
+     },
+     {
+      "type": "gas_giant",
+      "data": {
+       "au": 89.7,
+       "orbit_number": 8,
+       "orbit_type": "G",
+       "zone": 1,
+       "distant": true,
+       "giant_size": "L"
+      }
      }
     ],
     "world": {
-     "orbit_number": 0,
-     "au": 0.2,
+     "orbit_number": 3,
+     "au": 2.9,
      "orbit_type": "W",
      "zone": 0,
      "distant": false,
      "starport": "X",
-     "size": 11,
-     "atmosphere": 3,
-     "hydrographics": 10,
-     "population": 5,
-     "government": 10,
-     "law_level": 6,
+     "size": 7,
+     "atmosphere": 10,
+     "hydrographics": 1,
+     "population": 3,
+     "government": 0,
+     "law_level": 1,
      "tech_level": 6,
      "temperature": "T",
      "factions": [
-      "N",
-      "S"
+      "O"
+     ],
+     "faction_detail": [
+      {
+       "strength": "O",
+       "name": "Obscure",
+       "government": 5
+      }
      ],
      "trade_codes": [
-      "Oc",
-      "Ni"
+      "Fl",
+      "He",
+      "Lo"
      ],
-     "bases": ".....",
-     "travel_code": "..",
+     "bases": "..G..",
+     "travel_code": "AZ",
      "ix": -3,
      "ex": {
-      "res": 9,
-      "lab": 4,
-      "inf": 1,
-      "eff": 0
+      "res": 3,
+      "lab": 2,
+      "inf": 4,
+      "eff": 4
      },
      "cx": {
-      "homo": 8,
-      "acc": 2,
-      "str": 3,
-      "sym": 10
+      "homo": 5,
+      "acc": 1,
+      "str": 5,
+      "sym": 7
      },
-     "ru": 36,
-     "native": "Colony"
+     "ru": 96,
+     "native": "Colony",
+     "moons": [
+      {
+       "orbit": 2,
+       "orbital_radius": 2,
+       "size": -2,
+       "atmosphere": 0,
+       "hydrographics": 2
+      }
+     ]
     }
    },
    "origin": {
@@ -34749,20 +34617,28 @@
     ],
     "label_confidence": "ok"
    },
-   "legacy": {
-    "name": "Shoio",
-    "hex": "0612",
-    "placed_by": "frozen 2026-09-12 placement"
-   },
+   "legacy": null,
    "naming": {
     "bloc": "turkic",
-    "basis": "canon",
-    "register": "novel or legacy-authored"
+    "basis": "Menteshio",
+    "register": "freed procedural name (Ben, 2026-10-19: canon Shoio moved to 1911; 2312 takes 1911's pre-2026-09-14 name)"
    },
-   "carried": {
-    "from": "starmap/legacy-gendaldea/gendaldea-decline-era/gendaldea-decline-era.json",
-    "legacy_hex": "0612",
-    "date": "2026-09-13"
+   "generated": {
+    "by": "bin/terradoma-generate.rb",
+    "date": "2026-09-13",
+    "seed": 2027353728,
+    "tries": 1,
+    "rail": {
+     "degree": 1,
+     "best_class": "5",
+     "merged": 0,
+     "population": 4,
+     "starport": "D"
+    },
+    "ruleset": "t5",
+    "genre": "opera",
+    "tech_cap": 11,
+    "derived": "from the Imperium layer by bin/terradoma-build.py eras (2026-09-13); era framework rules"
    }
   },
   "2316": {

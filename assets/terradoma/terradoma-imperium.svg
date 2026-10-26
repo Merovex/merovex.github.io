@@ -1710,19 +1710,13 @@
     <text x='964' y='752'>F0</text>
     <text x='967' y='759'>DB</text>
 
-<!-- Volume: 1911 C6A4322-7 Tz SG AZ // Fl,Lo,Tz // F,M // K2V/DB // Trompio -->
+<!-- Volume: 1911 DB3A666-7 T S .. // Oc,Ni // N,S // M6V // Shoio -->
     <circle class='planet' cx='1120' cy='727' r='5' />
-    <text class='spaceport' x='1120' y='747'>C</text>
-    <text x='1120' y='758'>C6A4322-7</text>
-    <text x='1120' y='708'>Trompio</text>
-    <path class='zone' d='M 1110 713 a 20 20 0 1 0 20 0' />
+    <text class='spaceport' x='1120' y='747'>D</text>
+    <text x='1120' y='758'>DB3A666-7</text>
+    <text x='1120' y='708'>Shoio</text>
     <!-- S --><text class='symbol S' x='1097' y='744'>⚜</text>
-      <g class='gas-giant'><!-- Has Gas Giant -->
-        <ellipse cx='1142' cy='740' rx='6' ry='0.9' />
-        <circle  cx='1142' cy='740' r='2' />
-      </g>
-    <text x='1144' y='717'>K2</text>
-    <text x='1147' y='724'>DB</text>
+    <text x='1144' y='717'>M6</text>
 
 <!-- Volume: 2711 B57878B-8 T NG AZ // Ag,Pi //  // F0II // Kalio -->
     <circle class='planet' cx='1600' cy='727' r='5' />
@@ -1834,13 +1828,18 @@
       </g>
     <text x='1204' y='821'>G5</text>
 
-<!-- Volume: 2312 DB3A666-7 T S .. // Oc,Ni // N,S // M6V // Shoio -->
+<!-- Volume: 2312 D7A1431-7 T SG AZ // Fl,Ni // O // G2III // Menteshio -->
     <circle class='planet' cx='1360' cy='796' r='5' />
     <text class='spaceport' x='1360' y='816'>D</text>
-    <text x='1360' y='827'>DB3A666-7</text>
-    <text x='1360' y='777'>Shoio</text>
+    <text x='1360' y='827'>D7A1431-7</text>
+    <text x='1360' y='777'>Menteshio</text>
+    <path class='zone' d='M 1350 782 a 20 20 0 1 0 20 0' />
     <!-- S --><text class='symbol S' x='1337' y='813'>⚜</text>
-    <text x='1384' y='786'>M6</text>
+      <g class='gas-giant'><!-- Has Gas Giant -->
+        <ellipse cx='1382' cy='809' rx='6' ry='0.9' />
+        <circle  cx='1382' cy='809' r='2' />
+      </g>
+    <text x='1384' y='786'>G2</text>
 
 <!-- Volume: 2812 B78A650-B Tz G AZ // Wa,Ni,Ri,Tz // S,S,O,M // M0V/M4VI // Tugrulio -->
     <circle class='planet' cx='1660' cy='831' r='5' />

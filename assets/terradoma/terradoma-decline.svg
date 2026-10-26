@@ -1696,18 +1696,12 @@
     <text x='964' y='752'>F0</text>
     <text x='967' y='759'>DB</text>
 
-<!-- Volume: 1911 D6A4272-6 Tz G AZ // Fl,Lo,Tz // F,M // K2V/DB // Trompio -->
+<!-- Volume: 1911 XB3A5A6-6 T . .. // Oc,Ni // N,S // M6V // Shoio -->
     <circle class='planet' cx='1120' cy='727' r='5' />
-    <text class='spaceport' x='1120' y='747'>D</text>
-    <text x='1120' y='758'>D6A4272-6</text>
-    <text x='1120' y='708'>Trompio</text>
-    <path class='zone' d='M 1110 713 a 20 20 0 1 0 20 0' />
-      <g class='gas-giant'><!-- Has Gas Giant -->
-        <ellipse cx='1142' cy='740' rx='6' ry='0.9' />
-        <circle  cx='1142' cy='740' r='2' />
-      </g>
-    <text x='1144' y='717'>K2</text>
-    <text x='1147' y='724'>DB</text>
+    <text class='spaceport' x='1120' y='747'>X</text>
+    <text x='1120' y='758'>XB3A5A6-6</text>
+    <text x='1120' y='708'>Shoio</text>
+    <text x='1144' y='717'>M6</text>
 
 <!-- Volume: 2711 B57867B-8 T G AZ // Ni,Ag //  // F0II // Kalio -->
     <circle class='planet' cx='1600' cy='727' r='5' />
@@ -1816,12 +1810,17 @@
       </g>
     <text x='1204' y='821'>G5</text>
 
-<!-- Volume: 2312 XB3A5A6-6 T . .. // Oc,Ni // N,S // M6V // Shoio -->
+<!-- Volume: 2312 X7A1301-6 T G AZ // Fl,He,Lo // O // G2III // Menteshio -->
     <circle class='planet' cx='1360' cy='796' r='5' />
     <text class='spaceport' x='1360' y='816'>X</text>
-    <text x='1360' y='827'>XB3A5A6-6</text>
-    <text x='1360' y='777'>Shoio</text>
-    <text x='1384' y='786'>M6</text>
+    <text x='1360' y='827'>X7A1301-6</text>
+    <text x='1360' y='777'>Menteshio</text>
+    <path class='zone' d='M 1350 782 a 20 20 0 1 0 20 0' />
+      <g class='gas-giant'><!-- Has Gas Giant -->
+        <ellipse cx='1382' cy='809' rx='6' ry='0.9' />
+        <circle  cx='1382' cy='809' r='2' />
+      </g>
+    <text x='1384' y='786'>G2</text>
 
 <!-- Volume: 2812 B78A550-8 Tz G AZ // Wa,Ni,Pr,Tz // S,S,O,M // M0V/M4VI // Tugrulio -->
     <circle class='planet' cx='1660' cy='831' r='5' />
