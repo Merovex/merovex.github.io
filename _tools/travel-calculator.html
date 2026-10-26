@@ -7,92 +7,11 @@ travel."
 ---
 <script type="module" src="/assets/controllers/travel_calculator_controller.js"></script>
 
+<link rel="stylesheet" href="/assets/calculator.css">
 <style>
-  /* Self-contained styles; adapts to the site's light/dark theme. */
-  .transit {
-    /* Site tokens only (assets/site.css); light first, dark below.
-       Pairs are contrast-checked: text >= 4.5:1 (AA), borders/chart >= 3:1. */
-    --tc-card: var(--surface-1);
-    --tc-well: var(--surface-2);
-    --tc-line: var(--border-subtle);
-    --tc-line-2: var(--gray-500);
-    --tc-text: var(--text-1);
-    --tc-muted: var(--text-2);
-    --tc-faint: var(--gray-600);
-    --tc-accent: var(--primary-600);
-    --tc-chart: var(--primary-600);
-    --tc-accent-text: var(--primary-600);
-    --tc-accent-ink: #fff;
-    --tc-accent-deep: var(--primary-700);
-    --tc-accent-deep-ink: #fff;
-    --tc-coast: var(--gray-200);
-    --tc-coast-ink: var(--text-1);
-    --tc-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-
-    /* Break out of the tool layout's narrow column. */
-    width: min(1240px, calc(100vw - 32px));
-    margin-inline: calc((100% - min(1240px, calc(100vw - 32px))) / 2);
-    display: flex; flex-direction: column; gap: 28px;
-    color: var(--tc-text);
-  }
-  :root[data-color-scheme="dark"] .transit {
-    --tc-card: var(--surface-2);
-    --tc-well: var(--surface-1);
-    --tc-faint: var(--gray-400);
-    --tc-accent-text: var(--primary-300);
-    --tc-chart: var(--primary-400);
-    --tc-coast: var(--gray-800);
-  }
-
-  .transit [hidden] { display: none !important; }
-  .transit .mono { font-family: var(--tc-mono); }
-  .transit .faint { font-family: var(--tc-mono); font-size: 12px; color: var(--tc-faint); }
-
-
-  .transit .cols { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
-  .transit form { flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 16px; margin: 0; }
-  .transit .results { flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
-
-  .transit .card { background: var(--tc-card); border: 1px solid var(--tc-line); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
-  .transit h2 { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tc-muted); }
-  .transit .card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-  .transit .field { display: flex; flex-direction: column; gap: 6px; }
-  .transit .field > label, .transit .field-label { font-size: 13px; color: var(--tc-muted); }
-  .transit .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-  .transit .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-  .transit .row { display: flex; gap: 8px; align-items: center; }
-
-  .transit .fld {
-    width: 100%; min-width: 0; padding: 10px 12px; border-radius: 6px;
-    background: var(--tc-well); border: 1px solid var(--tc-line-2); color: var(--tc-text);
-    font-family: var(--tc-mono); font-size: 15px;
-  }
-  .transit .fld:focus-visible, .transit button:focus-visible { outline: 2px solid var(--tc-chart); outline-offset: 2px; }
-  .transit select.fld { font-size: 14px; padding-inline: 8px 4px; }
-  .transit output.fld { display: block; border-style: dashed; color: var(--tc-muted); }
-  .transit .readout { display: flex; flex-direction: column; gap: 4px; }
-  .transit .readout span { font-size: 12px; color: var(--tc-faint); }
-
-  .transit button { font: inherit; cursor: pointer; color: inherit; }
-  .transit button.ghost { flex: none; padding: 9px 14px; border-radius: 6px; border: 1px solid var(--tc-line-2); background: transparent; color: var(--tc-accent-text); font-weight: 500; }
-  .transit button.ghost:hover { border-color: var(--tc-accent); }
-  .transit .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-  .transit button.chip { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--tc-line-2); background: var(--tc-well); font-family: var(--tc-mono); font-size: 13px; }
-  .transit button.chip[aria-pressed="true"] { background: var(--tc-accent); border-color: var(--tc-accent); color: var(--tc-accent-ink); }
-
-  .transit .segmented { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: var(--tc-well); border: 1px solid var(--tc-line-2); border-radius: 8px; padding: 4px; }
-  .transit .segmented button { padding: 9px 12px; border: 0; border-radius: 6px; background: transparent; font-weight: 500; }
-  .transit .segmented button[aria-pressed="true"] { background: var(--tc-accent); color: var(--tc-accent-ink); }
-  .transit .note { margin: 0; font-size: 13px; line-height: 1.5; color: var(--tc-faint); }
-
-  .transit .hero { padding: 28px; gap: 24px; }
-  .transit .hero-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px; }
-  .transit .time-parts { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; font-family: var(--tc-mono); }
-  .transit .time-parts .n { font-size: 56px; font-weight: 500; line-height: 1; color: var(--tc-accent-text); }
-  .transit .time-parts .u { font-size: 20px; color: var(--tc-muted); margin-left: 3px; }
+  /* Travel-calculator pieces; shared layout lives in assets/calculator.css. */
   .transit .decimal { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; font-family: var(--tc-mono); }
   .transit .decimal strong { font-size: 22px; font-weight: 400; }
-
   .transit .chart-wrap { display: flex; flex-direction: column; gap: 10px; }
   .transit .chart-axis { display: flex; justify-content: space-between; }
   .transit .chart { position: relative; height: 200px; padding-top: 14px; border-left: 1px solid var(--tc-line-2); border-bottom: 1px solid var(--tc-line-2); }
@@ -102,29 +21,11 @@ travel."
   .transit .chart .curve { fill: none; stroke: var(--tc-chart); stroke-width: 2.5; stroke-linejoin: round; }
   .transit .chart .turn { stroke: var(--tc-muted); stroke-dasharray: 3 3; }
   .transit .turn-label { position: absolute; top: -6px; transform: translateX(8px); font-family: var(--tc-mono); font-size: 12px; color: var(--tc-muted); white-space: nowrap; }
-
   .transit .phases { display: flex; gap: 4px; height: 40px; }
   .transit .phase { flex: 1 1 0px; min-width: 0; border-radius: 4px; padding: 0 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; font-weight: 500; overflow: hidden; white-space: nowrap; }
   .transit .phase.acc { background: var(--tc-accent); color: var(--tc-accent-ink); }
   .transit .phase.coast { background: var(--tc-coast); color: var(--tc-coast-ink); }
   .transit .phase.dec { background: var(--tc-accent-deep); color: var(--tc-accent-deep-ink); }
-
-  .transit .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
-  .transit .stat { padding: 16px 18px; gap: 6px; }
-  .transit .stat .label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--tc-muted); }
-  .transit .stat .value { display: flex; align-items: baseline; gap: 6px; font-family: var(--tc-mono); }
-  .transit .stat .value strong { font-size: 26px; font-weight: 500; }
-  .transit .stat .value span { font-size: 14px; color: var(--tc-muted); }
-
-  .transit .summary { padding: 16px 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
-  .transit .summary div { display: flex; flex-direction: column; gap: 4px; }
-  .transit .summary span { font-size: 12px; color: var(--tc-muted); }
-  .transit .summary strong { font-family: var(--tc-mono); font-size: 15px; font-weight: 400; }
-
-  @media (max-width: 480px) {
-    .transit .time-parts .n { font-size: 40px; }
-    .transit .hero { padding: 20px; }
-  }
 </style>
 
 <aside class="mb-4 prosed md:prose-lg">
@@ -134,7 +35,7 @@ travel."
   </p>
 </aside>
 
-<div class="transit" data-controller="travel-calculator">
+<div class="calc transit" data-controller="travel-calculator">
 
   <div class="cols">
     <!-- INPUTS -->
@@ -145,41 +46,25 @@ travel."
           <span class="faint">all fields stay in sync</span>
         </div>
 
+        <div class="grid-2">
+          <div class="field">
+            <label for="ruleset">Rules</label>
+            <select id="ruleset" class="fld" data-travel-calculator-target="ruleset"
+              data-action="change->travel-calculator#changeRuleset"></select>
+          </div>
+          <div class="field">
+            <label for="uwp">Departure world UWP</label>
+            <input id="uwp" class="fld" type="text" autocomplete="off" spellcheck="false" placeholder="A788899-C"
+              data-travel-calculator-target="uwp" data-action="input->travel-calculator#applyUWP">
+          </div>
+        </div>
+        <span class="faint" style="margin-top: -8px" data-travel-calculator-target="uwpNote">Optional: sets the world size from its UWP</span>
+
         <div class="field">
           <label for="planet_size">Departure world size</label>
           <div class="row">
             <select id="planet_size" class="fld" data-travel-calculator-target="planetSize"
-              data-action="change->travel-calculator#showLimit">
-              <option value="200">Size 0 · Asteroid / belt</option>
-              <option value="1600">Size 1 · 1,600 km diam</option>
-              <option value="3200">Size 2 · 3,200 km diam (Luna)</option>
-              <option value="4800">Size 3 · 4,800 km diam (Mercury)</option>
-              <option value="6400">Size 4 · 6,400 km diam (Mars)</option>
-              <option value="8000">Size 5 · 8,000 km diam</option>
-              <option selected value="9600">Size 6 · 9,600 km diam</option>
-              <option value="12200">Size 7 · 12,200 km diam</option>
-              <option value="13800">Size 8 · 13,800 km diam (Venus/Terra)</option>
-              <option value="14400">Size 9 · 14,400 km diam</option>
-              <option value="16000">Size A · 16,000 km diam</option>
-              <option value="17600">Size B · 17,600 km diam</option>
-              <option value="19200">Size C · 19,200 km diam</option>
-              <option value="20800">Size D · 20,800 km diam</option>
-              <option value="22400">Size E · 22,400 km diam</option>
-              <option value="24000">Size F · 24,000 km diam</option>
-              <option disabled value="0">──────────</option>
-              <option value="20000">L · Small gas giant</option>
-              <option value="30000">M · Small gas giant (Neptune)</option>
-              <option value="40000">N · Small gas giant</option>
-              <option value="50000">P · Small gas giant</option>
-              <option value="60000">R · Small gas giant</option>
-              <option value="70000">S · Small gas giant (Saturn)</option>
-              <option value="80000">T · Large gas giant</option>
-              <option value="90000">U · Large gas giant (Jupiter)</option>
-              <option value="125000">U · Large gas giant</option>
-              <option value="180000">V · Large gas giant</option>
-              <option value="220000">W · Large gas giant</option>
-              <option value="250000">X · Large gas giant</option>
-            </select>
+              data-action="change->travel-calculator#showLimit"></select>
             <button type="button" class="ghost" data-action="travel-calculator#use100D">Use 100D</button>
           </div>
           <span class="faint">100D limit for this world: <span data-travel-calculator-target="limit"></span> km</span>
@@ -259,7 +144,7 @@ travel."
         <div class="hero-top">
           <div style="display: flex; flex-direction: column; gap: 10px">
             <h2>Travel time</h2>
-            <div class="time-parts" data-travel-calculator-target="timeParts"></div>
+            <div class="big" data-travel-calculator-target="timeParts"></div>
           </div>
           <div class="decimal">
             <strong data-travel-calculator-target="decimal"></strong>

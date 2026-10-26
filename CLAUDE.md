@@ -62,6 +62,8 @@ Most controllers self-start the Stimulus application with `window.Stimulus = App
 - CSS custom properties for the color palette and theme tokens, defined at the top of `assets/site.css`
 - Typography: Atkinson Hyperlegible (body), Fjalla One and Outfit (headings) — see `assets/fonts.css`
 - Utility-style classes are hand-defined in `assets/site.css`; classes referenced only from JS controllers must exist there (nothing scans/generates them)
+- Calculator tools (travel, orbital) share `assets/calculator.css`: a `.calc` wrapper that breaks out of the tool column, with cards, fields, stat tiles, a big headline number and reference tables, built only on site tokens and contrast-checked to WCAG AA. Each page links it and keeps only its own diagram styles in a page `<style>` block. Reuse it for new calculators.
+- World sizes come from `assets/js/traveller_worlds.js`: the Classic, Mongoose, T5 and Cepheus size tables (gravity where the ruleset gives it, T5 gas giants converted from miles), the UWP parser, and the remembered ruleset choice. Both calculators import it; the UWP Translator still has its own, different size table.
 
 ### Jekyll Collections
 - **_posts** - Blog articles

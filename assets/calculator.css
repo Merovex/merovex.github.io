@@ -1,0 +1,125 @@
+/* Shared layout for the calculator tools (travel, orbital). Scoped to .calc;
+   adapts to the site's light/dark theme via site.css tokens. */
+.calc {
+  /* Site tokens only (assets/site.css); light first, dark below.
+     Pairs are contrast-checked: text >= 4.5:1 (AA), borders/chart >= 3:1. */
+  --tc-card: var(--surface-1);
+  --tc-well: var(--surface-2);
+  --tc-line: var(--border-subtle);
+  --tc-line-2: var(--gray-500);
+  --tc-text: var(--text-1);
+  --tc-muted: var(--text-2);
+  --tc-faint: var(--gray-600);
+  --tc-accent: var(--primary-600);
+  --tc-chart: var(--primary-600);
+  --tc-accent-text: var(--primary-600);
+  --tc-accent-ink: #fff;
+  --tc-accent-deep: var(--primary-700);
+  --tc-accent-deep-ink: #fff;
+  --tc-coast: var(--gray-200);
+  --tc-coast-ink: var(--text-1);
+  --tc-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  /* Break out of the tool layout's narrow column. */
+  width: min(1240px, calc(100vw - 32px));
+  margin-inline: calc((100% - min(1240px, calc(100vw - 32px))) / 2);
+  display: flex; flex-direction: column; gap: 28px;
+  color: var(--tc-text);
+}
+:root[data-color-scheme="dark"] .calc {
+  --tc-card: var(--surface-2);
+  --tc-well: var(--surface-1);
+  --tc-faint: var(--gray-400);
+  --tc-accent-text: var(--primary-300);
+  --tc-chart: var(--primary-400);
+  --tc-coast: var(--gray-800);
+}
+
+.calc [hidden] { display: none !important; }
+.calc .mono { font-family: var(--tc-mono); }
+.calc .faint { font-family: var(--tc-mono); font-size: 12px; color: var(--tc-faint); }
+
+.calc .cols { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+.calc form { flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 16px; margin: 0; }
+.calc .results { flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+
+.calc .card { background: var(--tc-card); border: 1px solid var(--tc-line); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.calc h2 { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tc-muted); }
+.calc .card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.calc .field { display: flex; flex-direction: column; gap: 6px; }
+.calc .field > label, .calc .field-label { font-size: 13px; color: var(--tc-muted); }
+.calc .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.calc .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.calc .row { display: flex; gap: 8px; align-items: center; }
+
+.calc .fld {
+  width: 100%; min-width: 0; padding: 10px 12px; border-radius: 6px;
+  background: var(--tc-well); border: 1px solid var(--tc-line-2); color: var(--tc-text);
+  font-family: var(--tc-mono); font-size: 15px;
+}
+.calc .fld:focus-visible, .calc button:focus-visible { outline: 2px solid var(--tc-chart); outline-offset: 2px; }
+.calc select.fld { font-size: 14px; padding-inline: 8px 4px; }
+.calc output.fld { display: block; border-style: dashed; color: var(--tc-muted); }
+.calc .readout { display: flex; flex-direction: column; gap: 4px; }
+.calc .readout span { font-size: 12px; color: var(--tc-faint); }
+
+.calc button { font: inherit; cursor: pointer; color: inherit; }
+.calc button.ghost { flex: none; padding: 9px 14px; border-radius: 6px; border: 1px solid var(--tc-line-2); background: transparent; color: var(--tc-accent-text); font-weight: 500; }
+.calc button.ghost:hover { border-color: var(--tc-accent); }
+.calc .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.calc button.chip { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--tc-line-2); background: var(--tc-well); font-family: var(--tc-mono); font-size: 13px; }
+.calc button.chip[aria-pressed="true"] { background: var(--tc-accent); border-color: var(--tc-accent); color: var(--tc-accent-ink); }
+
+.calc .segmented { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: var(--tc-well); border: 1px solid var(--tc-line-2); border-radius: 8px; padding: 4px; }
+.calc .segmented button { padding: 9px 12px; border: 0; border-radius: 6px; background: transparent; font-weight: 500; }
+.calc .segmented button[aria-pressed="true"] { background: var(--tc-accent); color: var(--tc-accent-ink); }
+.calc .note { margin: 0; font-size: 13px; line-height: 1.5; color: var(--tc-faint); }
+
+.calc .hero { padding: 28px; gap: 24px; }
+.calc .hero-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px; }
+
+.calc .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.calc .stat { padding: 16px 18px; gap: 6px; }
+.calc .stat .label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--tc-muted); }
+.calc .stat .value { display: flex; align-items: baseline; gap: 6px; font-family: var(--tc-mono); }
+.calc .stat .value strong { font-size: 26px; font-weight: 500; }
+.calc .stat .value span { font-size: 14px; color: var(--tc-muted); }
+
+.calc .summary { padding: 16px 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+.calc .summary div { display: flex; flex-direction: column; gap: 4px; }
+.calc .summary span { font-size: 12px; color: var(--tc-muted); }
+.calc .summary strong { font-family: var(--tc-mono); font-size: 15px; font-weight: 400; }
+
+/* Headline result: big accent number(s) with a muted unit. */
+.calc .big { display: flex; flex-wrap: wrap; align-items: baseline; gap: 14px; font-family: var(--tc-mono); }
+.calc .big strong { font-size: 56px; font-weight: 500; line-height: 1; color: var(--tc-accent-text); }
+.calc .big .u { font-size: 20px; color: var(--tc-muted); margin-left: 3px; }
+
+/* Reference tables inside a full-width card. */
+.calc .table-card { padding: 20px 0 8px; gap: 8px; }
+.calc .table-card .card-head { padding-inline: 20px; flex-wrap: wrap; }
+.calc .table-scroll { overflow-x: auto; }
+.calc table, .calc thead, .calc tbody, .calc tr, .calc th, .calc td { background: transparent; }
+.calc table { width: 100%; border-collapse: collapse; font-family: var(--tc-mono); font-size: 14px; }
+.calc th { padding: 12px 14px; text-align: right; vertical-align: bottom; font-family: var(--font-sans); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--tc-muted); border-bottom: 1px solid var(--tc-line-2); }
+.calc td { padding: 8px 14px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--tc-line); }
+.calc th:first-child, .calc td:first-child { text-align: left; }
+.calc td:first-child { font-family: var(--font-sans); font-weight: 600; }
+.calc td.accent { color: var(--tc-accent-text); }
+.calc tbody tr:last-child td { border-bottom: 0; }
+.calc td button.ghost { padding: 5px 12px; font-size: 13px; }
+
+/* Status badge: the word carries the meaning; the dot is decoration. */
+.calc .status { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border: 1px solid var(--tc-line-2); border-radius: 999px; font-size: 12px; font-weight: 600; color: var(--tc-text); white-space: nowrap; }
+.calc .status:empty { display: none; }
+.calc .status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--tc-faint); }
+.calc .status[data-status="stable"]::before { background: var(--tc-chart); }
+.calc .status[data-status="marginal"]::before { background: var(--amber-600); }
+.calc .status[data-status="unstable"]::before, .calc .status[data-status="impossible"]::before { background: var(--rose-500); }
+
+.calc .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 480px) {
+  .calc .big strong { font-size: 40px; }
+  .calc .hero { padding: 20px; }
+}

@@ -7,198 +7,237 @@ description: "Calculate the synchronous orbit of a planet from its mass and rota
 ---
 <script type="module" src="/assets/controllers/orbital_calculator_controller.js"></script>
 
-<article class="" data-controller="orbital-calculator">
-  <section class="p-4 space-y-2 toolkit w-prose">
-    <select name="planet_size" id="planet_size"
-      class="block w-full rounded-md px-3 py-2 shadow-sm placeholder-gray-400 placeholder:text-gray-400 dark:placeholder-gray-300/50 focus:border-primary-500 focus:outline-none focus:ring-primary-600 dark:focus:ring-primary-500 border-0 text-gray-900 sm:leading-6 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset surface-2 dark:ring-gray-600 dark:text-gray-50 appearance-none "
-      data-action="change->orbital-calculator#calculate" data-orbital-calculator-target="planetSize">
-      <option value="200">0 - Asteroid / Planetary Belt / Debris</option>
-      <option value="1600">1 - Small </option>
-      <option value="3200">2 - Small (e.g. Luna)</option>
-      <option value="4800">3 - Small (e.g. Mercury)</option>
-      <option value="6400">4 - Medium (e.g. Mars)</option>
-      <option value="8000">5 - Medium </option>
-      <option selected="selected" value="9600">6 - Medium </option>
-      <option value="12200">7 - Large </option>
-      <option value="13800">8 - Large (e.g Venus/Terra) </option>
-      <option value="14400">9 - Large </option>
-      <option value="16000">A - Huge </option>
-      <option value="17600">B - Huge </option>
-      <option value="19200">C - Huge </option>
-      <option value="20800">D - Huge </option>
-      <option value="22400">E - Huge </option>
-      <option value="24000">F - Huge </option>
-      <option disabled="disabled" value="0">──────────</option>
-      <option value="20000">L - Small Gas Giant</option>
-      <option value="30000">M - Small Gas Giant (e.g. Neptune)</option>
-      <option value="40000">N - Small Gas Giant</option>
-      <option value="50000">P - Small Gas Giant</option>
-      <option value="60000">R - Small Gas Giant</option>
-      <option value="70000">S - Small Gas Giant (e.g. Saturn)</option>
-      <option value="80000">T - Large Gas Giant</option>
-      <option value="90000">U - Large Gas Giant(e.g. Jupiter)</option>
-      <option value="125000">U - Large Gas Giant</option>
-      <option value="180000">V - Large Gas Giant</option>
-      <option value="220000">W - Large Gas Giant</option>
-      <option value="250000">X - Large Gas Giant</option>
-    </select>
-    <div class="flex space-y-2">
-      <label class="flex-1" for="rotation_period">Rotational Period: (hours 24h=1d)</label>
-      <div class="flex-1">
-        <input type="text" name="rotation_period" id="rotation_period" value="24"
-          class="block w-full rounded-md px-3 py-2 shadow-sm placeholder-gray-400 placeholder:text-gray-400 dark:placeholder-gray-300/50 focus:border-primary-500 focus:outline-none focus:ring-primary-600 dark:focus:ring-primary-500 border-0 text-gray-900 sm:leading-6 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset surface-2 dark:ring-gray-600 dark:text-gray-50 "
-          data-orbital-calculator-target="rotationPeriod" data-action="change->orbital-calculator#calculate">
-      </div>
-    </div>
-    <div class="hidden space-y-2">
-      <label class="flex-1" for="gravity">Gravity:</label>
+<link rel="stylesheet" href="/assets/calculator.css">
+<style>
+  /* Orbital-calculator pieces; shared layout lives in assets/calculator.css. */
+  .orbital .stats { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+  .orbital .hero { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 28px; }
+  .orbital .headline { flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+  .orbital figure { flex: none; margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .orbital figure svg { display: block; width: 260px; height: 260px; max-width: 100%; }
+  .orbital .orbit { fill: none; stroke: var(--tc-chart); stroke-width: 1.5; stroke-dasharray: 4 4; }
+  .orbital .planet { fill: var(--tc-coast); stroke: var(--tc-line-2); }
+  .orbital .sat { fill: var(--tc-chart); }
 
-      <input type="text" name="gravity" id="gravity" value="1"
-        class="block w-full rounded-md px-3 py-2 shadow-sm placeholder-gray-400 placeholder:text-gray-400 dark:placeholder-gray-300/50 focus:border-primary-500 focus:outline-none focus:ring-primary-600 dark:focus:ring-primary-500 border-0 text-gray-900 sm:leading-6 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset surface-2 dark:ring-gray-600 dark:text-gray-50 "
-        data-orbital-calculator-target="gravity" data-action="change->orbital-calculator#calculate">
-    </div>
-    <div class="flex space-y-2">
-      <label class="flex-1" for="mass">Mass:</label>
-      <div class="flex-1 flex">
-        <input type="text" name="mass" id="mass" value="5.9736"
-          class="block flex-1 rounded-md px-3 py-2 shadow-sm placeholder-gray-400 placeholder:text-gray-400 dark:placeholder-gray-300/50 focus:border-primary-500 focus:outline-none focus:ring-primary-600 dark:focus:ring-primary-500 border-0 text-gray-900 sm:leading-6 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset surface-2 dark:ring-gray-600 dark:text-gray-50 "
-          data-orbital-calculator-target="mass" data-action="change->orbital-calculator#calculate">
-        <p class="hint flex-1 inline-block px-2 text-xs">kg in 10<sup>24</sup>. (Earth is 5.9736)</p>
-      </div>
-    </div>
-    <div class="flex space-y-2">
-      <label class="flex-1" for="altitude">Altitude (in Km):</label>
-      <div class="flex-1">
-        <input type="text" name="altitude" id="altitude" value="0" disabled="disabled"
-          class="block w-full rounded-md px-3 py-2 shadow-sm placeholder-gray-400 placeholder:text-gray-400 dark:placeholder-gray-300/50 focus:border-primary-500 focus:outline-none focus:ring-primary-600 dark:focus:ring-primary-500 border-0 text-gray-900 sm:leading-6 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset surface-2 dark:ring-gray-600 dark:text-gray-50 "
-          data-orbital-calculator-target="altitude" data-action="change->orbital-calculator#calculate">
-      </div>
-    </div>
-    <p>
-      The synchronous orbit planets is calculated using the law of universal gravitation becomes:
-      <code class="block mx-auto text-center">height = √3(G × M × T<sup>2</sup> ÷ 4π<sup>2</sup>) - R</code>
-    </p>
+  .orbital .formula { padding: 14px 16px; border: 1px solid var(--tc-line); border-radius: 6px; background: var(--tc-well); font-family: var(--tc-mono); text-align: center; }
+  .orbital dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 14px; line-height: 1.45; }
+  .orbital dt, .orbital dd { margin: 0; }
+  .orbital select.unit { flex: none; width: auto; }
+  .orbital th:nth-last-child(2), .orbital td:nth-last-child(2) { text-align: left; }
+  .orbital dt { font-family: var(--tc-mono); color: var(--tc-accent-text); }
+  .orbital dd { margin: 0; color: var(--tc-muted); }
+</style>
 
-    <ul>
-      <li>h = Height of the artificial satellite</li>
-      <li>G = Constant of gravitation (6.67 × 10<sup>-11</sup>)</li>
-      <li>M = Mass of the planet</li>
-      <li>T = Rotational period of the planet</li>
-      <li>R = Radius of the planet (Uses the Planet Size dropdown)</li>
-    </ul>
-    <p>The geosynchronous orbit (synchronous orbit of the Earth) is
-      at an altitude of 35,796&nbsp;km (≈ 36,000&nbsp;km) and has a
-      semi-major axis of 42,167&nbsp;km.</p>
+<aside class="mb-4 prosed md:prose-lg">
+  <p>
+    Find the altitude where a satellite's orbit matches the planet's rotation, so it hangs over one spot
+    on the surface.
+  </p>
+</aside>
+
+<div class="calc orbital" data-controller="orbital-calculator">
+  <div class="cols">
+    <!-- INPUTS -->
+    <form onsubmit="return false">
+      <section class="card">
+        <div class="card-head">
+          <h2>Planet</h2>
+          <span class="faint">all fields stay in sync</span>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="ruleset">Rules</label>
+            <select id="ruleset" class="fld" data-orbital-calculator-target="ruleset"
+              data-action="change->orbital-calculator#changeRuleset"></select>
+          </div>
+          <div class="field">
+            <label for="uwp">UWP</label>
+            <input id="uwp" class="fld" type="text" autocomplete="off" spellcheck="false" placeholder="A788899-C"
+              data-orbital-calculator-target="uwp" data-action="input->orbital-calculator#applyUWP">
+          </div>
+        </div>
+        <span class="faint" style="margin-top: -8px" data-orbital-calculator-target="uwpNote">Optional: sets the world size from its UWP</span>
+
+        <div class="field">
+          <label for="planet_size">World size</label>
+          <select id="planet_size" class="fld" data-orbital-calculator-target="planetSize"
+            data-action="change->orbital-calculator#setSize"></select>
+        </div>
+
+        <div class="field">
+          <div class="grid-2">
+            <div class="field">
+              <label for="radius">Radius (km)</label>
+              <input id="radius" class="fld" type="text" inputmode="decimal" value="4800"
+                data-orbital-calculator-target="radius" data-action="input->orbital-calculator#customRadius">
+            </div>
+            <div class="field">
+              <label for="rotation_period">Rotation (hours)</label>
+              <input id="rotation_period" class="fld" type="text" inputmode="decimal" value="24"
+                data-orbital-calculator-target="rotationPeriod" data-action="input->orbital-calculator#calculate">
+            </div>
+          </div>
+          <span class="faint">= <span data-orbital-calculator-target="days"></span> standard days</span>
+        </div>
+
+        <div class="field">
+          <div class="grid-3">
+            <div class="field">
+              <label for="mass">Mass (10²⁴ kg)</label>
+              <input id="mass" class="fld" type="text" inputmode="decimal" value="5.9736"
+                data-orbital-calculator-target="mass" data-action="input->orbital-calculator#holdMass">
+            </div>
+            <div class="field">
+              <label for="gravity">Gravity (G)</label>
+              <input id="gravity" class="fld" type="text" inputmode="decimal" value="1"
+                data-orbital-calculator-target="gravity" data-action="input->orbital-calculator#holdGravity">
+            </div>
+            <div class="field">
+              <label for="density">Density (g/cm³)</label>
+              <input id="density" class="fld" type="text" inputmode="decimal" value="5.51"
+                data-orbital-calculator-target="density" data-action="input->orbital-calculator#holdDensity">
+            </div>
+          </div>
+          <span class="faint" data-orbital-calculator-target="heldNote"></span>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Parent body</h2>
+        <div class="grid-2">
+          <div class="field">
+            <label for="parent_mass">Parent mass</label>
+            <div class="row">
+              <input id="parent_mass" class="fld" type="text" inputmode="decimal" value="1"
+                data-orbital-calculator-target="parentMass" data-action="input->orbital-calculator#calculate">
+              <select class="fld unit" aria-label="Parent mass unit" data-orbital-calculator-target="parentUnit"
+                data-action="change->orbital-calculator#calculate">
+                <option value="sun">M☉</option>
+                <option value="jupiter">M♃</option>
+                <option value="e24">10²⁴ kg</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="distance">Orbital distance</label>
+            <div class="row">
+              <input id="distance" class="fld" type="text" inputmode="decimal" value="1"
+                data-orbital-calculator-target="distance" data-action="input->orbital-calculator#calculate">
+              <select class="fld unit" aria-label="Orbital distance unit" data-orbital-calculator-target="distanceUnit"
+                data-action="change->orbital-calculator#calculate">
+                <option value="au">AU</option>
+                <option value="km">km</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <p class="note">The star (or planet, for a moon) this world orbits. It sets the Hill sphere: how far out the
+          world's gravity can hold a satellite against its parent's pull.</p>
+      </section>
+
+      <section class="card" style="gap: 14px">
+        <h2>The formula</h2>
+        <div class="formula">h = ∛( G · M · T² ⁄ 4π² ) − R</div>
+        <dl>
+          <dt>h</dt><dd>Altitude of the satellite above the surface</dd>
+          <dt>G</dt><dd>Gravitational constant, 6.674 × 10⁻¹¹</dd>
+          <dt>M</dt><dd>Mass of the planet</dd>
+          <dt>T</dt><dd>Rotation period of the planet</dd>
+          <dt>R</dt><dd>Radius of the planet</dd>
+        </dl>
+        <p class="note">Earth's geosynchronous orbit sits at 35,786&nbsp;km altitude, a semi-major axis of 42,164&nbsp;km.</p>
+      </section>
+    </form>
+
+    <!-- RESULTS -->
+    <section class="results" aria-live="polite">
+      <div class="card hero">
+        <div class="headline">
+          <div class="card-head" style="justify-content: flex-start; gap: 12px">
+            <h2>Synchronous altitude</h2>
+            <span class="status" data-orbital-calculator-target="status"></span>
+          </div>
+          <div class="big"><span><strong data-orbital-calculator-target="altitude"></strong><span class="u">km</span></span></div>
+          <p class="note" data-orbital-calculator-target="radii"></p>
+        </div>
+        <figure>
+          <svg viewBox="0 0 260 260" role="img" aria-label="Planet and synchronous orbit drawn to scale">
+            <circle class="orbit" cx="130" cy="130" r="120" data-orbital-calculator-target="orbitRing" />
+            <circle class="planet" cx="130" cy="130" r="14" data-orbital-calculator-target="planetDisc" />
+            <circle class="sat" cx="130" cy="10" r="6" data-orbital-calculator-target="satellite" />
+          </svg>
+          <figcaption class="faint">planet and orbit to scale</figcaption>
+        </figure>
+      </div>
+
+      <div class="stats">
+        <div class="card stat">
+          <span class="label">Semi-major axis</span>
+          <span class="value"><strong data-orbital-calculator-target="semiMajor"></strong><span>km</span></span>
+          <span class="faint">from the planet's center</span>
+        </div>
+        <div class="card stat">
+          <span class="label">Orbital speed</span>
+          <span class="value"><strong data-orbital-calculator-target="speed"></strong><span>km/s</span></span>
+          <span class="faint" data-orbital-calculator-target="speedKmh"></span>
+        </div>
+        <div class="card stat">
+          <span class="label">Escape velocity</span>
+          <span class="value"><strong data-orbital-calculator-target="escape"></strong><span>km/s</span></span>
+          <span class="faint">from the surface</span>
+        </div>
+        <div class="card stat">
+          <span class="label">Δv to sync orbit</span>
+          <span class="value"><strong data-orbital-calculator-target="deltaV"></strong><span>km/s</span></span>
+          <span class="faint" data-orbital-calculator-target="deltaVNote"></span>
+        </div>
+        <div class="card stat">
+          <span class="label">Coverage</span>
+          <span class="value"><strong data-orbital-calculator-target="latitude"></strong><span>° lat</span></span>
+          <span class="faint">poleward limit from one satellite</span>
+        </div>
+        <div class="card stat">
+          <span class="label">Equatorial ring</span>
+          <span class="value"><strong data-orbital-calculator-target="ring"></strong><span>satellites</span></span>
+          <span class="faint">to see the whole equator</span>
+        </div>
+        <div class="card stat">
+          <span class="label">Light lag to orbit</span>
+          <span class="value"><strong data-orbital-calculator-target="lag"></strong><span>ms</span></span>
+          <span class="faint">surface to satellite, one way</span>
+        </div>
+        <div class="card stat">
+          <span class="label">Hill sphere</span>
+          <span class="value"><strong data-orbital-calculator-target="hill"></strong><span>km</span></span>
+          <span class="faint" data-orbital-calculator-target="hillNote"></span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="card table-card">
+    <div class="card-head">
+      <h2>Sol system reference</h2>
+      <span class="faint">Use loads a body into the calculator</span>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Body</th>
+            <th scope="col">Mass<br>10²⁴ kg</th>
+            <th scope="col">Volume<br>10¹² km³</th>
+            <th scope="col">Radius<br>km</th>
+            <th scope="col">Rotation<br>hours</th>
+            <th scope="col">Sync altitude<br>km</th>
+            <th scope="col">Semi-major<br>axis km</th>
+            <th scope="col">Speed<br>km/s</th>
+            <th scope="col">Stability</th>
+            <th scope="col"><span class="sr-only">Action</span></th>
+          </tr>
+        </thead>
+        <tbody data-orbital-calculator-target="bodies"></tbody>
+      </table>
+    </div>
   </section>
-
-  <section class="prosed">
-
-    <table class="max-w-5xl mx-auto table-fixed">
-      <thead>
-        <tr>
-          <th>Planets</th>
-          <th>Planets Mass (10<sup>24</sup> kg)</th>
-          <th>Volume (10<sup>12</sup> km<sup>3</sup>) </th>
-          <th>Radius (km) </th>
-          <th>Rotation period (d) </th>
-          <th>Synchronous orbit altitude (km) </th>
-          <th>Synchronous orbit Semi-major axis (km)</th>
-          <th>Satellite speed (km/s)</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr>
-          <th scope="row">Mercury</th>
-          <td class="text-right">0.3302</td>
-          <td class="text-right">0.06083</td>
-          <td class="text-right">2439.74</td>
-          <td class="text-right">1403</td>
-          <td class="text-right">240,025</td>
-          <td class="text-right">242,464</td>
-          <td class="text-right">0.30</td>
-        </tr>
-        <tr>
-          <th scope="row">Venus</th>
-          <td class="text-right">4.8685</td>
-          <td class="text-right">0.92843</td>
-          <td class="text-right">6051.83</td>
-          <td class="text-right">5816</td>
-          <td class="text-right">1,527,832</td>
-          <td class="text-right">1,533,883</td>
-          <td class="text-right">0.46</td>
-        </tr>
-        <tr>
-          <th scope="row">Earth</th>
-          <td class="text-right">5.9736</td>
-          <td class="text-right">1.08321</td>
-          <td class="text-right">6371.01</td>
-          <td class="text-right">24</td>
-          <td class="text-right">35,796</td>
-          <td class="text-right">42,167</td>
-          <td class="text-right">3.07</td>
-        </tr>
-        <tr>
-          <th scope="row">Mars</th>
-          <td class="text-right">0.64185</td>
-          <td class="text-right">0.16318</td>
-          <td class="text-right">3389.95</td>
-          <td class="text-right">24.6</td>
-          <td class="text-right">17,002</td>
-          <td class="text-right">20,392</td>
-          <td class="text-right">1.45</td>
-        </tr>
-        <tr>
-          <th scope="row">Jupiter</th>
-          <td class="text-right">1898.6</td>
-          <td class="text-right">1431.28</td>
-          <td class="text-right">69910.97</td>
-          <td class="text-right">10</td>
-          <td class="text-right">89,811</td>
-          <td class="text-right">159,722</td>
-          <td class="text-right">28.17</td>
-        </tr>
-        <tr>
-          <th scope="row">Saturn</th>
-          <td class="text-right">568.46</td>
-          <td class="text-right">827.13</td>
-          <td class="text-right">58232.00</td>
-          <td class="text-right">10.6</td>
-          <td class="text-right">53,811</td>
-          <td class="text-right">112,043</td>
-          <td class="text-right">18.40</td>
-        </tr>
-        <tr>
-          <th scope="row">Uranus</th>
-          <td class="text-right">86.81</td>
-          <td class="text-right">68.33</td>
-          <td class="text-right">25361.46</td>
-          <td class="text-right">17.2</td>
-          <td class="text-right">57,173</td>
-          <td class="text-right">82,534</td>
-          <td class="text-right">8.38</td>
-        </tr>
-        <tr>
-          <th scope="row">Neptune</th>
-          <td class="text-right">102.43</td>
-          <td class="text-right">62.526</td>
-          <td class="text-right">24622.04</td>
-          <td class="text-right">16</td>
-          <td class="text-right">58,739</td>
-          <td class="text-right">83,361</td>
-          <td class="text-right">9.06</td>
-        </tr>
-        <tr>
-          <th scope="row">Europa</th>
-          <td class="text-right">0.048</td>
-          <td class="text-right">0.01593</td>
-          <td class="text-right">1560.90</td>
-          <td class="text-right">85</td>
-          <td class="text-right">18,134</td>
-          <td class="text-right">19,694</td>
-          <td class="text-right">0.40</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-</article>
+</div>

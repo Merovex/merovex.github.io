@@ -1,4 +1,5 @@
 import { Application, Controller } from "https://unpkg.com/@hotwired/stimulus/dist/stimulus.js"
+import { RULESETS, savedRuleset, saveRuleset, sizeFor, fillSizeSelect, parseUWP } from "/assets/js/traveller_worlds.js"
 window.Stimulus = Application.start()
 // Connects to data-controller="travel-calculator"
 Stimulus.register("travel-calculator", class extends Controller {
@@ -11,8 +12,10 @@ Stimulus.register("travel-calculator", class extends Controller {
     "flyButton",
     "fuelConversionRate",
     "planetSize",
+    "ruleset",
     "spaceshipMass",
     "stopButton",
+    "uwp",
     // distance readouts
     "cables",
     "limit",
@@ -48,6 +51,7 @@ Stimulus.register("travel-calculator", class extends Controller {
     "totalShort",
     "turnLabel",
     "turnLine",
+    "uwpNote",
   ]
   SPEED_OF_LIGHT = 299792458;       // m/sec
   C_KM = 299792.458                 // km/sec
@@ -70,6 +74,10 @@ Stimulus.register("travel-calculator", class extends Controller {
   // Connect: Called when the controller is connected to the DOM.
   connect() {
     this.flyPast = false;
+    this.rulesetTarget.innerHTML = Object.entries(RULESETS)
+      .map(([key, r]) => "<option value='" + key + "'>" + r.name + "</option>").join("");
+    this.rulesetTarget.value = savedRuleset();
+    fillSizeSelect(this.planetSizeTarget, this.rulesetTarget.value, "6");
     this.showLimit();
     // Populate every derived distance (AU, Roemetric) from the default km value,
     // then run the flight calculation.
@@ -135,10 +143,39 @@ Stimulus.register("travel-calculator", class extends Controller {
 
   // =================================================================================================
   // Actions
-  showLimit() { this.limitTarget.textContent = this.format(this.planetSizeTarget.value * 100) }
+  // 100 diameters of the departure world, from its size code (or the last UWP typed).
+  diameter() {
+    var size = this.planetSizeTarget.value && sizeFor(this.rulesetTarget.value, this.planetSizeTarget.value);
+    return size ? size.diameter : (this.uwpDiameter || 0);
+  }
+  showLimit() { this.limitTarget.textContent = this.format(this.diameter() * 100) }
   use100D() {
-    this.distanceTarget.value = this.planetSizeTarget.value * 100;
+    this.distanceTarget.value = this.diameter() * 100;
     this.setDistanceFromKM();
+  }
+  changeRuleset() {
+    saveRuleset(this.rulesetTarget.value);
+    fillSizeSelect(this.planetSizeTarget, this.rulesetTarget.value, this.planetSizeTarget.value);
+    if (this.uwpTarget.value.trim()) this.applyUWP();
+    else this.showLimit();
+  }
+  applyUWP() {
+    var parsed = parseUWP(this.uwpTarget.value);
+    if (parsed.error !== undefined) {
+      this.uwpNoteTarget.textContent = parsed.error || "Optional: sets the world size from its UWP";
+      return;
+    }
+    var size = sizeFor(this.rulesetTarget.value, parsed.size);
+    if (!size) {
+      this.uwpNoteTarget.textContent = "Size " + parsed.size + " isn't in the " + RULESETS[this.rulesetTarget.value].name + " table";
+      return;
+    }
+    this.uwpDiameter = size.diameter;
+    this.planetSizeTarget.value = size.code;
+    if (this.planetSizeTarget.value !== size.code) this.planetSizeTarget.value = "";
+    this.uwpNoteTarget.textContent = (parsed.uwp ? parsed.uwp + " · " : "") + "size " + size.code + " → " +
+      this.format(size.diameter) + " km" + (size.beyondTable ? " (extrapolated)" : "");
+    this.showLimit();
   }
   pickG(event) {
     this.accelerationTarget.value = event.currentTarget.dataset.g;
@@ -266,7 +303,7 @@ Stimulus.register("travel-calculator", class extends Controller {
 
     // Travel time.
     this.timePartsTarget.innerHTML = this.timeParts(seconds)
-      .map(([n, u]) => "<span><span class='n'>" + n + "</span><span class='u'>" + u + "</span></span>")
+      .map(([n, u]) => "<span><strong>" + n + "</strong><span class='u'>" + u + "</span></span>")
       .join("");
     this.decimalTarget.textContent = this.secondsToCycles(seconds);
     this.peakShortTarget.textContent = v.toFixed(1) + " km/s";
