@@ -36,7 +36,7 @@ Stimulus.register("calendar-graph", class extends Controller {
       calendar.classList.add("hidden");
     });
     this.buttonTargets.forEach((button) => {
-      button.classList.remove("bg-indigo-500", 'text-white', 'hover:bg-indigo-700');
+      button.classList.remove("bg-indigo-600", 'text-white', 'hover:bg-indigo-700');
     });
     const selectedButton = this.buttonTargets.find((button) => {
       console.log(button.dataset.calendarName, calendarName, button.classList);
@@ -44,7 +44,7 @@ Stimulus.register("calendar-graph", class extends Controller {
     });
     if (selectedButton) {
       console.log("selectedButton", selectedButton);
-      selectedButton.classList.add("bg-indigo-500", 'text-white', 'hover:bg-indigo-700');
+      selectedButton.classList.add("bg-indigo-600", 'text-white', 'hover:bg-indigo-700');
     }
 
     const selectedCalendar = this.calendarTargets.find((calendar) => {

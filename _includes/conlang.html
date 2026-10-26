@@ -253,7 +253,9 @@
 
   .conlang-console .cl-empty { color: var(--cl-dim); font-size: 0.78rem; font-style: italic; }
 
-  .conlang-console .cl-log { margin-top: 1rem; border-top: 1px solid var(--cl-line); padding-top: 0.6rem; }
+  .conlang-console .cl-log { margin-top: 1rem; border-top: 1px solid var(--cl-line); padding: 0.6rem 0 0; background: transparent; border-radius: 0; }
+  /* Undo Open Props' details/summary panels, which light up inside the dark console. */
+  .conlang-console .cl-log summary { background: transparent; margin: 0; padding: 0; border-radius: 0; }
   .conlang-console .cl-log summary {
     cursor: pointer;
     font-size: 0.66rem;

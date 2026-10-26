@@ -7,8 +7,8 @@
 
 <style>
   /* Self-contained styles; adapts to the site's light/dark theme. */
-  .tropes { --accent: #0f766e; --line: rgba(127, 127, 127, 0.25); }
-  :root[data-color-scheme="dark"] .tropes { --accent: #2dd4bf; }
+  .tropes { --accent: #0f766e; --accent-ink: #fff; --accent-text: #115e59; --line: rgba(127, 127, 127, 0.25); }
+  :root[data-color-scheme="dark"] .tropes { --accent: #2dd4bf; --accent-ink: var(--gray-950); --accent-text: #5eead4; }
 
   .tropes .dials { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 1.5rem; font-size: 0.875rem; }
   .tropes .dial-label { font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.6; }
@@ -23,8 +23,8 @@
   .tropes button.pill { padding: 0.25rem 0.75rem; }
   .tropes button.roll { padding: 0.5rem 1.5rem; font-weight: 600; box-shadow: 0 0 0 2px var(--accent); }
   .tropes button.pill:hover,
-  .tropes button.roll:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .tropes button.pill[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .tropes button.roll:hover { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .tropes button.pill[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 
   .tropes .summary {
     position: relative;
@@ -37,22 +37,22 @@
     border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
     background: transparent; color: inherit; cursor: pointer; font: inherit;
     border-radius: 0.375rem; padding: 0.2rem 0.5rem; font-size: 0.75rem; line-height: 1.2;
-    opacity: 0.55; transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+    opacity: 0.85; transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
   }
   .tropes .copy-btn:hover { opacity: 1; background: color-mix(in srgb, var(--accent) 12%, transparent); }
-  .tropes .copy-btn.copied { opacity: 1; color: #fff; background: var(--accent); border-color: var(--accent); }
+  .tropes .copy-btn.copied { opacity: 1; color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
 
   .tropes .center { text-align: center; margin-bottom: 2.5rem; }
 
   .tropes dl.slots { display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--line); border-radius: 0.375rem; overflow: hidden; margin: 0 0 2.5rem; }
   .tropes dl.slots > .row { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--page-bg, transparent); }
-  .tropes dl.slots dt { width: 7rem; flex-shrink: 0; font-weight: 600; color: var(--accent); margin: 0; }
+  .tropes dl.slots dt { width: 7rem; flex-shrink: 0; font-weight: 600; color: var(--accent-text); margin: 0; }
   .tropes dl.slots dd { flex: 1; margin: 0; }
   .tropes dl.slots dd strong { display: block; }
   .tropes dl.slots dd span { display: block; font-size: 0.9rem; opacity: 0.75; }
-  .tropes button.reroll { flex-shrink: 0; background: transparent; border: 0; color: inherit; opacity: 0.5; cursor: pointer; font-size: 1.125rem; line-height: 1; padding: 0; align-self: center; }
+  .tropes button.reroll { flex-shrink: 0; background: transparent; border: 0; color: inherit; opacity: 0.8; cursor: pointer; font-size: 1.125rem; line-height: 1; padding: 0; align-self: center; }
   .tropes button.reroll:hover { opacity: 1; }
-  .tropes button.lock { flex-shrink: 0; background: transparent; border: 0; cursor: pointer; font-size: 0.95rem; line-height: 1; padding: 0; opacity: 0.5; filter: grayscale(1); align-self: center; }
+  .tropes button.lock { flex-shrink: 0; background: transparent; border: 0; cursor: pointer; font-size: 0.95rem; line-height: 1; padding: 0; opacity: 0.8; filter: grayscale(1); align-self: center; }
   .tropes button.lock:hover { opacity: 0.85; }
   .tropes button.lock[aria-pressed="true"] { opacity: 1; filter: none; }
   .tropes dl.slots > .row.locked { background: color-mix(in srgb, var(--accent) 9%, transparent); }

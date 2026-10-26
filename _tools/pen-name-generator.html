@@ -10,8 +10,8 @@ never used."
 
 <style>
   /* Self-contained styles; adapts to the site's light/dark theme. */
-  .pennames { --accent: #0f766e; --line: rgba(127, 127, 127, 0.25); }
-  :root[data-color-scheme="dark"] .pennames { --accent: #2dd4bf; }
+  .pennames { --accent: #0f766e; --accent-ink: #fff; --accent-text: #115e59; --line: rgba(127, 127, 127, 0.25); }
+  :root[data-color-scheme="dark"] .pennames { --accent: #2dd4bf; --accent-ink: var(--gray-950); --accent-text: #5eead4; }
 
   .pennames .dials { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; font-size: 0.875rem; }
   .pennames .dial { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.5rem; }
@@ -27,8 +27,8 @@ never used."
   .pennames button.pill { padding: 0.25rem 0.75rem; }
   .pennames button.roll { padding: 0.5rem 1.5rem; font-weight: 600; box-shadow: 0 0 0 2px var(--accent); }
   .pennames button.pill:hover,
-  .pennames button.roll:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .pennames button.pill[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .pennames button.roll:hover { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .pennames button.pill[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 
   .pennames ul.names {
     list-style: none; padding: 0; margin: 0 0 2rem;
@@ -41,7 +41,7 @@ never used."
     transition: background-color 0.15s ease, border-color 0.15s ease;
   }
   .pennames button.name:hover { border-color: var(--accent); }
-  .pennames button.name.copied { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .pennames button.name.copied { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 
   .pennames .center { text-align: center; margin-bottom: 2.5rem; }
 </style>

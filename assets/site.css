@@ -66,6 +66,7 @@
   --violet-600: #7c3aed;
   --violet-900: #4c1d95;
   --rose-500: #f43f5e;
+  --stone-400: #a8a29e;
   --stone-500: #78716c;
   --stone-900: #1c1917;
 
@@ -195,12 +196,10 @@ img, svg, video, canvas { max-width: 100%; }
 .post-card header, .post-card footer { text-align: center; }
 .post-card header h2 { font-weight: 600; font-size: 1.5rem; line-height: 2rem; }
 .post-card header span, .post-card footer span {
-  color: var(--gray-500);
+  color: var(--text-2);
   font-size: 0.875rem;
   line-height: 1.25rem;
 }
-:root[data-color-scheme="dark"] .post-card header span,
-:root[data-color-scheme="dark"] .post-card footer span { color: var(--gray-400); }
 
 /* tools grid — single column on mobile, 3 abreast at md+ */
 .tools-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; max-width: 72rem; margin-inline: auto; }
@@ -479,6 +478,7 @@ img, svg, video, canvas { max-width: 100%; }
    6. CONTROLLER-TOGGLED CLASSES (referenced from assets/controllers/*.js)
    --------------------------------------------------------------------- */
 .bg-indigo-500 { background-color: var(--primary-500); }
+.bg-indigo-600 { background-color: var(--primary-600); }
 .hover\:bg-indigo-700:hover { background-color: var(--primary-700); }
 .bg-amber-100 { background-color: var(--amber-100); }
 .bg-amber-300 { background-color: var(--amber-300); }
@@ -596,6 +596,7 @@ img, svg, video, canvas { max-width: 100%; }
 .text-gray-500 { color: var(--gray-500); }
 .text-gray-600 { color: var(--gray-600); }
 .text-gray-900 { color: var(--gray-900); }
+.text-stone-400 { color: var(--stone-400); }
 .text-stone-500 { color: var(--stone-500); }
 .bg-gray-100 { background-color: var(--gray-100); }
 .bg-grey-800 { background-color: var(--grey-800); }

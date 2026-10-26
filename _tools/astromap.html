@@ -6,6 +6,13 @@ description: "A tool to explore Terradoma, the star chart of the Postal Marines 
 keep track of the setting. It helps me measure superluminal travel distances."
 ---
 
+<style>
+  /* Contrast overrides for the chart SVG (generated upstream; see assets/terradoma/README.md):
+     hex numbers up from 50% opacity, the subsector watermark letters from 10% to the
+     3:1 that large text needs on the dark chart. */
+  [data-controller~="astromap"] g.volumes text { opacity: 0.85; }
+  [data-controller~="astromap"] g.tract text { opacity: 0.35; }
+</style>
 <script type="module" src="/assets/controllers/astromap_controller.js?v=20260913d"></script>
 <!-- To use a custom JSON file, add data-astromap-data-url-value="/path/to/your/file.json" -->
 <article class='w-prose h-full' data-controller='astromap'

@@ -17,8 +17,8 @@ distributes the spine's clicks on a plant / nudge / tag rhythm."
   /* Self-contained styles — no Tailwind build required. Adapts to the site's
      light/dark theme via :root[data-color-scheme="dark"] and currentColor.
      Shares the visual language of the Episode Plot Generator tool. */
-  .cstory { --accent: #b45309; --line: rgba(127, 127, 127, 0.25); }
-  :root[data-color-scheme="dark"] .cstory { --accent: #f59e0b; }
+  .cstory { --accent: #b45309; --accent-ink: #fff; --accent-text: #78350f; --line: rgba(127, 127, 127, 0.25); }
+  :root[data-color-scheme="dark"] .cstory { --accent: #f59e0b; --accent-ink: var(--gray-950); --accent-text: #fcd34d; }
 
   .cstory .dials { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem; font-size: 0.875rem; }
   .cstory .dial { display: flex; align-items: center; gap: 0.5rem; }
@@ -34,12 +34,12 @@ distributes the spine's clicks on a plant / nudge / tag rhythm."
   .cstory button.pill { padding: 0.25rem 0.75rem; }
   .cstory button.roll { padding: 0.5rem 1.5rem; font-weight: 600; box-shadow: 0 0 0 2px var(--accent); }
   .cstory button.pill:hover,
-  .cstory button.roll:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .cstory button.pill[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .cstory button.roll:hover { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .cstory button.pill[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 
   /* episode-count slider */
   .cstory input[type="range"] { accent-color: var(--accent); cursor: pointer; }
-  .cstory .episodes-out { font-weight: 600; color: var(--accent); min-width: 1.5rem; text-align: right; }
+  .cstory .episodes-out { font-weight: 600; color: var(--accent-text); min-width: 1.5rem; text-align: right; }
 
   /* the archetype design note — always shown when an archetype is selected */
   .cstory .note {
@@ -57,17 +57,17 @@ distributes the spine's clicks on a plant / nudge / tag rhythm."
     border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
     background: transparent; color: inherit; cursor: pointer; font: inherit;
     border-radius: 0.375rem; padding: 0.2rem 0.5rem; font-size: 0.75rem; line-height: 1.2;
-    opacity: 0.55; transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+    opacity: 0.85; transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
   }
   .cstory .copy-btn:hover { opacity: 1; background: color-mix(in srgb, var(--accent) 12%, transparent); }
-  .cstory .copy-btn.copied { opacity: 1; color: #fff; background: var(--accent); border-color: var(--accent); }
+  .cstory .copy-btn.copied { opacity: 1; color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
 
   .cstory h2.slot-head { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.6; margin-bottom: 0.75rem; }
   .cstory dl.slots { display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--line); border-radius: 0.375rem; overflow: hidden; margin: 0 0 2.5rem; }
   .cstory dl.slots > .row { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--page-bg, transparent); }
-  .cstory dl.slots dt { width: 7rem; flex-shrink: 0; font-weight: 600; color: var(--accent); margin: 0; }
+  .cstory dl.slots dt { width: 7rem; flex-shrink: 0; font-weight: 600; color: var(--accent-text); margin: 0; }
   .cstory dl.slots dd { flex: 1; margin: 0; }
-  .cstory button.reroll { flex-shrink: 0; background: transparent; border: 0; color: inherit; opacity: 0.5; cursor: pointer; font-size: 1.125rem; line-height: 1; padding: 0; align-self: center; }
+  .cstory button.reroll { flex-shrink: 0; background: transparent; border: 0; color: inherit; opacity: 0.8; cursor: pointer; font-size: 1.125rem; line-height: 1; padding: 0; align-self: center; }
   .cstory button.reroll:hover { opacity: 1; }
 
   /* per-episode timeline */
@@ -80,7 +80,7 @@ distributes the spine's clicks on a plant / nudge / tag rhythm."
   }
   .cstory .beat .click { flex: 1; }
   .cstory .beat-plant .role,
-  .cstory .beat-tag .role { color: var(--accent); opacity: 1; }
+  .cstory .beat-tag .role { color: var(--accent-text); opacity: 1; }
   .cstory .beat-plant, .cstory .beat-tag { background: color-mix(in srgb, var(--accent) 7%, transparent); }
 
   .cstory .hidden { display: none; }
@@ -94,18 +94,18 @@ distributes the spine's clicks on a plant / nudge / tag rhythm."
      Shares the page's theme hooks. Distinct accent (teal) so the two tools
      read as siblings, not the same widget. A/B/C tracks are colour-coded. */
   .shaper {
-    --accent: #0f766e; --line: rgba(127, 127, 127, 0.25);
+    --accent: #0f766e; --accent-ink: #fff; --accent-text: #115e59; --line: rgba(127, 127, 127, 0.25);
     --track-a: #0f766e; --track-b: #b45309; --track-c: #6d28d9;
   }
   :root[data-color-scheme="dark"] .shaper {
-    --accent: #2dd4bf; --track-a: #2dd4bf; --track-b: #f59e0b; --track-c: #a78bfa;
+    --accent: #2dd4bf; --accent-ink: var(--gray-950); --accent-text: #5eead4; --track-a: #2dd4bf; --track-b: #f59e0b; --track-c: #a78bfa;
   }
 
   .shaper .dials { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 2rem; margin-bottom: 1.5rem; font-size: 0.875rem; }
   .shaper .dial { display: flex; align-items: center; gap: 0.6rem; }
   .shaper .dial-label { font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.6; }
   .shaper input[type="range"] { accent-color: var(--accent); cursor: pointer; }
-  .shaper .out { font-weight: 600; color: var(--accent); min-width: 1.5rem; text-align: right; }
+  .shaper .out { font-weight: 600; color: var(--accent-text); min-width: 1.5rem; text-align: right; }
 
   /* wordcount target row */
   .shaper .wc-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: center; gap: 1rem 1.25rem; margin: 0 0 1.75rem; }
@@ -117,7 +117,7 @@ distributes the spine's clicks on a plant / nudge / tag rhythm."
     border-radius: 0.375rem; background: var(--page-bg, transparent); color: inherit;
   }
   .shaper .wc-field input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-  .shaper .wc-field input[readonly] { opacity: 0.7; border-style: dashed; cursor: default; font-weight: 600; color: var(--accent); }
+  .shaper .wc-field input[readonly] { border-style: dashed; cursor: default; font-weight: 600; color: var(--accent-text); }
 
   .shaper .totals {
     position: relative; text-align: center; font-size: 0.95rem; font-weight: 600;
@@ -130,10 +130,10 @@ distributes the spine's clicks on a plant / nudge / tag rhythm."
     border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
     background: transparent; color: inherit; cursor: pointer; font: inherit;
     border-radius: 0.375rem; padding: 0.2rem 0.5rem; font-size: 0.75rem; line-height: 1.2;
-    opacity: 0.55; transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+    opacity: 0.85; transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
   }
   .shaper .copy-btn:hover { opacity: 1; background: color-mix(in srgb, var(--accent) 12%, transparent); }
-  .shaper .copy-btn.copied { opacity: 1; color: #fff; background: var(--accent); border-color: var(--accent); }
+  .shaper .copy-btn.copied { opacity: 1; color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
 
   .shaper .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.25rem; font-size: 0.8rem; margin-bottom: 1.75rem; opacity: 0.85; }
   .shaper .legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
@@ -150,18 +150,18 @@ distributes the spine's clicks on a plant / nudge / tag rhythm."
     border-bottom: 1px solid var(--line);
   }
   .shaper .ep-num { font-weight: 700; }
-  .shaper .ep-role { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
-  .shaper .role-terminus, .shaper .role-false_terminus { color: #b45309; }
+  .shaper .ep-role { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-text); }
+  .shaper .role-terminus, .shaper .role-false_terminus { color: #92400e; }
   :root[data-color-scheme="dark"] .shaper .role-terminus,
   :root[data-color-scheme="dark"] .shaper .role-false_terminus { color: #f59e0b; }
   .shaper .ep-mix { margin-left: auto; font-size: 0.8rem; opacity: 0.7; }
 
   .shaper .scene-strip { display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--line); }
   .shaper .scene { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.45rem 1rem; background: var(--page-bg, transparent); }
-  .shaper .sc-pos { width: 1.75rem; flex-shrink: 0; text-align: right; opacity: 0.5; font-variant-numeric: tabular-nums; }
+  .shaper .sc-pos { width: 1.75rem; flex-shrink: 0; text-align: right; opacity: 0.8; font-variant-numeric: tabular-nums; }
   .shaper .sc-track {
     width: 1.4rem; flex-shrink: 0; text-align: center; font-weight: 700; font-size: 0.75rem;
-    border-radius: 3px; color: #fff; line-height: 1.4; align-self: center;
+    border-radius: 3px; color: var(--accent-ink); line-height: 1.4; align-self: center;
   }
   .shaper .track-a .sc-track { background: var(--track-a); }
   .shaper .track-b .sc-track { background: var(--track-b); }
@@ -172,15 +172,15 @@ distributes the spine's clicks on a plant / nudge / tag rhythm."
   .shaper hr.divider { border: 0; border-top: 1px solid var(--line); margin: 3.5rem 0; }
 
   /* Shape export: one button that copies the whole page as a prompt */
-  .shape-export { --accent: #0f766e; text-align: center; margin: 2.5rem 0 0; }
-  :root[data-color-scheme="dark"] .shape-export { --accent: #2dd4bf; }
+  .shape-export { --accent: #0f766e; --accent-ink: #fff; --accent-text: #115e59; text-align: center; margin: 2.5rem 0 0; }
+  :root[data-color-scheme="dark"] .shape-export { --accent: #2dd4bf; --accent-ink: var(--gray-950); --accent-text: #5eead4; }
   .shape-export button {
     border: 1px solid currentColor; border-radius: 9999px; background: transparent; color: inherit;
     cursor: pointer; font: inherit; font-weight: 600; line-height: 1.2; padding: 0.6rem 1.75rem;
     box-shadow: 0 0 0 2px var(--accent); transition: background-color 0.15s ease, color 0.15s ease;
   }
-  .shape-export button:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .shape-export button.copied { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .shape-export button:hover { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .shape-export button.copied { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 </style>
 
 <aside class="prosed text-left" style="margin-bottom: 2rem;">
