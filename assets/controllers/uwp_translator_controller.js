@@ -259,7 +259,36 @@ Stimulus.register("uwp-translator", class extends Controller {
       .map(([key, r]) => "<option value='" + key + "'>" + r.name + "</option>").join("");
     this.rulesetTarget.value = savedRuleset();
     this.ixEdited = false;
+    // Tapped tooltips stay open until a tap lands outside a tile, or Escape.
+    this.closeOnOutside = event => { if (!event.target.closest(".tile")) this.closeTips() };
+    this.closeOnEscape = event => { if (event.key === "Escape") this.closeTips() };
+    document.addEventListener("click", this.closeOnOutside);
+    document.addEventListener("keydown", this.closeOnEscape);
     this.translate();
+  }
+
+  disconnect() {
+    document.removeEventListener("click", this.closeOnOutside);
+    document.removeEventListener("keydown", this.closeOnEscape);
+  }
+
+  // =================================================================================================
+  // Tooltips: hover and focus are CSS; a tap toggles .open. Either way the tooltip is
+  // shifted sideways so it fits the viewport, whatever the tile's position in the grid.
+  toggleTip(event) {
+    var tile = event.currentTarget;
+    var wasOpen = tile.classList.contains("open");
+    this.closeTips();
+    if (!wasOpen) { tile.classList.add("open"); this.placeTip(event) }
+  }
+  closeTips() { this.tilesTarget.querySelectorAll(".tile.open").forEach(t => t.classList.remove("open")) }
+  placeTip(event) {
+    var tile = event.currentTarget, tip = tile.querySelector(".tip");
+    var margin = 16, viewport = document.documentElement.clientWidth;
+    var left = tile.getBoundingClientRect().left, width = tip.offsetWidth || Math.min(260, viewport - 2 * margin);
+    var shift = Math.min(0, viewport - margin - (left + width));
+    shift = Math.max(shift, margin - left);
+    tip.style.left = shift + "px";
   }
 
   changeRuleset() {
@@ -380,7 +409,8 @@ Stimulus.register("uwp-translator", class extends Controller {
       var tipId = `uwp-tip-${key}`;
       var label = d === undefined ? "Not defined" : this.tileFor(key, value, d);
       var tip = d === undefined ? `${rules} has no ${NAMES[key].toLowerCase()} ${value}.` : this.definitionFor(key, value, d);
-      return `<div class="tile${d === undefined ? " undefined" : ""}" tabindex="0" aria-describedby="${tipId}">
+      return `<div class="tile${d === undefined ? " undefined" : ""}" tabindex="0" aria-describedby="${tipId}"
+        data-action="click->uwp-translator#toggleTip mouseenter->uwp-translator#placeTip focus->uwp-translator#placeTip">
         <span class="code">${value}</span>
         <span class="label">${NAMES[key]}</span>
         <span class="reading">${label}</span>

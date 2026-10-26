@@ -82,7 +82,12 @@ Stimulus.register("travel-calculator", class extends Controller {
     // Populate every derived distance (AU, Roemetric) from the default km value,
     // then run the flight calculation.
     this.setDistanceFromKM();
+    // Re-place the chart label when the screen width changes (e.g. a phone rotates).
+    this.onResize = () => this.calculate();
+    window.addEventListener("resize", this.onResize);
   }
+
+  disconnect() { window.removeEventListener("resize", this.onResize) }
 
   // =================================================================================================
   // Helper Functions
@@ -334,6 +339,17 @@ Stimulus.register("travel-calculator", class extends Controller {
       (km / 1e6).toFixed(3) + " Gm · " + parseFloat((km / this.KM_PER_AU).toPrecision(3)) + " AU";
   }
 
+  // Put the turnover label beside its line: to the right if it fits, else to the
+  // left, else clamped inside the chart (narrow phone screens).
+  placeTurnLabel(leftPercent) {
+    var label = this.turnLabelTarget, chartWidth = label.parentElement.clientWidth;
+    var x = leftPercent / 100 * chartWidth, width = label.offsetWidth, gap = 8, shift;
+    if (x + gap + width <= chartWidth) shift = gap;
+    else if (x - gap - width >= 0) shift = -(gap + width);
+    else shift = Math.max(-x, Math.min(gap, chartWidth - x - width));
+    label.style.transform = "translateX(" + shift + "px)";
+  }
+
   // Velocity-over-time chart (SVG viewBox 1000×200) plus the phase bar below it.
   drawProfile(p) {
     var T = p.time || 1;
@@ -355,8 +371,8 @@ Stimulus.register("travel-calculator", class extends Controller {
     this.turnLineTarget.setAttribute("x2", x(turnAt));
     this.turnLabelTarget.style.display = showTurn ? "" : "none";
     this.turnLabelTarget.style.left = left + "%";
-    this.turnLabelTarget.style.transform = left > 70 ? "translateX(calc(-100% - 8px))" : "";
     this.turnLabelTarget.textContent = "turnover · T+" + this.shortDuration(turnAt);
+    if (showTurn) this.placeTurnLabel(left);
 
     [[this.accPhaseTarget, this.accDurTarget, p.acc],
      [this.coastPhaseTarget, this.coastDurTarget, p.coast],

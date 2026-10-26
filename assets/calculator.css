@@ -78,14 +78,14 @@
 .calc .hero { padding: 28px; gap: 24px; }
 .calc .hero-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px; }
 
-.calc .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.calc .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: 12px; }
 .calc .stat { padding: 16px 18px; gap: 6px; }
 .calc .stat .label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--tc-muted); }
-.calc .stat .value { display: flex; align-items: baseline; gap: 6px; font-family: var(--tc-mono); }
+.calc .stat .value { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 6px; font-family: var(--tc-mono); }
 .calc .stat .value strong { font-size: 26px; font-weight: 500; }
 .calc .stat .value span { font-size: 14px; color: var(--tc-muted); }
 
-.calc .summary { padding: 16px 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+.calc .summary { padding: 16px 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 16px; }
 .calc .summary div { display: flex; flex-direction: column; gap: 4px; }
 .calc .summary span { font-size: 12px; color: var(--tc-muted); }
 .calc .summary strong { font-family: var(--tc-mono); font-size: 15px; font-weight: 400; }
@@ -98,7 +98,7 @@
 /* Reference tables inside a full-width card. */
 .calc .table-card { padding: 20px 0 8px; gap: 8px; }
 .calc .table-card .card-head { padding-inline: 20px; flex-wrap: wrap; }
-.calc .table-scroll { overflow-x: auto; }
+.calc .table-scroll { position: relative; overflow-x: auto; } /* relative: keeps absolutely positioned cells (sr-only) inside the scroll box */
 .calc table, .calc thead, .calc tbody, .calc tr, .calc th, .calc td { background: transparent; }
 .calc table { width: 100%; border-collapse: collapse; font-family: var(--tc-mono); font-size: 14px; }
 .calc th { padding: 12px 14px; text-align: right; vertical-align: bottom; font-family: var(--font-sans); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--tc-muted); border-bottom: 1px solid var(--tc-line-2); }
@@ -121,5 +121,6 @@
 
 @media (max-width: 480px) {
   .calc .big strong { font-size: 40px; }
+  .calc .stat .value strong { font-size: 22px; }
   .calc .hero { padding: 20px; }
 }

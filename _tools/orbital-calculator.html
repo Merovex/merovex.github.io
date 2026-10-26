@@ -10,7 +10,7 @@ description: "Calculate the synchronous orbit of a planet from its mass and rota
 <link rel="stylesheet" href="/assets/calculator.css">
 <style>
   /* Orbital-calculator pieces; shared layout lives in assets/calculator.css. */
-  .orbital .stats { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+  .orbital .stats { grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr)); }
   .orbital .hero { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 28px; }
   .orbital .headline { flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
   .orbital figure { flex: none; margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }

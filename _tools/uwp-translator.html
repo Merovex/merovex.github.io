@@ -9,7 +9,7 @@ description: "Translate Traveller's Universal World Profile (UWP) codes into a p
 <link rel="stylesheet" href="/assets/calculator.css">
 <style>
   /* UWP-translator pieces; shared layout lives in assets/calculator.css. */
-  .uwp .grid-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .uwp .grid-3 { grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 16px; }
   .uwp #uwp { font-size: 20px; letter-spacing: 0.12em; text-transform: uppercase; }
 
   .uwp .result { padding: 24px 28px; gap: 20px; }
@@ -21,19 +21,25 @@ description: "Translate Traveller's Universal World Profile (UWP) codes into a p
 
   .uwp .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
   .uwp .tile { position: relative; display: flex; flex-direction: column; gap: 6px; min-height: 44px; padding: 14px 12px; border: 1px solid var(--tc-line); border-radius: 8px; background: var(--tc-well); cursor: help; }
-  .uwp .tile:focus-visible { outline: 2px solid var(--tc-chart); outline-offset: 2px; }
+  .uwp .tile { -webkit-tap-highlight-color: transparent; }
+  .uwp .tile:focus-visible, .uwp .tile.open { outline: 2px solid var(--tc-chart); outline-offset: 2px; }
+  @media (hover: hover) { .uwp .tile:hover { outline: 2px solid var(--tc-chart); outline-offset: 2px; } }
   .uwp .tile .code { font-family: var(--tc-mono); font-size: 40px; font-weight: 500; line-height: 1; color: var(--tc-accent-text); }
   .uwp .tile .label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--tc-muted); }
   .uwp .tile .reading { font-size: 13px; line-height: 1.35; }
   .uwp .tile.undefined .code, .uwp .tile.undefined .reading { color: var(--tc-faint); }
   .uwp .tip {
-    position: absolute; top: calc(100% + 6px); left: 0; z-index: 5; width: 260px; max-width: 80vw;
+    position: absolute; top: calc(100% + 6px); left: 0; z-index: 5; width: 260px; max-width: calc(100vw - 32px);
     padding: 10px 12px; border: 1px solid var(--tc-line-2); border-radius: 6px; background: var(--tc-card);
     box-shadow: 0 8px 24px rgb(0 0 0 / 0.25); font-size: 13px; line-height: 1.45;
-    opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.12s ease;
+    display: none; /* not just invisible: a hidden tooltip must not widen the page on phones */
   }
-  .uwp .tile:nth-child(n+5) .tip { left: auto; right: 0; }
-  .uwp .tile:hover .tip, .uwp .tile:focus-visible .tip { opacity: 1; visibility: visible; }
+  /* Shown on hover (mouse), keyboard focus, or tap (.open, set by the controller,
+     which also shifts the tooltip sideways so it stays on screen). */
+  .uwp .tile:focus-visible .tip, .uwp .tile.open .tip { display: block; }
+  @media (hover: hover) { .uwp .tile:hover .tip { display: block; } }
+  .uwp .hint-touch { display: none; }
+  @media (hover: none) { .uwp .hint-hover { display: none; } .uwp .hint-touch { display: inline; } }
   .uwp .tip-head { display: block; margin-bottom: 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tc-accent-text); }
 
   .uwp .prose-card { flex: 999 1 520px; min-width: 0; gap: 10px; }
@@ -88,7 +94,7 @@ description: "Translate Traveller's Universal World Profile (UWP) codes into a p
       <div class="chips-tc" data-uwp-translator-target="chips"></div>
     </div>
     <div class="tiles" data-uwp-translator-target="tiles"></div>
-    <span class="faint">Hover or tab to a code for its full definition.</span>
+    <span class="faint"><span class="hint-hover">Hover or tab to a code for its full definition.</span><span class="hint-touch">Tap a code for its full definition; tap elsewhere to close it.</span></span>
   </section>
 
   <div class="cols">
