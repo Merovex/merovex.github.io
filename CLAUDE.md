@@ -52,18 +52,18 @@ Located in `assets/controllers/` (each tool page loads its own controller via a 
 - `color_scheme_controller.js` - Dark/light theme switching
 - `orbital_calculator_controller.js` / `travel_calculator_controller.js` - Space travel calculations
 - `calendar_graph_controller.js` - Contribution heatmaps
-- `uwp_translator_controller.js` / `ix_translator_controller.js` - Traveller world-profile translators
+- `uwp_translator_controller.js` - Traveller UWP translator: per-ruleset tables, trade codes and the T5 Importance (Ix) extension
 - `wordcount_budget_controller.js`, `plot_generator_controller.js`, `season_shaper_controller.js`, `haiku_controller.js`, `drifter_saga_controller.js`, `c_story_engine_controller.js`, `days_clock_controller.js`, `shape_export_controller.js`
 
-Most controllers self-start the Stimulus application with `window.Stimulus = Application.start()`. When a page loads more than one controller (e.g. the UWP translator page), the second one should reuse the existing app via `window.Stimulus || Application.start()` rather than starting a second application.
+Most controllers self-start the Stimulus application with `window.Stimulus = Application.start()`. When a page loads more than one controller, the second one should reuse the existing app via `window.Stimulus || Application.start()` rather than starting a second application.
 
 ### Styling System
 - Dark mode via `data-color-scheme` attribute on the `:root`/HTML element
 - CSS custom properties for the color palette and theme tokens, defined at the top of `assets/site.css`
 - Typography: Atkinson Hyperlegible (body), Fjalla One and Outfit (headings) — see `assets/fonts.css`
 - Utility-style classes are hand-defined in `assets/site.css`; classes referenced only from JS controllers must exist there (nothing scans/generates them)
-- Calculator tools (travel, orbital) share `assets/calculator.css`: a `.calc` wrapper that breaks out of the tool column, with cards, fields, stat tiles, a big headline number and reference tables, built only on site tokens and contrast-checked to WCAG AA. Each page links it and keeps only its own diagram styles in a page `<style>` block. Reuse it for new calculators.
-- World sizes come from `assets/js/traveller_worlds.js`: the Classic, Mongoose, T5 and Cepheus size tables (gravity where the ruleset gives it, T5 gas giants converted from miles), the UWP parser, and the remembered ruleset choice. Both calculators import it; the UWP Translator still has its own, different size table.
+- Calculator-style tools (travel, orbital, UWP translator) share `assets/calculator.css`: a `.calc` wrapper that breaks out of the tool column, with cards, fields, stat tiles, a big headline number and reference tables, built only on site tokens and contrast-checked to WCAG AA. Each page links it and keeps only its own diagram styles in a page `<style>` block. Reuse it for new calculators.
+- World sizes come from `assets/js/traveller_worlds.js`: the Classic, Mongoose, T5 and Cepheus size tables (gravity where the ruleset gives it, T5 gas giants converted from miles), the UWP parser, and the remembered ruleset choice. The two calculators and the UWP Translator import it.
 
 ### Jekyll Collections
 - **_posts** - Blog articles

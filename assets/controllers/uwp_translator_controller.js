@@ -148,71 +148,137 @@ const TECH = {
   C: "Average Imperial", D: "Average Stellar", E: "High Stellar", F: "Imperial Maximum",
 }
 
+// Trade classifications per ruleset: each lists the digits allowed for the
+// characteristics it tests (port, siz, atm, hyd, pop, gov, law, tl). Climate and
+// referee-assigned codes (T5 Tr, Tu, Px, capitals...) need more than a UWP.
+const ANY_POP = "123456789ABCDEF"
+const T = (code, name, rules) => ({ code, name, ...rules })
+const TRADE_CLASSIC = [
+  T("Ag", "Agricultural", { atm: "456789", hyd: "45678", pop: "567" }),
+  T("Na", "Non-agricultural", { atm: "0123", hyd: "0123", pop: "6789A" }),
+  T("In", "Industrial", { atm: "012479", pop: "9A" }),
+  T("Ni", "Non-industrial", { pop: "0123456" }),
+  T("Ri", "Rich", { atm: "68", pop: "678", gov: "456789" }),
+  T("Po", "Poor", { atm: "2345", hyd: "0123" }),
+]
+const TRADE_CEPHEUS = [
+  T("Ag", "Agricultural", { atm: "456789", hyd: "45678", pop: "567" }),
+  T("As", "Asteroid", { siz: "0", atm: "0", hyd: "0" }),
+  T("Ba", "Barren", { pop: "0", gov: "0", law: "0" }),
+  T("De", "Desert", { atm: "23456789ABCDEF", hyd: "0" }),
+  T("Fl", "Fluid oceans", { atm: "ABCDEF", hyd: "123456789A" }),
+  T("Ga", "Garden", { atm: "568", hyd: "456789", pop: "45678" }),
+  T("Hi", "High population", { pop: "9ABCDEF" }),
+  T("Ht", "High technology", { tl: "CDEFGHJKL" }),
+  T("Ic", "Ice-capped", { atm: "01", hyd: "123456789A" }),
+  T("In", "Industrial", { atm: "012479", pop: "9ABCDEF" }),
+  T("Lo", "Low population", { pop: "123" }),
+  T("Lt", "Low technology", { tl: "012345" }),
+  T("Na", "Non-agricultural", { atm: "0123", hyd: "0123", pop: "6789ABCDEF" }),
+  T("Ni", "Non-industrial", { pop: "456" }),
+  T("Po", "Poor", { atm: "2345", hyd: "0123" }),
+  T("Ri", "Rich", { atm: "68", pop: "678" }),
+  T("Wa", "Water world", { hyd: "A" }),
+  T("Va", "Vacuum", { atm: "0" }),
+]
+const TRADE_MONGOOSE = TRADE_CEPHEUS.map(t => ({
+  Ga: T("Ga", "Garden", { siz: "678", atm: "568", hyd: "567" }),
+  De: T("De", "Desert", { atm: "23456789", hyd: "0" }),
+  In: T("In", "Industrial", { atm: "012479ABC", pop: "9ABCDEF" }),
+  Lt: T("Lt", "Low technology", { pop: ANY_POP, tl: "012345" }),
+  Ri: T("Ri", "Rich", { atm: "68", pop: "678", gov: "456789" }),
+  Wa: T("Wa", "Water world", { atm: "3456789DEF", hyd: "A" }),
+}[t.code] || t))
+const TRADE_T5 = [
+  T("As", "Asteroid belt", { siz: "0", atm: "0", hyd: "0" }),
+  T("De", "Desert", { atm: "23456789", hyd: "0" }),
+  T("Fl", "Fluid", { atm: "ABC", hyd: "123456789A" }),
+  T("Ga", "Garden world", { siz: "678", atm: "568", hyd: "567" }),
+  T("He", "Hellworld", { siz: "3456789ABC", atm: "2479ABC", hyd: "012" }),
+  T("Ic", "Ice-capped", { atm: "01", hyd: "123456789A" }),
+  T("Oc", "Ocean world", { siz: "ABCDEF", atm: "3456789DEF", hyd: "A" }),
+  T("Va", "Vacuum", { atm: "0" }),
+  T("Wa", "Water world", { siz: "3456789", atm: "3456789DEF", hyd: "A" }),
+  T("Di", "Dieback", { pop: "0", gov: "0", law: "0", tl: "123456789ABCDEFGHJKL" }),
+  T("Ba", "Barren", { pop: "0", gov: "0", law: "0", tl: "0" }),
+  T("Lo", "Low population", { pop: "123" }),
+  T("Ni", "Non-industrial", { pop: "456" }),
+  T("Ph", "Pre-high population", { pop: "8" }),
+  T("Hi", "High population", { pop: "9ABCDEF" }),
+  T("Pa", "Pre-agricultural", { atm: "456789", hyd: "45678", pop: "48" }),
+  T("Ag", "Agricultural", { atm: "456789", hyd: "45678", pop: "567" }),
+  T("Na", "Non-agricultural", { atm: "0123", hyd: "0123", pop: "6789ABCDEF" }),
+  T("Pi", "Pre-industrial", { atm: "012479", pop: "78" }),
+  T("In", "Industrial", { atm: "012479ABC", pop: "9ABCDEF" }),
+  T("Po", "Poor", { atm: "2345", hyd: "0123" }),
+  T("Pr", "Pre-rich", { atm: "68", pop: "59" }),
+  T("Ri", "Rich", { atm: "68", pop: "678" }),
+]
+const TRADE = { classic: TRADE_CLASSIC, mongoose: TRADE_MONGOOSE, t5: TRADE_T5, cepheus: TRADE_CEPHEUS }
+
+// UWP digits are extended hex (I and O are skipped).
+const EHEX = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZ"
+const ehex = c => EHEX.indexOf(c)
+
+// T5 Importance (Book 3, Ix table): the UWP part, without bases.
+function importanceFromUWP(port, pop, tl, codes) {
+  var ix = 0;
+  if ("AB".includes(port)) ix += 1;
+  if ("DEX".includes(port)) ix -= 1;
+  if (ehex(tl) >= 16) ix += 1;
+  if (ehex(tl) >= 10) ix += 1;
+  if (ehex(tl) <= 8) ix -= 1;
+  ix += codes.filter(c => ["Ag", "Hi", "In", "Ri"].includes(c)).length;
+  if (ehex(pop) <= 6) ix -= 1;
+  return ix;
+}
+
+function describeImportance(ix) {
+  if (ix >= 5) return ["a highly Important world", "a likely sector capital, anchoring trade routes across its region."];
+  if (ix === 4) return ["an Important world", "a likely subsector capital, linked to its peers by established trade routes of Jump-4 or less."];
+  if (ix === 3) return ["a notable world", "a significant center of trade, just short of Important."];
+  if (ix === 2) return ["an ordinary world", "a modest center of commerce and influence among its neighbors."];
+  if (ix === 1) return ["an ordinary world", "with some influence over nearby systems."];
+  if (ix >= -1) return ["an Unimportant world", "of little weight beyond its own system."];
+  return ["a thoroughly Unimportant world", "an isolated backwater of negligible regional influence."];
+}
+
+const KEYS = ["port", "size", "atmos", "hydro", "popx", "govt", "law", "tech"]
+const NAMES = {
+  port: "Starport", size: "Size", atmos: "Atmosphere", hydro: "Hydrographics",
+  popx: "Population", govt: "Government", law: "Law Level", tech: "Tech Level",
+}
+
 // Connects to data-controller="uwp-translator"
 Stimulus.register("uwp-translator", class extends Controller {
-  static targets = ["name", "uwp", "code", "output", "list", "ruleset", "rulesetNote",
-    "port", "size", "atmos", "popx", "hydro", "govt", "law", "tech",
-  ];
-
-  // Display order and labels for the UWP fields (standard SAEHPGLT order).
-  static keys = ["port", "size", "atmos", "hydro", "popx", "govt", "law", "tech"];
-  static names = {
-    port: "Starport", size: "Size", atmos: "Atmosphere", hydro: "Hydrographics",
-    popx: "Population", govt: "Government", law: "Law Level", tech: "Tech Level",
-  };
+  static targets = ["name", "uwp", "ruleset", "rulesetNote", "heading", "chips", "tiles", "prose",
+    "ix", "ixScale", "ixText", "ixNote"]
 
   connect() {
     this.rulesetTarget.innerHTML = Object.entries(RULESETS)
       .map(([key, r]) => "<option value='" + key + "'>" + r.name + "</option>").join("");
     this.rulesetTarget.value = savedRuleset();
+    this.ixEdited = false;
     this.translate();
   }
 
   changeRuleset() {
     saveRuleset(this.rulesetTarget.value);
-    this.codeTarget.innerHTML = ""; // re-render every clause under the new rules
     this.translate();
   }
 
-  highlight(target) {
-    let el = this[`${target}Target`];
-    el.classList.add("bg-amber-100", "text-amber-900");
-    setTimeout(() => { el.classList.remove("bg-amber-100", "text-amber-900"); }, 1000);
-  }
-
-  translate() {
-    let keys = this.constructor.keys;
-    let names = this.constructor.names;
-    let bits = this.uwpTarget.value.toUpperCase().split("").filter(bit => bit !== "-");
-    let prev = this.codeTarget.innerHTML.split("").filter(bit => bit !== "-");
-    if (bits.length !== keys.length) { return; }
-
-    let rules = RULESETS[this.rulesetTarget.value].name;
-    let undefinedCodes = keys.filter((key, i) => this.lookup(key, bits[i]) === undefined);
-    this.rulesetNoteTarget.textContent = undefinedCodes.length
-      ? `${rules} doesn't define: ${undefinedCodes.map(k => `${names[k]} ${bits[keys.indexOf(k)]}`).join(", ")}.`
-      : `Read under ${rules} rules.`;
-
-    // Itemized quick-reference table, rebuilt each change.
-    this.listTarget.innerHTML = keys.map((key, i) =>
-      `<tr><th scope='row'>${names[key]}</th><td class='uwp-code'>${bits[i]}</td><td>${this.shortFor(key, bits[i])}</td></tr>`
-    ).join("");
-
-    // Narrative prose: only re-render and flash the fields that changed.
-    keys.forEach((key, i) => {
-      if (prev[i] !== bits[i]) {
-        this[`${key}Target`].innerHTML = this.narrativeFor(key, bits[i]);
-        this.highlight(key);
-      }
-    });
-    this.codeTarget.innerHTML = this.uwpTarget.value.toUpperCase();
-  }
-
-  // The entry for a code under the current ruleset, or undefined when it has none.
+  // =================================================================================================
+  // Lookups
   lookup(key, value) {
-    if (key === "tech") return TECH[value];
+    if (key === "tech") return TECH[value] !== undefined ? TECH[value] : (ehex(value) > 15 ? "Beyond Imperial maximum" : undefined);
     if (key === "size") return sizeFor(this.rulesetTarget.value, value) || undefined;
     return RULES[this.rulesetTarget.value][key][value];
+  }
+
+  tradeCodes(d) {
+    var fields = { port: d[0], siz: d[1], atm: d[2], hyd: d[3], pop: d[4], gov: d[5], law: d[6], tl: d[7] };
+    return TRADE[this.rulesetTarget.value].filter(t =>
+      Object.keys(fields).every(k => !t[k] || t[k].includes(fields[k])));
   }
 
   sizeClass(size) {
@@ -225,27 +291,37 @@ Stimulus.register("uwp-translator", class extends Controller {
     return "a huge world";
   }
 
-  // Terse label for the itemized list.
-  shortFor(key, value) {
-    let d = this.lookup(key, value);
-    if (d === undefined) return "&mdash; not defined in these rules";
+  // Tile label: the short reading shown under each code.
+  tileFor(key, value, d) {
+    switch (key) {
+      case "port":  return value === "X" || value === "Y" ? "None" : d[0];
+      case "size":  return d.code === "0" ? "Asteroid belt" : d.diameter.toLocaleString("en-US") + " km";
+      case "atmos": return d[0];
+      case "hydro": return d[0] + " water";
+      case "popx":  return value === "0" ? "None" : d[1].replace(/ of$/, "");
+      case "govt":  return d;
+      case "law":   return d[0];
+      default:      return "TL " + ehex(value);
+    }
+  }
+
+  // Tooltip: the full definition.
+  definitionFor(key, value, d) {
     switch (key) {
       case "port":  return `${d[0]} &mdash; ${d[1]}`;
       case "size":  return d.code === "0" ? "Asteroid belt"
         : `${d.diameter.toLocaleString("en-US")} km${d.gravity ? `, ${d.gravity} G` : ""}${d.beyondTable ? " (extrapolated)" : ""}`;
       case "atmos": return d[1] ? `${d[0]} &mdash; ${d[1]}` : `${d[0]} &mdash; breathable${d[2] ? ` only ${d[2]}` : ""}`;
       case "hydro": return `${d[0]} water, ${d[1]}`;
-      case "popx":  return value === "0" ? "Unpopulated" : `${d[1].replace(/ of$/, "")}`;
+      case "popx":  return value === "0" ? "Unpopulated" : `${d[1]} inhabitants`;
       case "govt":  return d;
       case "law":   return `${d[0]} &mdash; prohibits ${d[1]}`;
-      default:      return d; // tech
+      default:      return `TL ${ehex(value)} &middot; ${d}`;
     }
   }
 
-  // Concise narrative clause for the prose paragraph.
-  narrativeFor(key, value) {
-    let d = this.lookup(key, value);
-    if (d === undefined) return "";
+  // One sentence per characteristic for the plain-English paragraph.
+  sentenceFor(key, value, d) {
     switch (key) {
       case "port":
         return value === "X" || value === "Y"
@@ -269,7 +345,92 @@ Stimulus.register("uwp-translator", class extends Controller {
       case "law":
         return value === "0" ? "There is <strong>no law</strong>; nothing is prohibited."
           : `Law is <strong>${d[0].replace(/ Law$/, "").toLowerCase()}</strong>, prohibiting ${d[1]}.`;
-      default:     return `Technology is <strong>${d}</strong>.`;
+      default: return `Technology is <strong>${d}</strong> (TL ${ehex(value)}).`;
     }
+  }
+
+  // =================================================================================================
+  // Render
+  translate() {
+    var raw = this.uwpTarget.value.toUpperCase().replace(/\s+/g, "");
+    var digits = raw.replace(/-/g, "").split("");
+    var rules = RULESETS[this.rulesetTarget.value].name;
+    var name = this.nameTarget.value.trim();
+
+    if (digits.length !== KEYS.length) {
+      this.rulesetNoteTarget.textContent = "A UWP has eight characters, such as B937411-B.";
+      return;
+    }
+    var code = digits.slice(0, 7).join("") + "-" + digits[7];
+    var entries = KEYS.map((key, i) => ({ key, value: digits[i], d: this.lookup(key, digits[i]) }));
+    var missing = entries.filter(e => e.d === undefined);
+    this.rulesetNoteTarget.textContent = missing.length
+      ? `${rules} doesn't define ${missing.map(e => `${NAMES[e.key].toLowerCase()} ${e.value}`).join(", ")}.`
+      : `Read under ${rules} rules.`;
+
+    // Heading and trade codes.
+    this.headingTarget.textContent = name ? `${name} · ${code}` : code;
+    var codes = this.tradeCodes(digits);
+    this.chipsTarget.innerHTML = codes.length
+      ? codes.map(t => `<span class="chip-tc" title="${t.name}"><b>${t.code}</b>${t.name}</span>`).join("")
+      : `<span class="faint">No trade classifications</span>`;
+
+    // Code tiles with their full definitions.
+    this.tilesTarget.innerHTML = entries.map(({ key, value, d }, i) => {
+      var tipId = `uwp-tip-${key}`;
+      var label = d === undefined ? "Not defined" : this.tileFor(key, value, d);
+      var tip = d === undefined ? `${rules} has no ${NAMES[key].toLowerCase()} ${value}.` : this.definitionFor(key, value, d);
+      return `<div class="tile${d === undefined ? " undefined" : ""}" tabindex="0" aria-describedby="${tipId}">
+        <span class="code">${value}</span>
+        <span class="label">${NAMES[key]}</span>
+        <span class="reading">${label}</span>
+        <span class="tip" role="tooltip" id="${tipId}"><span class="tip-head">${NAMES[key]} ${value}</span>${tip}</span>
+      </div>`;
+    }).join("");
+
+    // Plain English.
+    this.proseTarget.innerHTML = entries.filter(e => e.d !== undefined)
+      .map(({ key, value, d }) => this.sentenceFor(key, value, d)).join(" ");
+
+    // Importance: what the UWP alone gives, unless the reader has set a value.
+    this.uwpIx = importanceFromUWP(digits[0], digits[4], digits[7], codes.map(t => t.code));
+    if (!this.ixEdited) this.ixTarget.value = this.formatIx(this.uwpIx);
+    this.renderImportance();
+  }
+
+  formatIx(n) { return `{ ${n >= 0 ? "+" : ""}${n} }` }
+  readIx() {
+    var m = this.ixTarget.value.match(/[-−]?\d+/);
+    return m ? parseInt(m[0].replace("−", "-"), 10) : null;
+  }
+
+  editIx() { this.ixEdited = true; this.renderImportance() }
+  stepIx(event) {
+    var n = this.readIx();
+    n = (n === null ? this.uwpIx : n) + parseInt(event.currentTarget.dataset.step, 10);
+    this.ixTarget.value = this.formatIx(n);
+    this.editIx();
+  }
+  resetIx() { this.ixEdited = false; this.ixTarget.value = this.formatIx(this.uwpIx); this.renderImportance() }
+
+  renderImportance() {
+    var ix = this.readIx();
+    this.ixScaleTarget.innerHTML = [-3, -2, -1, 0, 1, 2, 3, 4, 5].map(n => {
+      var cls = ["cell"];
+      if (n === ix || (n === 5 && ix > 5) || (n === -3 && ix < -3)) cls.push("current");
+      if (n === this.uwpIx) cls.push("computed");
+      return `<span class="${cls.join(" ")}">${n > 0 ? "+" : ""}${n}</span>`;
+    }).join("");
+    if (ix === null) {
+      this.ixTextTarget.innerHTML = "Enter an Importance value, such as <code>{ +2 }</code>.";
+    } else {
+      var [label, rest] = describeImportance(ix);
+      this.ixTextTarget.innerHTML = `An Importance of ${ix >= 0 ? "+" : ""}${ix} marks this as <strong>${label}</strong>, ${rest}`;
+    }
+    var signed = `${this.uwpIx >= 0 ? "+" : ""}${this.uwpIx}`;
+    this.ixNoteTarget.innerHTML = `From the UWP alone, Ix works out to ${signed} (dashed cell)` +
+      (this.ixEdited && ix !== this.uwpIx ? ` <button type="button" class="link" data-action="uwp-translator#resetIx">Use ${signed}</button>` : "") +
+      `. Bases aren't in the UWP: add +1 for a naval and a scout base, and +1 for a way station. See the ` +
+      `<a href="https://wiki.travellerrpg.com/Importance_Extension">Importance Extension</a>.`;
   }
 });
