@@ -2,35 +2,60 @@ import { Application, Controller } from "https://unpkg.com/@hotwired/stimulus/di
 window.Stimulus = Application.start()
 // Connects to data-controller="travel-calculator"
 Stimulus.register("travel-calculator", class extends Controller {
-  // export default class extends Controller {
   static targets = [
+    // inputs
     "acceleration",
+    "chip",
     "distance",
     "distanceAU",
-    "distanceGm",
-    "distanceLs",
-    "fuelConsumed",
+    "flyButton",
     "fuelConversionRate",
-    "maxVelocity",
-    "mls",
-    "mwConsumed",
-    "noDeceleration",
-    "observerTime",
     "planetSize",
-    "roemetric",
     "spaceshipMass",
-    "starSize",
-    "timeTravel",
-    "travelTimeDmhs",
+    "stopButton",
+    // distance readouts
+    "cables",
+    "limit",
+    "rods",
+    "roemers",
+    // results
+    "accDur",
+    "accPhase",
+    "area",
+    "burnNote",
+    "burnTime",
+    "coastDur",
+    "coastPhase",
+    "curve",
+    "decDur",
+    "decPhase",
+    "decimal",
+    "deltaV",
+    "deltaVNote",
+    "dilation",
+    "distSummary",
+    "distanceLs",
+    "driveName",
+    "fuelConsumed",
+    "lightFraction",
+    "maxVelocity",
+    "observerTime",
+    "peakShort",
+    "profileNote",
+    "thrust",
+    "thrustNote",
+    "timeParts",
+    "totalShort",
+    "turnLabel",
+    "turnLine",
   ]
-  SPEED_OF_LIGHT_SQUARED = 89875517873681760;
-  SPEED_OF_LIGHT = 299792458;
-  ACCELERATION_IN_G = 0.0098
+  SPEED_OF_LIGHT = 299792458;       // m/sec
+  C_KM = 299792.458                 // km/sec
+  ACCELERATION_IN_G = 0.0098        // km/sec^2
   // Hard speed limit: never exceed 1% of light speed, no matter the distance.
   // Once reached, the ship stops accelerating and coasts.
   VELOCITY_CAP_FRACTION = 0.01
   KM_PER_AU = 149597870.700
-  SUN_DIAMETER = 1390000
   // Roemetric measures. The base unit (Roemer) is one light-second, approximated
   // in meters behind the scenes so the breakdown adjusts with the other settings.
   // 1 Roemer = 1 light-second = 20 Rods; 1 Rod = 12 Cables.
@@ -38,100 +63,107 @@ Stimulus.register("travel-calculator", class extends Controller {
   RODS_PER_ROEMER = 20
   CABLES_PER_ROD = 12
   // Fuel Conversion Rate is HALF whatever is said in TNE: Fire, Fusion & Steel.
-  // FUEL_CONVERSION_RATE = 0.00125; // HEPlaR 
+  // FUEL_CONVERSION_RATE = 0.00125; // HEPlaR
   FUEL_CONVERSION_RATE = 0.0025; // M-Drive
 
   // =================================================================================================
   // Connect: Called when the controller is connected to the DOM.
   connect() {
-    console.log("Travel Calculator Connected")
-    // Populate every derived distance (AU, Gm, light-seconds, Roemetric) from the
-    // default km value, then run the flight calculation.
+    this.flyPast = false;
+    this.showLimit();
+    // Populate every derived distance (AU, Roemetric) from the default km value,
+    // then run the flight calculation.
     this.setDistanceFromKM();
   }
+
   // =================================================================================================
   // Helper Functions
-  acceleration() { return parseFloat(this.accelerationTarget.value) * this.ACCELERATION_IN_G }
-  acosh(arg) { return Math.log(arg + Math.sqrt(arg * arg - 1)); }
+  num(target) { var n = parseFloat(target.value); return isFinite(n) ? n : 0 }
+  gees() { return this.num(this.accelerationTarget) }
+  acceleration() { return this.gees() * this.ACCELERATION_IN_G }
+  km() { return this.num(this.distanceTarget) }
   format(n) { return n.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",") }
   fuel_conversion_rate() { return this.fuelConversionRateTarget.value }
+
+  // Imperial seconds as metric days.cycles.beats (1 metric second = 0.864 s).
   secondsToCycles(imperialSeconds) {
-    var metricSeconds = Math.ceil(parseInt(imperialSeconds) / 0.864);
+    var metricSeconds = Math.ceil(imperialSeconds / 0.864);
     var days = Math.floor(metricSeconds / 100000)
     var cycles = Math.floor((metricSeconds % 100000) / 10000);
     var beats = Math.floor(metricSeconds % (10000) / 100);
-    return " <span class='block text-sm opacity-60 hover:opacity-100'>(" + days + "." + cycles + "." + beats + " days.cycles.beats)</span>";
-    // return result;
+    return days + "." + cycles + "." + String(beats).padStart(2, "0");
+  }
+  dhms(seconds) {
+    return {
+      d: Math.floor(seconds / 86400),
+      h: Math.floor(seconds % 86400 / 3600),
+      m: Math.floor(seconds % 3600 / 60),
+      s: Math.floor(seconds % 60),
+    }
   }
   secondsToDhms(seconds) {
-    var seconds = parseInt(seconds);
-    var d = Math.floor(seconds / (3600 * 24));
-    var h = Math.floor(seconds % (3600 * 24) / 3600);
-    var m = Math.floor(seconds % 3600 / 60);
-    var s = Math.floor(seconds % 60);
-
-    var dDisplay = d > 0 ? d + (d == 1 ? " day, " : " days, ") : "";
-    var hDisplay = h > 0 ? h + (h == 1 ? " hour, " : " hours, ") : "";
-    var mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : "";
-    var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
+    var t = this.dhms(seconds);
+    var dDisplay = t.d > 0 ? t.d + (t.d == 1 ? " day, " : " days, ") : "";
+    var hDisplay = t.h > 0 ? t.h + (t.h == 1 ? " hour, " : " hours, ") : "";
+    var mDisplay = t.m > 0 ? t.m + (t.m == 1 ? " minute, " : " minutes, ") : "";
+    var sDisplay = t.s > 0 ? t.s + (t.s == 1 ? " second" : " seconds") : "";
     var result = dDisplay + hDisplay + mDisplay + sDisplay;
-    return result.replace(/, $/, "")
+    return result.replace(/, $/, "") || "0 seconds"
+  }
+  // Two most significant units, e.g. "2h 48m".
+  shortDuration(seconds) {
+    var t = this.dhms(seconds);
+    if (t.d > 0) return t.d + "d " + t.h + "h";
+    if (t.h > 0) return t.h + "h " + t.m + "m";
+    if (t.m > 0) return t.m + "m " + t.s + "s";
+    return t.s + "s";
+  }
+  // Three most significant units as [number, unit] pairs for the big readout.
+  timeParts(seconds) {
+    var t = this.dhms(seconds);
+    if (t.d > 0) return [[t.d, "d"], [t.h, "h"], [t.m, "m"]];
+    if (t.h > 0) return [[t.h, "h"], [t.m, "m"], [t.s, "s"]];
+    if (t.m > 0) return [[t.m, "m"], [t.s, "s"]];
+    return [[t.s, "s"]];
+  }
+  smallTime(seconds) {
+    if (seconds < 1e-3) return (seconds * 1e6).toFixed(1) + " µs";
+    if (seconds < 1) return (seconds * 1e3).toFixed(1) + " ms";
+    if (seconds < 60) return seconds.toFixed(2) + " s";
+    return this.secondsToDhms(seconds);
   }
 
   // =================================================================================================
+  // Actions
+  showLimit() { this.limitTarget.textContent = this.format(this.planetSizeTarget.value * 100) }
+  use100D() {
+    this.distanceTarget.value = this.planetSizeTarget.value * 100;
+    this.setDistanceFromKM();
+  }
+  pickG(event) {
+    this.accelerationTarget.value = event.currentTarget.dataset.g;
+    this.calculate();
+  }
+  pickStop() { this.flyPast = false; this.calculate() }
+  pickFly() { this.flyPast = true; this.calculate() }
+
+  // =================================================================================================
   // Setters: Calculate values from other fields.
-  setAU(km) {
-    var au = km / this.KM_PER_AU
-    switch (true) {
-      case (au < 0.1): au = au.toFixed(3); break;
-      case (au < 1): au = au.toFixed(2); break;
-      case (au < 10): au = au.toFixed(1); break;
-      default: au = au.toFixed(0); break;
-    }
-    this.distanceAUTarget.value = au;
+  setDistanceFromKM() {
+    var km = this.km();
+    this.setAU(km);
+    this.setRoemetric(km);
+    this.calculate();
   }
   setDistanceFromAU() {
-    var au = this.distanceAUTarget.value;
-    var km = au * 149597900
-    this.setKM(km);
-    this.setGM(km)
-    this.setLightSeconds(km);
+    var km = this.num(this.distanceAUTarget) * this.KM_PER_AU;
+    this.distanceTarget.value = Math.round(km);
     this.setRoemetric(km);
     this.calculate();
   }
-  setDistanceFromKM() {
-    var km = this.distanceTarget.value;
-    this.setAU(km);
-    this.setGM(km)
-    this.setLightSeconds(km);
-    this.setRoemetric(km);
-    this.calculate();
-  }
-  setDistanceFromPlanetSize() {
-    var km = this.planetSizeTarget.value * 100;
-    this.setAU(km);
-    this.setGM(km);
-    this.setKM(km);
-    this.setLightSeconds(km);
-    this.setRoemetric(km);
-    this.calculate()
-  }
-  setDistanceFromStarSize() {
-    var stellar_size = this.starSizeTarget.value;
-    var km = stellar_size * this.SUN_DIAMETER * 100
-    this.setAU(km);
-    this.setGM(km);
-    this.setKM(km);
-    this.setLightSeconds(km);
-    this.setRoemetric(km);
-    calculate()
-  }
-  setKM(km) { this.distanceTarget.value = km }
-  setGM(km) { this.distanceGmTarget.innerHTML = (km / 1000000).toFixed(2); }
-  setLightSeconds(km) {
-    var seconds = Math.round(km / 299792.558)
-    this.distanceLsTarget.innerHTML = seconds;
-    this.mlsTarget.innerHTML = Math.round(seconds / 0.864);
+  setAU(km) {
+    var au = km / this.KM_PER_AU;
+    this.distanceAUTarget.value = au < 1 ? parseFloat(au.toPrecision(4)) : parseFloat(au.toFixed(3));
   }
   // Meters in one Rod / one Cable, derived from the Roemer so they stay in sync.
   rodInMeters() { return this.ROEMER_IN_METERS / this.RODS_PER_ROEMER }
@@ -148,109 +180,153 @@ Stimulus.register("travel-calculator", class extends Controller {
     // Carry rounded-up cables/rods so we never display the unit maximum.
     if (cables >= this.CABLES_PER_ROD) { cables -= this.CABLES_PER_ROD; rods += 1; }
     if (rods >= this.RODS_PER_ROEMER) { rods -= this.RODS_PER_ROEMER; roemers += 1; }
-    this.roemetricTarget.innerHTML =
-      roemers + (roemers == 1 ? " Roemer, " : " Roemers, ") +
-      rods + (rods == 1 ? " Rod, " : " Rods, ") +
-      cables + (cables == 1 ? " Cable" : " Cables");
+    this.roemersTarget.textContent = this.format(roemers);
+    this.rodsTarget.textContent = rods;
+    this.cablesTarget.textContent = cables;
   }
 
   // =================================================================================================
   // Calculations
   // Speed cap expressed in km/sec (matches the km/sec^2 acceleration).
-  velocityCap() { return this.VELOCITY_CAP_FRACTION * this.SPEED_OF_LIGHT / 1000 }
-  // True when the ship decelerates to a complete stop at the destination,
-  // false when it keeps accelerating and flies past (No-Deceleration toggle).
-  stopsAtDestination() { return !this.noDecelerationTarget.checked }
+  velocityCap() { return this.VELOCITY_CAP_FRACTION * this.C_KM }
 
   // Newtonian flight profile. The 1% c cap keeps relativistic effects negligible,
   // so this stays accurate while covering both flight modes plus the coast phase.
-  // Returns { time (sec), maxVelocity (km/sec) }.
+  // Returns phase durations in seconds and the peak velocity in km/sec.
   kinematics() {
-    var a = this.acceleration();                    // km/sec^2
-    var d = parseFloat(this.distanceTarget.value);  // km
-    if (!(a > 0) || !(d > 0)) return { time: 0, maxVelocity: 0 };
+    var a = this.acceleration();  // km/sec^2
+    var d = this.km();            // km
+    var none = { acc: 0, coast: 0, dec: 0, time: 0, maxVelocity: 0 };
+    if (!(a > 0) || !(d > 0)) return none;
 
     var vCap = this.velocityCap();
-    var tRamp = vCap / a;                            // time to spin up to the cap
-    var dRamp = (vCap * vCap) / (2 * a);             // distance covered in one ramp
+    var tRamp = vCap / a;                 // time to spin up to the cap
+    var dRamp = (vCap * vCap) / (2 * a);  // distance covered in one ramp
+    var p;
 
-    if (this.stopsAtDestination()) {
+    if (!this.flyPast) {
       // Accelerate to the midpoint, then decelerate to rest.
       var vPeak = Math.sqrt(a * d);
-      if (vPeak <= vCap) return { time: 2 * Math.sqrt(d / a), maxVelocity: vPeak };
-      // Capped: ramp up, coast at the cap, ramp down.
-      var tCoast = (d - 2 * dRamp) / vCap;
-      return { time: 2 * tRamp + tCoast, maxVelocity: vCap };
+      if (vPeak <= vCap) {
+        var half = Math.sqrt(d / a);
+        p = { acc: half, coast: 0, dec: half, maxVelocity: vPeak };
+      } else {
+        // Capped: ramp up, coast at the cap, ramp down.
+        p = { acc: tRamp, coast: (d - 2 * dRamp) / vCap, dec: tRamp, maxVelocity: vCap };
+      }
     } else {
       // Accelerate the whole way and fly past at full speed.
       var vFinal = Math.sqrt(2 * a * d);
-      if (vFinal <= vCap) return { time: Math.sqrt(2 * d / a), maxVelocity: vFinal };
-      // Capped: ramp up, then coast at the cap to the destination.
-      return { time: tRamp + (d - dRamp) / vCap, maxVelocity: vCap };
+      if (vFinal <= vCap) {
+        p = { acc: Math.sqrt(2 * d / a), coast: 0, dec: 0, maxVelocity: vFinal };
+      } else {
+        // Capped: ramp up, then coast at the cap to the destination.
+        p = { acc: tRamp, coast: (d - dRamp) / vCap, dec: 0, maxVelocity: vCap };
+      }
     }
+    p.time = p.acc + p.coast + p.dec;
+    return p;
   }
 
-  calculate() {
-    var flight = this.kinematics();
-    var ttSeconds = parseInt(flight.time)
-    var mwh = this.calcMWHConsumed(ttSeconds)
-    this.maxVelocityTarget.innerHTML = flight.maxVelocity.toFixed(0);
-    this.observerTimeTarget.innerHTML = this.secondsToDhms(ttSeconds);
-    this.travelTimeDmhsTarget.innerHTML = this.secondsToDhms(ttSeconds) + this.secondsToCycles(ttSeconds);
-    this.fuelConsumedTarget.innerHTML = this.format(this.calcFuelMass(flight.maxVelocity))
-    this.mwConsumedTarget.innerHTML = (mwh > 10) ? mwh.toFixed(0) : mwh.toFixed(2)
-  }
-
-  calcMWHConsumed(ttSeconds) {
-    var fc = 16000 * this.fuel_conversion_rate()
-    var mass = this.spaceshipMassTarget.value / 200;
-
-    var result = this.acceleration() * (mass / fc) * (ttSeconds / 3600);
-    return result;
+  // How far the ship's clock falls behind the observer's. At these speeds
+  // dτ ≈ v²/2c² dt; a linear ramp to v over t integrates to v²t/6c².
+  timeDilation(p) {
+    var beta2 = Math.pow(p.maxVelocity / this.C_KM, 2);
+    return beta2 * ((p.acc + p.dec) / 6 + p.coast / 2);
   }
 
   calcFuelMass(maxVelocity) {
     // Liquid Hydrogen weighs 71kg
     // HEPlaR is 0.25 cubic meter of liquid hydrogen per Megawatt Hour
 
-    // This is Traveller's computation
-    // var mwHour = calcMWHConsumed(ttSeconds);
-    // var efficiency = 0.25 // HEPlaR
-    // var result = mwHour * 71.0 * efficiency;
-
     // This is a more scientific calculation.
-    var mass = parseInt(this.spaceshipMassTarget.value) * 1000; // Mass in Metric tons to KGs
+    var mass = this.num(this.spaceshipMassTarget) * 1000; // Mass in Metric tons to KGs
     var vel_to_c = maxVelocity / this.SPEED_OF_LIGHT;
     var per_kg_100percent = 2 * vel_to_c / (1 - vel_to_c);
     return per_kg_100percent * mass / this.fuel_conversion_rate();
   }
 
-  calcDistanceFromAcceleration() {
-    var time = this.timeTravelTarget.value * 60
-    var speed = this.acceleration()
-    var km = 0.5 * speed * Math.pow(time, 2)
-    this.setKM(km);
-    this.setGM(km);
-    this.setLightSeconds(km);
-    this.setRoemetric(km);
-    this.calcMaxVelocity(time * 2)
+  calculate() {
+    var p = this.kinematics();
+    var seconds = Math.floor(p.time);
+    var v = p.maxVelocity;
+    var km = this.km();
+    var tons = this.num(this.spaceshipMassTarget);
+
+    // Inputs reflect state.
+    this.chipTargets.forEach(chip =>
+      chip.setAttribute("aria-pressed", parseFloat(chip.dataset.g) === this.gees()));
+    this.stopButtonTarget.setAttribute("aria-pressed", !this.flyPast);
+    this.flyButtonTarget.setAttribute("aria-pressed", this.flyPast);
+    var note = this.flyPast
+      ? "Keep accelerating the whole way and fly past the destination at full speed."
+      : "Flip at the midpoint and brake to a full stop at the destination.";
+    if (p.coast > 0) note += " Hits the 1% light cap and coasts for " + this.shortDuration(p.coast) + ".";
+    this.profileNoteTarget.textContent = note;
+
+    // Travel time.
+    this.timePartsTarget.innerHTML = this.timeParts(seconds)
+      .map(([n, u]) => "<span><span class='n'>" + n + "</span><span class='u'>" + u + "</span></span>")
+      .join("");
+    this.decimalTarget.textContent = this.secondsToCycles(seconds);
+    this.peakShortTarget.textContent = v.toFixed(1) + " km/s";
+    this.totalShortTarget.textContent = this.shortDuration(seconds);
+    this.drawProfile(p);
+
+    // Stats.
+    this.maxVelocityTarget.textContent = v.toFixed(2);
+    this.lightFractionTarget.textContent = (v / this.C_KM * 100).toFixed(3) + "% of light";
+    this.deltaVTarget.textContent = (this.flyPast ? v : 2 * v).toFixed(1);
+    this.deltaVNoteTarget.textContent = this.flyPast ? "accelerate only" : "accelerate + brake";
+    this.fuelConsumedTarget.textContent = this.format(this.calcFuelMass(v));
+    var drive = this.fuelConversionRateTarget;
+    this.driveNameTarget.textContent = drive.options[drive.selectedIndex].text;
+    this.burnTimeTarget.textContent = this.shortDuration(p.acc + p.dec);
+    this.burnNoteTarget.textContent = p.coast > 0
+      ? "coasting " + this.shortDuration(p.coast)
+      : "thrusting the whole way";
+    this.thrustTarget.textContent = this.format(tons * this.acceleration() * 1000);
+    this.thrustNoteTarget.textContent = this.format(tons) + " t at " + this.gees() + " G";
+    var lag = km / this.C_KM;
+    this.distanceLsTarget.textContent = lag < 100 ? lag.toFixed(2) : this.format(lag);
+
+    // Summary.
+    this.observerTimeTarget.textContent = this.secondsToDhms(seconds);
+    this.dilationTarget.textContent = this.smallTime(this.timeDilation(p));
+    this.distSummaryTarget.textContent =
+      (km / 1e6).toFixed(3) + " Gm · " + parseFloat((km / this.KM_PER_AU).toPrecision(3)) + " AU";
   }
 
-  calcDist(observerTime, velocity) {
-    // Formula from:
-    // http://www.mrelativity.net/MBriefs/Most%20Direct%20Derivation%20of%20Relativistic%20Constant%20Acceleration%20Distance%20Formula.htm
-    // Which is:
-    // distance = c * max_vel * T_obs / c + sqrt(c^2 - max_vel^2)
+  // Velocity-over-time chart (SVG viewBox 1000×200) plus the phase bar below it.
+  drawProfile(p) {
+    var T = p.time || 1;
+    var x = t => (t / T * 1000).toFixed(1);
+    var top = p.maxVelocity > 0 ? 0 : 200;
+    var pts = [[0, 200], [x(p.acc), top]];
+    if (this.flyPast) pts.push([1000, top]);
+    else pts.push([x(p.acc + p.coast), top], [1000, 200]);
+    var line = pts.map(pt => pt.join(",")).join(" ");
+    this.curveTarget.setAttribute("points", line);
+    this.areaTarget.setAttribute("points", line + (this.flyPast ? " 1000,200" : ""));
 
-    var numerator = this.SPEED_OF_LIGHT * velocity * observerTime;
-    var lorentz = Math.sqrt(this.SPEED_OF_LIGHT_SQUARED - Math.pow(velocity, 2));
-    var result = numerator / (this.SPEED_OF_LIGHT + lorentz);
-    return result;
-  }
+    // Turnover marker: where braking begins.
+    var showTurn = !this.flyPast && p.time > 0;
+    var turnAt = p.acc + p.coast;
+    var left = turnAt / T * 100;
+    this.turnLineTarget.style.display = showTurn ? "" : "none";
+    this.turnLineTarget.setAttribute("x1", x(turnAt));
+    this.turnLineTarget.setAttribute("x2", x(turnAt));
+    this.turnLabelTarget.style.display = showTurn ? "" : "none";
+    this.turnLabelTarget.style.left = left + "%";
+    this.turnLabelTarget.style.transform = left > 70 ? "translateX(calc(-100% - 8px))" : "";
+    this.turnLabelTarget.textContent = "turnover · T+" + this.shortDuration(turnAt);
 
-  calcMaxVelocity(time_elapsed) {
-    var result = this.acceleration() * (time_elapsed / 2); // * 1000;
-    this.maxVelocityTarget.innerHTML = result.toFixed(0);
-    return result;
+    [[this.accPhaseTarget, this.accDurTarget, p.acc],
+     [this.coastPhaseTarget, this.coastDurTarget, p.coast],
+     [this.decPhaseTarget, this.decDurTarget, p.dec]].forEach(([bar, label, t]) => {
+      bar.style.display = t > 0 ? "" : "none";
+      bar.style.flexGrow = t;
+      label.textContent = this.shortDuration(t);
+    });
   }
 });
